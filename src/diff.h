@@ -2,9 +2,13 @@
 #define INCLUDE_diff_h__
 
 /* --SAMPLE prone to change based on research etc--
+ *
+ * diffdata_t
+ * mnfile_t
+ *
  * Internal representation of a diff */
 typedef struct {
-    char* string;
+    char *string;
     int size;
 } git_diff;
 

@@ -13,12 +13,12 @@ static int load_file(char *file_name, char *buffer)
     fileLen=ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    //Allocate memory
+    /* Allocate memory */
     buffer=(char *)malloc(fileLen+1);
     if (!buffer)
         return GIT_ENOMEM;
 
-    //Read file contents into buffer
+    /* Read file contents into buffer */
     fread(buffer, fileLen, 1, file);
     fclose(file);
 
@@ -27,11 +27,11 @@ static int load_file(char *file_name, char *buffer)
 
 int git_diff_no_index (git_diff *diff, char *file1, char *file2)
 {
-    char *buffer1;
-    char *buffer2;
+    char *buffer1 = NULL;
+    char *buffer2 = NULL;
 
     /* Insure all paramater are valid */
-    if(!d | !file1 | !file2)
+    if(!file1 | !file2)
         return appropiate_error;
 
     /* load file1 into a cstring, return errof if this doesn't work */
