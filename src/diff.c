@@ -31,15 +31,19 @@ typedef struct {
 	const long *k;
 } middle_edit;
 
+/* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff_no_index(git_diffdata *diffdata, const char *filename1,
 		const char *filename2) {}
 
+/* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff(git_diffdata *diffdata, git_commit *commit,
 		git_repository *repo) {}
 
+/* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff_cached(git_diffdata *diffdata, git_commit *commit,
 		git_index *index) {}
 
+/* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff_commits(git_diffdata *diffdata, git_commit *commit1,
 		git_commit *commit2) {}
 
