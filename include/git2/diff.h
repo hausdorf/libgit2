@@ -38,6 +38,7 @@
  */
 GIT_BEGIN_DECL
 
+GIT_EXTERN(git_diffdata *) git_diff();
 
 /** @} */
 GIT_END_DECL
