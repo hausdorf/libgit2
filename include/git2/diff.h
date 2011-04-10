@@ -62,14 +62,14 @@ GIT_EXTERN(int) git_diff_no_index(git_diffdata *diffdata, const char *file_path1
 		const char *file_path2);
 
 /**
- * The "standard" diff: diffs a commit (defaults to HEAD) and working dir
+ * The "standard" diff: diffs a commit (usually HEAD) and working dir
  *
  * The "standard" diff one gets when they type "git diff" into a
  * terminal somewhere. Generates the changeset required to get from given
  * commit to the current state of the working directory.
  *
  * NOTE: the commit parameter is entirely optional; if you leave it empty,
- * it defaults to head and you get the equivalent of the familiar
+ * it defaults to HEAD and you get the equivalent of the familiar
  * "git diff" command.
  *
  * @param diffdata The results of our diff operation
@@ -84,7 +84,23 @@ GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_commit *commit,
 		git_repository *repo);
 
 /**
- * Equivalent to git diff --cached
+ * Equivalent to git diff --cached: diffs a commit (usually HEAD) and index
+ *
+ * The equivalent of "git diff --cached", this will produce a diff of the
+ * whatever you have staged for commit and another commit. Generates the
+ * changeset required to get from this commit to the staged commits.
+ *
+ * NOTE: the commit parameter is entirely optional; if you leave it empty,
+ * it defaults to HEAD and you get the equivalent of the familiar
+ * "git diff --cached" command.
+ *
+ * @param diffdata The results of our diff operation
+ * @param commit The commit to diff against the index; if you leave it
+ *		NULL, this defaults to HEAD (which will give you the
+ *		equivalent of a regular "git diff --cached")
+ * @param index The index we're working with
+ *
+ * @return 0 on success; error code otherwise
  */
 GIT_EXTERN(int) git_diff_cached(git_diffdata *diffdata, git_repository *repo,
 		git_index *index);
