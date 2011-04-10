@@ -10,6 +10,8 @@
 #ifndef INCLUDE_diff_h__
 #define INCLUDE_diff_h__
 
+#include "git2/diff.h"
+
 /**
  * \struct git_diff_data
  * Represents the metadata for the diff
