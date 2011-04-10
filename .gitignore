@@ -21,3 +21,4 @@ msvc/Release/
 *.opensdf
 .DS_Store
 *.swp
+tags

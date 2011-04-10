@@ -209,6 +209,17 @@ static int tag_create(
 		return error;
 	}
 
+	if (!git_odb_exists(repo->db, target))
+		return GIT_ENOTFOUND;
+
+	/* Try to find out what the type is */
+	if (target_type == GIT_OBJ_ANY) {
+		size_t _unused;
+		error = git_odb_read_header(&_unused, &target_type, repo->db, target);
+		if (error < GIT_SUCCESS)
+			return error;
+	}
+
 	type_str = git_object_type2string(target_type);
 
 	tagger_str_len = git_signature__write(&tagger_str, "tagger", tagger);
@@ -260,7 +271,6 @@ int git_tag_create_frombuffer(git_oid *oid, git_repository *repo, const char *bu
 {
 	git_tag tag;
 	int error;
-	git_object *obj;
 
 	assert(oid && buffer);
 
@@ -269,15 +279,8 @@ int git_tag_create_frombuffer(git_oid *oid, git_repository *repo, const char *bu
 	if ((error = parse_tag_buffer(&tag, buffer, buffer + strlen(buffer))) < GIT_SUCCESS)
 		return error;
 
-	error = git_object_lookup(&obj, repo, &tag.target, tag.type);
-	if (error < GIT_SUCCESS)
-		goto cleanup;
+	error = git_tag_create(oid, repo, tag.tag_name, &tag.target, tag.type, tag.tagger, tag.message);
 
-	error = git_tag_create_o(oid, repo, tag.tag_name, obj, tag.tagger, tag.message);
-
-	git_object_close(obj);
-
-cleanup:
 	git_signature_free(tag.tagger);
 	free(tag.tag_name);
 	free(tag.message);
