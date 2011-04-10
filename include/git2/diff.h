@@ -38,10 +38,6 @@
  */
 GIT_BEGIN_DECL
 
-/*
- * TODO TODO TODO: COMMENT THESE
- */
-
 /**
  * Diffs two files
  *
