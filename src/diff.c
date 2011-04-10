@@ -40,6 +40,8 @@ int git_diff(git_diffdata *diffdata, git_commit *commit,
 int git_diff_cached(git_diffdata *diffdata, git_commit *commit,
 		git_index *index) {}
 
+int git_diff_commits(git_diffdata *diffdata, git_commit *commit1,
+		git_commit *commit2) {}
 
 int xdl_recs_cmp(git_diffdata *dd1, long off1, long lim1,
 		 git_diffdata *dd2, long off2, long lim2,

@@ -105,6 +105,9 @@ GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_commit *commit,
 GIT_EXTERN(int) git_diff_cached(git_diffdata *diffdata, git_commit *commit,
 		git_index *index);
 
+GIT_EXTERN(int) git_diff_commits(git_diffdata *diffdata, git_commit *commit1,
+		git_commit *commit2);
+
 /** @} */
 GIT_END_DECL
 #endif
