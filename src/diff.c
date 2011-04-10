@@ -37,7 +37,8 @@ int git_diff_no_index(git_diffdata *diffdata, const char *filename1,
 int git_diff(git_diffdata *diffdata, git_commit *commit,
 		git_repository *repo) {}
 
-int git_diff_cached(git_diffdata *diffdata, git_repository *repo, git_index *index) {}
+int git_diff_cached(git_diffdata *diffdata, git_commit *commit,
+		git_index *index) {}
 
 
 int xdl_recs_cmp(git_diffdata *dd1, long off1, long lim1,

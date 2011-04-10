@@ -102,7 +102,7 @@ GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_commit *commit,
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff_cached(git_diffdata *diffdata, git_repository *repo,
+GIT_EXTERN(int) git_diff_cached(git_diffdata *diffdata, git_commit *commit,
 		git_index *index);
 
 /** @} */
