@@ -38,7 +38,26 @@
  */
 GIT_BEGIN_DECL
 
-GIT_EXTERN(git_diffdata *) git_diff();
+/*
+ * TODO TODO TODO: COMMENT THESE
+ */
+
+/**
+ * Equivalent to git diff --no-index
+ */
+GIT_EXTERN(int) git_diff_no_index(git_diffdata *diffdata, const char *filename1,
+		const char *filename2);
+
+/**
+ * Equivalent to git diff
+ */
+GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_repository *repo);
+
+/**
+ * Equivalent to git diff --cached
+ */
+GIT_EXTERN(int) git_diff_cached(git_diffdata *diffdata, git_repository *repo,
+		git_index *index);
 
 /** @} */
 GIT_END_DECL
