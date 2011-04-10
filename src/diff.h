@@ -7,7 +7,7 @@
  * \struct git_diff_data
  * Represents the metadata for the diff
  */
-typedef struct {
+struct git_diffdata {
 	/*! The number of records (lines) in the content */
 	long num_records;
 	/*! Ordered list of hashed records */
@@ -16,6 +16,6 @@ typedef struct {
 	long *record_index;
 	/*! The set of records that have changed, represented by 1: changed */
 	char *records_changed;
-} git_diff_data;
+};
 
 #endif
