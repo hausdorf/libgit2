@@ -62,7 +62,23 @@ GIT_EXTERN(int) git_diff_no_index(git_diffdata *diffdata, const char *file_path1
 		const char *file_path2);
 
 /**
- * The "standard" diff: diffs the working directory and the index
+ * The "standard" diff: diffs a commit (defaults to HEAD) and working dir
+ *
+ * The "standard" diff one gets when they type "git diff" into a
+ * terminal somewhere. Generates the changeset required to get from given
+ * commit to the current state of the working directory.
+ *
+ * NOTE: the commit parameter is entirely optional; if you leave it empty,
+ * it defaults to head and you get the equivalent of the familiar
+ * "git diff" command.
+ *
+ * @param diffdata The results of our diff operation
+ * @param commit The commit to diff against working directory; if you leave
+ *		it NULL, this defaults to HEAD (which will give you the equivalent
+ *		of a regular "git diff")
+ * @param repo The repository we're working with
+ *
+ * @return 0 on success; error code otherwise
  */
 GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_commit *commit,
 		git_repository *repo);
