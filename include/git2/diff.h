@@ -58,8 +58,8 @@ GIT_BEGIN_DECL
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff_no_index(git_diffdata *diffdata, const char *filename1,
-		const char *filename2);
+GIT_EXTERN(int) git_diff_no_index(git_diffdata *diffdata, const char *file_path1,
+		const char *file_path2);
 
 /**
  * The "standard" diff: diffs the working directory and the index
