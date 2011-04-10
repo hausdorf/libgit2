@@ -43,13 +43,26 @@ GIT_BEGIN_DECL
  */
 
 /**
- * Equivalent to git diff --no-index
+ * Diffs two files
+ *
+ * Diff two files such that the diff output generates the changes
+ * required to change the first file into the second file.
+ *
+ * Both 'file_path1' and 'file_path2' must point to some sort of file,
+ * i.e., not a directory. This function will automatically detect
+ * whether either 'file_path1' or 'file_path2' are actual files or not.
+ *
+ * @param diffdata The results of our diff operation
+ * @param file_path1 The path to the first file
+ * @param file_path2 The path to the second file
+ *
+ * @return 0 on success; error code otherwise
  */
 GIT_EXTERN(int) git_diff_no_index(git_diffdata *diffdata, const char *filename1,
 		const char *filename2);
 
 /**
- * Equivalent to git diff
+ * The "standard" diff: diffs the working directory and the index
  */
 GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_repository *repo);
 
