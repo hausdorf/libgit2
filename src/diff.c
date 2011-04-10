@@ -24,13 +24,6 @@
  */
 #include "diff.h"
 
-typedef struct {
-	// begin..end of sequences a, b
-	const long *begin_a, *end_a, *begin_b, *end_b;
-	// the difference value of begin b, a
-	const long *k;
-} middle_edit;
-
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
 		const char *filename2) {}
@@ -47,66 +40,12 @@ int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
 int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
 		git_commit *commit2) {}
 
-int xdl_recs_cmp(git_diffdata *dd1, long off1, long lim1,
-		 git_diffdata *dd2, long off2, long lim2,
-		 long *kvdf, long *kvdb, int need_min/*, xdalgoenv_t *xenv*/) {
-	unsigned long const *ha1 = dd1->hashed_records, *ha2 = dd2->hashed_records;
-
-	/*
-	 * Shrink the box by walking through each diagonal snake (SW and NE).
-	 */
-	for (; off1 < lim1 && off2 < lim2 && ha1[off1] == ha2[off2]; off1++, off2++);
-	for (; off1 < lim1 && off2 < lim2 && ha1[lim1 - 1] == ha2[lim2 - 1]; lim1--, lim2--);
-
-	/*
-	 * If one dimension is empty, then all records on the other one must
-	 * be obviously changed.
-	 */
-	/*if (off1 == lim1) {
-		char *rchg2 = dd2->rchg;
-		long *rindex2 = dd2->rindex;
-
-		for (; off2 < lim2; off2++)
-			rchg2[rindex2[off2]] = 1;
-	} else if (off2 == lim2) {
-		char *rchg1 = dd1->rchg;
-		long *rindex1 = dd1->rindex;
-
-		for (; off1 < lim1; off1++)
-			rchg1[rindex1[off1]] = 1;
-	} else {
-		xdpsplit_t spl;
-		spl.i1 = spl.i2 = 0;*/
-
-		/*
-		 * Divide ...
-		 */
-		/*if (xdl_split(ha1, off1, lim1, ha2, off2, lim2, kvdf, kvdb,
-			      need_min, &spl, xenv) < 0) {
-
-			return -1;
-		}*/
-
-		/*
-		 * ... et Impera.
-		 */
-		/*if (xdl_recs_cmp(dd1, off1, spl.i1, dd2, off2, spl.i2,
-				 kvdf, kvdb, spl.min_lo, xenv) < 0 ||
-		    xdl_recs_cmp(dd1, spl.i1, lim1, dd2, spl.i2, lim2,
-				 kvdf, kvdb, spl.min_hi, xenv) < 0) {
-
-			return -1;
-		}
-	}*/
-
-	return 0;
-}
-
-/*int main()
+/**
+ * TODO: give credit to Eppstein, as this is an implementation of his Memoized LCS
+ * http://www.ics.uci.edu/~eppstein/161/960229.html
+ */
+int lcs_length(git_diffdata *data_a, git_diffdata *data_b, 
 {
-	git_diff_data dd1, dd2;
-	long off1, lim1, off2, lim2, kvdf, kvdb;
-	int need_min;
-	xdl_recs_cmp(&dd1, off1, lim1, &dd2, off2, lim2, &kvdf, &kvdb, need_min/ *, xdalgoenv_t *xenv* /);
-}*/
 
+
+}
