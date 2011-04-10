@@ -53,4 +53,6 @@
 
 #include "git2/index.h"
 
+#include "git2/diff.h"
+
 #endif
