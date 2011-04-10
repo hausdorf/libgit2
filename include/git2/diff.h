@@ -46,7 +46,8 @@ GIT_BEGIN_DECL
  * Diffs two files
  *
  * Diff two files such that the diff output generates the changes
- * required to change the first file into the second file.
+ * required to change the first file into the second file. Dumps the
+ * data into the diffdata param.
  *
  * Both 'file_path1' and 'file_path2' must point to some sort of file,
  * i.e., not a directory. This function will automatically detect
@@ -65,8 +66,9 @@ GIT_EXTERN(int) git_diff_no_index(git_diffdata *diffdata, const char *file_path1
  * The "standard" diff: diffs a commit (usually HEAD) and working dir
  *
  * The "standard" diff one gets when they type "git diff" into a
- * terminal somewhere. Generates the changeset required to get from given
- * commit to the current state of the working directory.
+ * terminal somewhere. Dumps the changeset required to get from given
+ * commit to the current state of the working directory into the diffdata
+ * param.
  *
  * NOTE: the commit parameter is entirely optional; if you leave it empty,
  * it defaults to HEAD and you get the equivalent of the familiar
@@ -87,8 +89,9 @@ GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_commit *commit,
  * Equivalent to git diff --cached: diffs a commit (usually HEAD) and index
  *
  * The equivalent of "git diff --cached", this will produce a diff of the
- * whatever you have staged for commit and another commit. Generates the
- * changeset required to get from this commit to the staged commits.
+ * whatever you have staged for commit and another commit. Dumps the
+ * changeset required to get from this commit to the staged commits into
+ * the diffdata param.
  *
  * NOTE: the commit parameter is entirely optional; if you leave it empty,
  * it defaults to HEAD and you get the equivalent of the familiar
@@ -105,6 +108,18 @@ GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_commit *commit,
 GIT_EXTERN(int) git_diff_cached(git_diffdata *diffdata, git_commit *commit,
 		git_index *index);
 
+/**
+ * Diffs between two arbitrary commits
+ *
+ * Generates the changeset required to change commit1 into commit2.
+ * Dumps the diff data into diffdata param.
+ *
+ * @param diffdata The results of our diff operation
+ * @param commit1 The first commit; we diff commit2 against it
+ * @param commit2 The second commit; we diff it against commit1
+ *
+ * @return 0 on success; error code otherwise
+ */
 GIT_EXTERN(int) git_diff_commits(git_diffdata *diffdata, git_commit *commit1,
 		git_commit *commit2);
 
