@@ -1,12 +1,3 @@
-/**
- * diff Implements the Myers O(ND) diff algorithm and the public API
- *
- * @author Alex Clemmer <clemmer.alexander@gmail.com>
- * @author Landon Gilbert-Bland <landogbland@gmail.com>
- * @author Andrew Kuhnhausen <andrew.kuhnhausen@gmail.com>
- * @author Colton Myers <colton.myers@gmail.com>
- */
-
 #ifndef INCLUDE_diff_h__
 #define INCLUDE_diff_h__
 
