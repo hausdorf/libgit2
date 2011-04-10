@@ -34,7 +34,8 @@ typedef struct {
 int git_diff_no_index(git_diffdata *diffdata, const char *filename1,
 		const char *filename2) {}
 
-int git_diff(git_diffdata *diffdata, git_repository *repo) {}
+int git_diff(git_diffdata *diffdata, git_commit *commit,
+		git_repository *repo) {}
 
 int git_diff_cached(git_diffdata *diffdata, git_repository *repo, git_index *index) {}
 

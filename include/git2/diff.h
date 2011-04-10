@@ -64,7 +64,8 @@ GIT_EXTERN(int) git_diff_no_index(git_diffdata *diffdata, const char *file_path1
 /**
  * The "standard" diff: diffs the working directory and the index
  */
-GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_repository *repo);
+GIT_EXTERN(int) git_diff(git_diffdata *diffdata, git_commit *commit,
+		git_repository *repo);
 
 /**
  * Equivalent to git diff --cached
