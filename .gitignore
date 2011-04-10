@@ -20,3 +20,4 @@ msvc/Release/
 *.sdf
 *.opensdf
 .DS_Store
+*.swp
