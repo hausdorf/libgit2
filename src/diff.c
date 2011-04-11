@@ -23,17 +23,68 @@
  * Boston, MA 02110-1301, USA.
  */
 #include "diff.h"
+#include <stdio.h>
 
 typedef struct {
-	// begin..end of sequences a, b
+	/* begin..end of sequences a, b */
 	const long *begin_a, *end_a, *begin_b, *end_b;
-	// the difference value of begin b, a
+	/* the difference value of begin b, a */
 	const long *k;
 } middle_edit;
 
-/* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
+
+static int load_file(char *file_name, char *buffer)
+{
+    FILE *file;
+    file = fopen(file_name, "rb");
+
+    if(!file)
+        return appropiate_error;
+
+    fseek(file, 0, SEEK_END);
+    fileLen=ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    /* Allocate memory */
+    buffer=(char *)malloc(fileLen+1);
+    if (!buffer)
+        return GIT_ENOMEM;
+
+    /* Read file contents into buffer */
+    fread(buffer, fileLen, 1, file);
+    fclose(file);
+
+    return GIT_SUCCESS;
+}
+
 int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
-		const char *filename2) {}
+		const char *filename2)
+{
+    char *buffer1 = NULL;
+    char *buffer2 = NULL;
+
+    /* Insure all paramater are valid */
+    if(!file1 | !file2)
+        return appropiate_error;
+
+    /* load file1 into a cstring, return errof if this doesn't work */
+    if(!load_file(file1, buffer1))
+        return appropiate_error;
+
+    /* load file2 into a cstring, return errof if this doesn't work */
+    if(!load_file(file2, buffer2)) {
+        free(buffer1);
+        return appropiate_error;
+    }
+
+    /* call diff on file1, file2 */
+
+    /* return git success */
+    free(buffer1);
+    free(buffer2);
+    return GIT_SUCCESS;
+}
+
 
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff(git_diffdata **diffdata, git_commit *commit,
@@ -109,4 +160,3 @@ int xdl_recs_cmp(git_diffdata *dd1, long off1, long lim1,
 	int need_min;
 	xdl_recs_cmp(&dd1, off1, lim1, &dd2, off2, lim2, &kvdf, &kvdb, need_min/ *, xdalgoenv_t *xenv* /);
 }*/
-
