@@ -150,7 +150,28 @@ int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
 
 
 int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
-		git_commit *commit2) {}
+		git_commit *commit2)
+{
+    git_tree *tree1, *tree2;
+
+    /* Get the trees for this diff */
+    if(git_commit_tree(&tree1, commit1) < GIT_SUCCESS)
+        return approperate_error;
+    if(git_commit_tree(&tree2, commit2) < GIT_SUCCESS)
+        return approperate_error;
+
+    /* Compare the blobs in this tree with the files in the local filesystem
+     * TODO - make sure there are only filenames in the tree
+     * TODO - this only checks everything in the git tree, there may be more
+     *        files added in the filesystem that we need to acount for */
+    for(int i=0; i<get_tree_entrycount(tree); i++) {
+    }
+
+    /* Cleanup */
+    git_tree_close(tree1);
+    git_tree_close(tree2);
+    return GIT_SUCCESS;
+}
 
 
 int xdl_recs_cmp(git_diffdata *dd1, long off1, long lim1,
