@@ -86,25 +86,39 @@ int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
 }
 
 
-int git_diff(git_diffdata **diffdata, git_commit *commit,
-		git_repository *repo)
+int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 {
-    git_oid *oid;
     git_reference *reference;
+    git_oid *tree_id;
+    git_tree *tree;
 
     /* Get the oid for this diff, head if commit is null, else the commit oid */
     if(!commit) {
         if(git_reference_lookup(&reference, repo, "HEAD") < GIT_SUCCESS)
             return approperate_error;
 
-        oid = git_reference_oid(head);
+        tree_id = git_reference_oid(head);
     }
     else {
-        oid = git_commit_id(commit);
+        /* TODO - make sure that the commit id is an oid to a tree, not a blob
+         * or anything else */
+        tree_id = git_commit_id(commit);
 
-        if(!oid)
+        if(!tree_id)
             return apporperate_error;
     }
+
+    /* Open a tree with the specified oid, and use said tree to get files
+     * (aka blobs) and compare them to the files in the local filesystem */
+    if(git_tree_lookup(&tree, repo, tree_id) < GIT_SUCCESS)
+        return apporperate_error;
+
+    /* For every blob, compare the SHA1 of that blob to the SHA1 of the local
+     * file system. If they don't match, call diff on both of the files */
+
+    /* Cleanup */
+    git_tree_close(tree);
+    return GIT_SUCCESS;
 }
 
 
