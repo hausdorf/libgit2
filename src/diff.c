@@ -160,10 +160,10 @@ int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
     if(git_commit_tree(&tree2, commit2) < GIT_SUCCESS)
         return approperate_error;
 
-    /* Compare the blobs in this tree with the files in the local filesystem
+    /* Compare the blobs in these trees looking for differences
      * TODO - make sure there are only filenames in the tree
-     * TODO - this only checks everything in the git tree, there may be more
-     *        files added in the filesystem that we need to acount for */
+     * TODO - make sure that the every file from both tree is checked and
+     *        accounted for */
     for(int i=0; i<get_tree_entrycount(tree); i++) {
     }
 
