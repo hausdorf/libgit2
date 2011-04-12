@@ -77,7 +77,7 @@ int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
         return appropiate_error;
     }
 
-    /* call diff on file1, file2 */
+    /* call diff on file1, file2 (don't forget to malloc diffdata) */
 
     /* return git success */
     free(buffer1);
@@ -86,17 +86,35 @@ int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
 }
 
 
-/* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff(git_diffdata **diffdata, git_commit *commit,
-		git_repository *repo) {}
+		git_repository *repo)
+{
+    git_oid *oid;
+    git_reference *reference;
 
-/* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
+    /* Get the oid for this diff, head if commit is null, else the commit oid */
+    if(!commit) {
+        if(git_reference_lookup(&reference, repo, "HEAD") < GIT_SUCCESS)
+            return approperate_error;
+
+        oid = git_reference_oid(head);
+    }
+    else {
+        oid = git_commit_id(commit);
+
+        if(!oid)
+            return apporperate_error;
+    }
+}
+
+
 int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
 		git_index *index) {}
 
-/* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
+
 int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
 		git_commit *commit2) {}
+
 
 int xdl_recs_cmp(git_diffdata *dd1, long off1, long lim1,
 		 git_diffdata *dd2, long off2, long lim2,
