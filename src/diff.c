@@ -121,7 +121,9 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
     }
 
     /* Compare the blobs in this tree with the files in the local filesystem
-     * TODO make sure there are only filenames in the tree */
+     * TODO - make sure there are only filenames in the tree
+     * TODO - this only checks everything in the git tree, there may be more
+     *        files added in the filesystem that we need to acount for */
     for(int i=0; i<get_tree_entrycount(tree); i++) {
         entry = git_tree_entry_byindex(tree, i);
         filename = git_tree_entry_name(entry);
