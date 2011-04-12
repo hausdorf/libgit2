@@ -91,6 +91,7 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
     git_reference *reference;
     git_oid *tree_id;
     git_tree *tree;
+    git_tree_entry *entry;
 
     /* Get the oid for this diff, head if commit is null, else the commit oid */
     if(!commit) {
@@ -100,8 +101,6 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
         tree_id = git_reference_oid(head);
     }
     else {
-        /* TODO - make sure that the commit id is an oid to a tree, not a blob
-         * or anything else */
         tree_id = git_commit_id(commit);
 
         if(!tree_id)
@@ -113,8 +112,19 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
     if(git_tree_lookup(&tree, repo, tree_id) < GIT_SUCCESS)
         return apporperate_error;
 
-    /* For every blob, compare the SHA1 of that blob to the SHA1 of the local
-     * file system. If they don't match, call diff on both of the files */
+    for(int i=0; i<get_tree_entrycount(tree); i++) {
+        entry = git_tree_entry_byindex(tree, i);
+
+        if(entry name exists in filesystem) {
+            /* Check if the SHA1 is different between the filesystem and the
+             * blob. If so, call diff on these two files */
+
+            /* TODO - check differences in file attributes? */
+        }
+        else {
+            /* Do something here */
+        }
+    }
 
     /* Cleanup */
     git_tree_close(tree);
