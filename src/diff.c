@@ -85,13 +85,25 @@ int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
     return GIT_SUCCESS;
 }
 
+/* 1 is hashes are the same, 0 otherwise */
+static int compare_hashes(char *filename, git_oid *blob_id)
+{
+    return 0;
+}
+
+/* Prone to change, maybe easier to pass repo in then char* location */
+static int file_exists(char *filename, char *location)
+{
+    return 0;
+}
 
 int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 {
     git_reference *reference;
-    git_oid *tree_id;
     git_tree *tree;
+    git_oid *tree_id;
     git_tree_entry *entry;
+    char *filename;
 
     /* Get the tree for this diff, head if commit is null, else the commit
      * tree */
@@ -108,13 +120,15 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
             return approperate_error;
     }
 
-    /* Compare the blobs in this tree with the files in the local filesystem */
+    /* Compare the blobs in this tree with the files in the local filesystem
+     * TODO make sure there are only filenames in the tree */
     for(int i=0; i<get_tree_entrycount(tree); i++) {
         entry = git_tree_entry_byindex(tree, i);
+        filename = git_tree_entry_name(entry);
 
-        if(entry name exists in filesystem) {
-            /* Check if the SHA1 is different between the filesystem and the
-             * blob. If so, call diff on these two files */
+        if(file_exists(filename)) {
+            if(!compare_hashes(filename, git_tree_entry_id(entry)))
+                diff();
 
             /* TODO - check differences in file attributes? */
         }
