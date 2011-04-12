@@ -93,25 +93,22 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
     git_tree *tree;
     git_tree_entry *entry;
 
-    /* Get the oid for this diff, head if commit is null, else the commit oid */
+    /* Get the tree for this diff, head if commit is null, else the commit
+     * tree */
     if(!commit) {
         if(git_reference_lookup(&reference, repo, "HEAD") < GIT_SUCCESS)
             return approperate_error;
 
         tree_id = git_reference_oid(head);
-    }
-    else {
-        tree_id = git_commit_id(commit);
-
-        if(!tree_id)
+        if(git_tree_lookup(&tree, repo, tree_id) < GIT_SUCCESS)
             return apporperate_error;
     }
+    else {
+        if(git_commit_tree(&tree, commit) < GIT_SUCCESS)
+            return approperate_error;
+    }
 
-    /* Open a tree with the specified oid, and use said tree to get files
-     * (aka blobs) and compare them to the files in the local filesystem */
-    if(git_tree_lookup(&tree, repo, tree_id) < GIT_SUCCESS)
-        return apporperate_error;
-
+    /* Compare the blobs in this tree with the files in the local filesystem */
     for(int i=0; i<get_tree_entrycount(tree); i++) {
         entry = git_tree_entry_byindex(tree, i);
 
