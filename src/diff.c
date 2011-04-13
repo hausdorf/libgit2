@@ -26,19 +26,31 @@
 
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
-		const char *filename2) {}
+		const char *filename2)
+{
+    return 0;
+}
 
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff(git_diffdata **diffdata, git_commit *commit,
-		git_repository *repo) {}
+		git_repository *repo)
+{
+    return 0;
+}
 
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
-		git_index *index) {}
+		git_index *index)
+{
+    return 0;
+}
 
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
 int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
-		git_commit *commit2) {}
+		git_commit *commit2)
+{
+    return 0;
+}
 
 /*!
  * Represents file data (binary or text) in memory.
