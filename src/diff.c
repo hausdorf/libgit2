@@ -85,7 +85,9 @@ int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
     return GIT_SUCCESS;
 }
 
-/* 1 is hashes are the same, 0 otherwise */
+/* The git_oid is the sha1 identifier for this blob if I am not mistake,
+ * therefore i think the fastest way to do this would be to take the sha1 of
+ * the file on the local filesystem and compare it to thsi git_oid. */
 static int compare_hashes(char *filename, git_oid *blob_id)
 {
     /* Get the hash out of the oid and compare it with a hash of the
