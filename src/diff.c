@@ -40,12 +40,24 @@ int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
 int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
 		git_commit *commit2) {}
 
-/**
- * TODO: give credit to Eppstein, as this is an implementation of his Memoized LCS
- * http://www.ics.uci.edu/~eppstein/161/960229.html
+/*!
+ * Represents file data (binary or text) in memory.
+ * Where the data variable points to user data and size is the size of that data
+ * This is used to hold the data from one diff file.
  */
-int lcs_length(git_diffdata *data_a, git_diffdata *data_b, 
-{
+typedef struct git_diff_m_data {
+	long size;
+	char *data;
+} git_diff_m_data;
+
+/*!
+ * Represents the memory buffer
+ * Where the data variable points to user data and size is the size of that data
+ * In general, this is used for binary files
+ */
+typedef struct git_diff_m_buffer {
+	long size;
+	char *data;
+} git_diff_m_buffer;
 
 
-}
