@@ -88,6 +88,8 @@ int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
 /* 1 is hashes are the same, 0 otherwise */
 static int compare_hashes(char *filename, git_oid *blob_id)
 {
+    /* Get the hash out of the oid and compare it with a hash of the
+     * local file in the filesystem */
     return 0;
 }
 
@@ -103,6 +105,7 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
     git_tree *tree;
     git_oid *tree_id;
     git_tree_entry *entry;
+    git_hashtable *files_hash;
     char *filename;
 
     /* Get the tree for this diff, head if commit is null, else the commit
@@ -120,10 +123,15 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
             return approperate_error;
     }
 
+    /* Set up the hash table used to track which files from both the
+     * repository and local filesystem have been processed */
+    files_hash = git_hashtable_alloc(11, string_hash_function/* todo */,
+                 (git_hash_keyeq_ptr)strcmp);
+    if(files_hash == NULL)
+        return GIT_ENOMEM;
+
     /* Compare the blobs in this tree with the files in the local filesystem
-     * TODO - make sure there are only filenames in the tree
-     * TODO - this only checks everything in the git tree, there may be more
-     *        files added in the filesystem that we need to acount for */
+     * TODO - make sure there are only filenames in the tree */
     for(int i=0; i<get_tree_entrycount(tree); i++) {
         entry = git_tree_entry_byindex(tree, i);
         filename = git_tree_entry_name(entry);
@@ -141,6 +149,7 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 
     /* Cleanup */
     git_tree_close(tree);
+    git_hashtable_free(files_hash);
     return GIT_SUCCESS;
 }
 
