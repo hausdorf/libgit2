@@ -143,9 +143,25 @@ static int get_git_tree(git_tree *results, git_commit *commit)
     return GIT_SUCCESS;
 }
 
+/* 0 on success, error on failure. The resulting char* must be freed by the
+ * caller */
+static int get_filepath(char* results, git_repository *repo,
+                        git_tree_entry *entry)
+{
+        filepath = malloc (char *) sizeof(char) *
+                   (strlen(git_repository_workdir(repo))
+                   + strlen(git_tree_entry_name(entry)));
+        if(filepath == NULL)
+            return ENOMEM;
+
+        strcat(filepath, git_repository_workdir(repo));
+        strcat(filepath, git_tree_entry_name(entry));
+
+        return GIT_SUCCESS;
+}
+
 int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 {
-    git_tree *tree;             /* the tree being diff'd to the filesystem */
     git_tree_entry *entry;      /* hold entries from the ree we are diffing */
     git_hashtable *files_hash;  /* tracks what files have been processed */
     char *filepath;             /* filepath to a file in the working directory*/
@@ -165,13 +181,10 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 
     /* Compare the blobs in this tree with the files in the local filesystem */
     for(i=0; i<get_tree_entrycount(tree); i++) {
-        /* Get the full filepath for this macro */
-        entry = git_tree_entry_byindex(tree, i);
-        filepath = malloc (char *) sizeof(char) *
-                   (strlen(git_repository_workdir(repo))
-                   + strlen(git_tree_entry_name(entry)));
-        strcat(filepath, git_repository_workdir(repo));
-        strcat(filepath, git_tree_entry_name(entry));
+
+        /* Get the full filepath for this blob */
+        if(get_filepath(filepath, repo, git_tree_entry_byindex(tree, i)) < 0)
+            return ENOMEM;
 
         /* If the file exists in the local filesystem, diff it. Otherwise it
          * has been deleted from the file system sense this commit */
