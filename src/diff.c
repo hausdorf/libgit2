@@ -184,7 +184,15 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
         else {
         }
 
+        /* TODO - add this filepath to the hashtable */
         free(filepath);
+    }
+
+    /* Check every file on the local filesystem, to catch any new files that
+     * may have been created sense the commit */
+    for(each file in filesystem) {
+        if(file doesn't exist in hashtable)
+            mark this as a new file for the diff
     }
 
     /* Cleanup */
