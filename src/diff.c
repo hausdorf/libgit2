@@ -119,16 +119,11 @@ static int file_exists(char *filename, char *location)
     return 0;
 }
 
-int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
+/* 0 if success, error otherwise */
+static int get_git_tree(git_tree *results, git_commit *commit)
 {
-    git_reference *reference;
-    git_tree *tree;
     git_oid *tree_id;
-    git_tree_entry *entry;
-    git_hashtable *files_hash;
-    char *filepath;
-    char *working_dir;
-    int compare_results;
+    git_reference *reference;
 
     /* Get the tree for this diff, head if commit is null, else the commit
      * tree */
@@ -145,9 +140,21 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
             return approperate_error;
     }
 
-    /* Get the working directory from the repository
-     * TODO - does this need to be freed? */
-    working_dir = git_repository_workdir(repo);
+    return GIT_SUCCESS;
+}
+
+int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
+{
+    git_tree *tree;             /* the tree being diff'd to the filesystem */
+    git_tree_entry *entry;      /* hold entries from the ree we are diffing */
+    git_hashtable *files_hash;  /* tracks what files have been processed */
+    char *filepath;             /* filepath to a file in the working directory*/
+    int compare_results;        /* results from compare hash */
+    int i;                      /* loop counter */
+
+    /* Get the tree we will be diffing */
+    if(get_git_tree(tree, commit) < 0)
+        return ERROR;
 
     /* Set up the hash table used to track which files from both the
      * repository and local filesystem have been processed */
@@ -157,13 +164,13 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
         return GIT_ENOMEM;
 
     /* Compare the blobs in this tree with the files in the local filesystem */
-    for(int i=0; i<get_tree_entrycount(tree); i++) {
-        entry = git_tree_entry_byindex(tree, i);
-
+    for(i=0; i<get_tree_entrycount(tree); i++) {
         /* Get the full filepath for this macro */
-        filepath = malloc (char *) sizeof(char) * (strlen(working_dir)
-               + strlen(git_tree_entry_name(entry)));
-        strcat(filepath, working_dir)
+        entry = git_tree_entry_byindex(tree, i);
+        filepath = malloc (char *) sizeof(char) *
+                   (strlen(git_repository_workdir(repo))
+                   + strlen(git_tree_entry_name(entry)));
+        strcat(filepath, git_repository_workdir(repo));
         strcat(filepath, git_tree_entry_name(entry));
 
         /* If the file exists in the local filesystem, diff it. Otherwise it
