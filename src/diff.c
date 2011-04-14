@@ -24,6 +24,7 @@
  */
 #include "diff.h"
 #include <stdio.h>
+#include <string.h>
 
 typedef struct {
 	/* begin..end of sequences a, b */
@@ -33,10 +34,10 @@ typedef struct {
 } middle_edit;
 
 
-static int load_file(char *file_name, char *buffer, int *size)
+static int load_file(char *file_path, char *buffer, int *size)
 {
     FILE *file;
-    file = fopen(file_name, "rb");
+    file = fopen(file_path, "rb");
 
     if(!file)
         return appropiate_error;
@@ -125,7 +126,8 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
     git_oid *tree_id;
     git_tree_entry *entry;
     git_hashtable *files_hash;
-    char *filename;
+    char *filepath;
+    char *working_dir;
     int compare_results;
 
     /* Get the tree for this diff, head if commit is null, else the commit
@@ -143,6 +145,10 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
             return approperate_error;
     }
 
+    /* Get the working directory from the repository
+     * TODO - does this need to be freed? */
+    working_dir = git_repository_workdir(repo);
+
     /* Set up the hash table used to track which files from both the
      * repository and local filesystem have been processed */
     files_hash = git_hashtable_alloc(11, /*string_hash_function todo */,
@@ -150,16 +156,23 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
     if(files_hash == NULL)
         return GIT_ENOMEM;
 
-    /* Compare the blobs in this tree with the files in the local filesystem
-     * TODO - make sure there are only filenames in the tree */
+    /* Compare the blobs in this tree with the files in the local filesystem */
     for(int i=0; i<get_tree_entrycount(tree); i++) {
         entry = git_tree_entry_byindex(tree, i);
-        filename = git_tree_entry_name(entry);
 
-        if(file_exists(filename)) {
-            if(compare_hashes(filename, blob, &compare_results) < 0) {
+        /* Get the full filepath for this macro */
+        filepath = malloc (char *) sizeof(char) * (strlen(working_dir)
+               + strlen(git_tree_entry_name(entry)));
+        strcat(filepath, working_dir)
+        strcat(filepath, git_tree_entry_name(entry));
+
+        /* If the file exists in the local filesystem, diff it. Otherwise it
+         * has been deleted from the file system sense this commit */
+        if(file_exists(filepath)) {
+            if(compare_hashes(filepath, blob, &compare_results) < 0) {
                 git_tree_close(tree);
                 git_hashtable_free(files_hash);
+                free(filepath);
                 return ENOMEM;
             }
 
@@ -169,8 +182,9 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
             /* TODO - check differences in file attributes? */
         }
         else {
-            /* Do something here */
         }
+
+        free(filepath);
     }
 
     /* Cleanup */
