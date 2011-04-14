@@ -33,7 +33,7 @@ typedef struct {
 } middle_edit;
 
 
-static int load_file(char *file_name, char *buffer)
+static int load_file(char *file_name, char *buffer, int *size)
 {
     FILE *file;
     file = fopen(file_name, "rb");
@@ -42,16 +42,16 @@ static int load_file(char *file_name, char *buffer)
         return appropiate_error;
 
     fseek(file, 0, SEEK_END);
-    fileLen=ftell(file);
+    size=ftell(file);
     fseek(file, 0, SEEK_SET);
 
     /* Allocate memory */
-    buffer=(char *)malloc(fileLen+1);
+    buffer=(char *)malloc(size+1);
     if (!buffer)
         return GIT_ENOMEM;
 
     /* Read file contents into buffer */
-    fread(buffer, fileLen, 1, file);
+    fread(buffer, size, 1, file);
     fclose(file);
 
     return GIT_SUCCESS;
@@ -62,17 +62,18 @@ int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
 {
     char *buffer1 = NULL;
     char *buffer2 = NULL;
+    int buffer1_size, buffer2_size;
 
     /* Insure all paramater are valid */
     if(!file1 | !file2)
         return appropiate_error;
 
     /* load file1 into a cstring, return errof if this doesn't work */
-    if(!load_file(file1, buffer1))
+    if(!load_file(file1, buffer1, &buffer1_size))
         return appropiate_error;
 
     /* load file2 into a cstring, return errof if this doesn't work */
-    if(!load_file(file2, buffer2)) {
+    if(!load_file(file2, buffer2, &buffer2_size)) {
         free(buffer1);
         return appropiate_error;
     }
@@ -88,11 +89,27 @@ int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
 /* The git_oid is the sha1 identifier for this blob if I am not mistake,
  * therefore i think the fastest way to do this would be to take the sha1 of
  * the file on the local filesystem and compare it to thsi git_oid. */
-static int compare_hashes(char *filename, git_oid *blob_id)
+static int compare_hashes(char *filename, git_oid *blob_id, int *result)
 {
-    /* Get the hash out of the oid and compare it with a hash of the
-     * local file in the filesystem */
-    return 0;
+    /* This is just throwing something together and is prone to change */
+
+    char *file;
+    int file_size;
+    git_oid file_id; /* The resulting SHA1 hash of the file */
+
+    if(load_file(filename, file, &filesize) == NULL)
+        return ENOMEM;
+
+    /* Compare the two git_oid */
+    git_hash_buf(&file_id, (void *) file, file_size);
+    if(file_id == *blob_id)
+        *result = 1;
+    else
+        *result = 0;
+
+    /* Cleanup */
+    free(file);
+    return GIT_SUCCESS;
 }
 
 /* Prone to change, maybe easier to pass repo in then char* location */
@@ -109,6 +126,7 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
     git_tree_entry *entry;
     git_hashtable *files_hash;
     char *filename;
+    int compare_results;
 
     /* Get the tree for this diff, head if commit is null, else the commit
      * tree */
@@ -127,7 +145,7 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 
     /* Set up the hash table used to track which files from both the
      * repository and local filesystem have been processed */
-    files_hash = git_hashtable_alloc(11, string_hash_function/* todo */,
+    files_hash = git_hashtable_alloc(11, /*string_hash_function todo */,
                  (git_hash_keyeq_ptr)strcmp);
     if(files_hash == NULL)
         return GIT_ENOMEM;
@@ -139,7 +157,13 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
         filename = git_tree_entry_name(entry);
 
         if(file_exists(filename)) {
-            if(!compare_hashes(filename, git_tree_entry_id(entry)))
+            if(compare_hashes(filename, blob, &compare_results) < 0) {
+                git_tree_close(tree);
+                git_hashtable_free(files_hash);
+                return ENOMEM;
+            }
+
+            if(!compare_results)
                 diff();
 
             /* TODO - check differences in file attributes? */
