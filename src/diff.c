@@ -162,6 +162,7 @@ static int get_filepath(char* results, git_repository *repo,
 
 int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 {
+    git_tree *tree;             /* The tree that we will be diffing */
     git_hashtable *files_hash;  /* tracks what files have been processed */
     char *filepath;             /* filepath to a file in the working directory*/
     int compare_results;        /* results from compare hash */
@@ -178,7 +179,7 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 
     /* Set up the hash table used to track which files from both the
      * repository and local filesystem have been processed */
-    files_hash = git_hashtable_alloc(11, /*string_hash_function todo */,
+    files_hash = git_hashtable_alloc(11, /*string_hash_function TODO */,
                  (git_hash_keyeq_ptr)strcmp);
 
     if(files_hash == NULL) {
@@ -188,8 +189,6 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 
     /* Compare the blobs in this tree with the files in the local filesystem */
     for(i=0; i<get_tree_entrycount(tree); i++) {
-
-        /* Get the full filepath for this blob */
         if(get_filepath(filepath, repo, git_tree_entry_byindex(tree, i)) < 0) {
             error_status = GIT_ENOMEM;
             goto cleanup;
