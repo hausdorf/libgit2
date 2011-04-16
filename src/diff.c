@@ -96,18 +96,16 @@ cleanup:
     return GIT_SUCCESS;
 }
 
-/* The git_oid is the sha1 identifier for this blob if I am not mistake,
- * therefore i think the fastest way to do this would be to take the sha1 of
- * the file on the local filesystem and compare it to thsi git_oid. */
+/* The git_oid is the sha1 identifier for a blob. Therefore, i think the
+ * fastest way to do this would be to take the sha1 of  the file on the local
+ * filesystem and compare it to this git_oid. */
 static int compare_hashes(char *filename, git_oid *blob_id, int *result)
 {
-    /* This is just throwing something together and is prone to change */
-
     char *file;
     int file_size;
     git_oid file_id; /* The resulting SHA1 hash of the file */
 
-    if(load_file(filename, file, &filesize)  < 0)
+    if(load_file(filename, file, &file_size)  < 0)
         return GIT_ENOMEM;
 
     /* Compare the two git_oid */
@@ -241,6 +239,11 @@ int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
 		git_commit *commit2)
 {
     git_tree *tree1, *tree2;
+    git_tree_entry *entry;
+    int results;
+    int i;
+
+    results = GIT_SUCCESS;
 
     /* Get the trees for this diff */
     if(git_commit_tree(&tree1, commit1) < GIT_SUCCESS)
