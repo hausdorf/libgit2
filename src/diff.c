@@ -64,26 +64,33 @@ int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
     char *buffer1 = NULL;
     char *buffer2 = NULL;
     int buffer1_size, buffer2_size;
+    int result = GIT_SUCCESS;
 
     /* Insure all paramater are valid */
-    if(!file1 | !file2)
-        return appropiate_error;
+    if(!file1 | !file2) {
+        result = appropiate_error;
+        goto cleanup;
+    }
 
-    /* load file1 into a cstring, return errof if this doesn't work */
     if(!load_file(file1, buffer1, &buffer1_size))
-        return appropiate_error;
+        result = appropiate_error;
+        goto cleanup;
+    }
 
-    /* load file2 into a cstring, return errof if this doesn't work */
     if(!load_file(file2, buffer2, &buffer2_size)) {
-        free(buffer1);
-        return appropiate_error;
+        result = appropiate_error;
+        goto cleanup;
     }
 
     /* call diff on file1, file2 (don't forget to malloc diffdata) */
+    diff();
 
-    /* return git success */
-    free(buffer1);
-    free(buffer2);
+cleanup:
+    if(buffer1)
+        free(buffer1);
+    if(buffer2)
+        free(buffer2);
+
     return GIT_SUCCESS;
 }
 
