@@ -163,11 +163,11 @@ static int get_filepath(char* results, git_repository *repo,
 int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 {
     git_tree *tree;             /* The tree that we will be diffing */
-    git_hashtable *files_hash;  /* tracks what files have been processed */
+    git_tree_entry *entry;      /* Enteries in the tree we are diffing */
     char *filepath;             /* filepath to a file in the working directory*/
     int compare_results;        /* results from compare hash */
-    int i;                      /* loop counter */
     int error_status;           /* error status of this method */
+    int i;                      /* loop counter */
 
     error_status = GIT_SUCCESS;
 
@@ -177,26 +177,15 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
         goto cleanup;
     }
 
-    /* Set up the hash table used to track which files from both the
-     * repository and local filesystem have been processed */
-    files_hash = git_hashtable_alloc(11, /*string_hash_function TODO */,
-                 (git_hash_keyeq_ptr)strcmp);
-
-    if(files_hash == NULL) {
-        error_status = GIT_ENOMEM;
-        goto cleanup;
-    }
-
     /* Compare the blobs in this tree with the files in the local filesystem */
     for(i=0; i<get_tree_entrycount(tree); i++) {
-        if(get_filepath(filepath, repo, git_tree_entry_byindex(tree, i)) < 0) {
+        entry = git_tree_entry_byindex(tree, i);
+
+        if(get_filepath(filepath, repo, entry) < 0) {
             error_status = GIT_ENOMEM;
             goto cleanup;
         }
 
-        /* If the file exists in the local filesystem and has changed, diff it.
-         * If it doesn't exist in the filesystem then the file has been deleted
-         * from the file system sense this commit */
         if(file_exists(filepath)) {
             if(compare_hashes(filepath, blob, &compare_results) < 0) {
                 error_status = GIT_ENOMEM;
@@ -205,21 +194,22 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 
             if(!compare_results)
                 diff();
-
-            /* TODO - check differences in file attributes? */
         }
         else {
+            /* The file has been deleted from the file system */
         }
 
-        /* TODO - add this filepath to the hashtable */
         free(filepath);
     }
 
     /* Check every file on the local filesystem, to catch any new files that
      * may have been created sense the commit */
     for(each file in filesystem) {
-        if(file doesn't exist in hashtable)
-            mark this as a new file for the diff
+        entry = git_tree_entry_byname(tree, filename);
+
+        if(entry == NULL) {
+            /* This is a newly created file sense the commit we are diffing */
+        }
     }
 
 cleanup:
