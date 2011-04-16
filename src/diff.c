@@ -230,9 +230,11 @@ cleanup:
 	return error_status;
 }
 
-
 int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
-		git_index *index) {}
+		git_index *index)
+{
+    return 0;
+}
 
 
 /* Assumes commit1 is newer then commit 2 */
@@ -365,3 +367,23 @@ int xdl_recs_cmp(git_diffdata *dd1, long off1, long lim1,
 	int need_min;
 	xdl_recs_cmp(&dd1, off1, lim1, &dd2, off2, lim2, &kvdf, &kvdb, need_min/ *, xdalgoenv_t *xenv* /);
 }*/
+
+/*!
+ * Represents file data (binary or text) in memory.
+ * Where the data variable points to user data and size is the size of that data
+ * This is used to hold the data from one diff file.
+ */
+typedef struct git_diff_m_data {
+	long size;
+	char *data;
+} git_diff_m_data;
+
+/*!
+ * Represents the memory buffer
+ * Where the data variable points to user data and size is the size of that data
+ * In general, this is used for binary files
+ */
+typedef struct git_diff_m_buffer {
+	long size;
+	char *data;
+} git_diff_m_buffer;
