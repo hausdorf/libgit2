@@ -34,6 +34,8 @@ typedef struct {
 } middle_edit;
 
 
+/* 0 on success, error on failure. The char* file_path must be free'd by
+ * the caller or a memory leak will occur */
 static int load_file(char *file_path, char *buffer, int *size)
 {
     FILE *file;
