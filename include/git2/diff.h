@@ -55,8 +55,8 @@ GIT_BEGIN_DECL
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff_no_index(git_diffdata **diffdata, const char *file_path1,
-		const char *file_path2);
+GIT_EXTERN(int) git_diff_no_index(git_diffresults_conf **results_conf,
+		const char *file_path1, const char *file_path2);
 
 /**
  * The "standard" diff: diffs a commit (usually HEAD) and working dir
@@ -78,8 +78,8 @@ GIT_EXTERN(int) git_diff_no_index(git_diffdata **diffdata, const char *file_path
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff(git_diffdata **diffdata, git_commit *commit,
-		git_repository *repo);
+GIT_EXTERN(int) git_diff(git_diffresults_conf **results_conf,
+		git_commit *commit, git_repository *repo);
 
 /**
  * Equivalent to git diff --cached: diffs a commit (usually HEAD) and index
@@ -101,8 +101,8 @@ GIT_EXTERN(int) git_diff(git_diffdata **diffdata, git_commit *commit,
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff_cached(git_diffdata **diffdata, git_commit *commit,
-		git_index *index);
+GIT_EXTERN(int) git_diff_cached(git_diffresults_conf **results_conf,
+		git_commit *commit, git_index *index);
 
 /**
  * Diffs between two arbitrary commits
@@ -116,8 +116,8 @@ GIT_EXTERN(int) git_diff_cached(git_diffdata **diffdata, git_commit *commit,
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
-		git_commit *commit2);
+GIT_EXTERN(int) git_diff_commits(git_diffresults_conf **results_conf,
+		git_commit *commit1, git_commit *commit2);
 
 /** @} */
 GIT_END_DECL

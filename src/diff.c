@@ -32,23 +32,23 @@ typedef struct {
 } middle_edit;
 
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
-int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
+int git_diff_no_index(git_diffresults_conf **results_conf, const char *filename1,
 		const char *filename2) {}
 
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
-int git_diff(git_diffdata **diffdata, git_commit *commit,
+int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		git_repository *repo) {}
 
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
-int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
+int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
 		git_index *index) {}
 
 /* TODO TODO TODO: THIS NEEDS TO BE IMPLEMENTED */
-int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
+int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		git_commit *commit2) {}
 
-int xdl_recs_cmp(git_diffdata *dd1, long off1, long lim1,
-		 git_diffdata *dd2, long off2, long lim2,
+int xdl_recs_cmp(git_diffresults_conf *dd1, long off1, long lim1,
+		 git_diffresults_conf *dd2, long off2, long lim2,
 		 long *kvdf, long *kvdb, int need_min/*, xdalgoenv_t *xenv*/) {
 	unsigned long const *ha1 = dd1->hashed_records, *ha2 = dd2->hashed_records;
 
