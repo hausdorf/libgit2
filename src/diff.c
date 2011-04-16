@@ -123,6 +123,7 @@ static int compare_hashes(char *filename, git_oid *blob_id, int *result)
 /* Prone to change, maybe easier to pass repo in then char* location */
 static int file_exists(char *filename, char *location)
 {
+	/* TODO */
 	return 0;
 }
 
@@ -169,12 +170,12 @@ static int get_filepath(char* results, git_repository *repo,
 
 int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 {
-	git_tree *tree;			 /* The tree that we will be diffing */
-	git_tree_entry *entry;	  /* Enteries in the tree we are diffing */
-	char *filepath;			 /* filepath to a file in the working directory*/
-	int compare_results;		/* results from compare hash */
-	int error_status;		   /* error status of this method */
-	int i;					  /* loop counter */
+	git_tree *tree;			/* The tree that we will be diffing */
+	git_tree_entry *entry;  /* Enteries in the tree we are diffing */
+	char *filepath;			/* filepath to a file in the working directory*/
+	int compare_results;	/* results from compare hash */
+	int error_status;		/* error status of this method */
+	int i;					/* loop counter */
 
 	error_status = GIT_SUCCESS;
 
@@ -210,7 +211,8 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
 	}
 
 	/* Check every file on the local filesystem, to catch any new files that
-	 * may have been created sense the commit */
+	 * may have been created sense the commit
+	 * TODO - implement this, and make it compatible with linux and word */
 	for(each file in filesystem) {
 		entry = git_tree_entry_byname(tree, filename);
 
@@ -233,9 +235,9 @@ cleanup:
 int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
 		git_index *index)
 {
+	/* TODO */
     return 0;
 }
-
 
 /* Assumes commit1 is newer then commit 2 */
 int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
