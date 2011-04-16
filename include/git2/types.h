@@ -131,7 +131,7 @@ typedef struct git_treebuilder git_treebuilder;
 typedef struct git_index git_index;
 
 /** Memory representation of a diff */
-typedef struct git_diffdata git_diffdata;
+typedef struct git_diffresults_conf git_diffreults_conf;
 
 /** Time in a signature */
 typedef struct git_time {

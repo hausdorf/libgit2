@@ -3,7 +3,7 @@
 
 #include "git2/diff.h"
 
-struct git_diffdata {
+struct git_diffresults_conf {
 	/* The number of records (lines) in the content */
 	long num_records;
 	/* Ordered list of hashed records */
