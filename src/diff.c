@@ -203,15 +203,16 @@ int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
     }
 
     /* Check every file on the local filesystem, to catch any new files that
-     * may have been created sense the commit */
+     * may have been created since the commit */
     for(each file in filesystem) {
         entry = git_tree_entry_byname(tree, filename);
 
         if(entry == NULL) {
-            /* This is a newly created file sense the commit we are diffing */
+            /* This is a newly created file since the commit we are diffing */
         }
     }
 
+/* Flag used with goto in case of errors to clean up the pointers */
 cleanup:
     if(filepath)
         free(filepath);
