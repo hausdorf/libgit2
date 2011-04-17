@@ -13,7 +13,7 @@
  * conceptually different.
  */
 struct git_diff_mem {
-	long size;
+	size_t size;
 	char *data;
 };
 typedef struct git_diff_mem git_diff_m_data;
