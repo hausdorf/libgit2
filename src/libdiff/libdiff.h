@@ -9,11 +9,11 @@
  * diffing is performed on.
  *
  * Typedef'd as both git_diff_m_data and git_diff_m_buffer,
- * which are identical in concept and execution, but
- * conceptually different.
+ * which are identical in execution, but conceptually different
+ * and follow a different pipeline.
  */
 struct git_diff_mem {
-	long size;
+	size_t size;
 	char *data;
 };
 typedef struct git_diff_mem git_diff_m_data;
@@ -35,6 +35,7 @@ typedef struct git_diff_callback git_diff_callback;
  * but also *where* they go, and what form they take.
  */
 struct git_diffresults_conf {
+	// unique flags correspond to specific bit positions in 'flags'
 	// TODO: find out if this should be a size_t
 	unsigned long flags;
 	git_diff_callback *callback;
