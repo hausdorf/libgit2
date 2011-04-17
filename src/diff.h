@@ -35,7 +35,7 @@ typedef struct git_diff_callback git_diff_callback;
  * but also *where* they go, and what form they take.
  */
 struct git_diffresults_conf {
-    // unique flags correspond to specific bit positions in 'flags'
+	// unique flags correspond to specific bit positions in 'flags'
 	unsigned long flags;
 	git_diff_callback *callback;
 };
