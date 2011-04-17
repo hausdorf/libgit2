@@ -14,4 +14,7 @@ struct git_diff_mem {
 typedef struct git_diff_mem git_diff_m_data;
 typedef struct git_diff_mem git_diff_m_buffer;
 
+int diff(git_diff_m_data *data1, git_diff_m_data *data2,
+		git_diffresults_conf const *results_conf);
+
 #endif
