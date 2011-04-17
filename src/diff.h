@@ -28,6 +28,7 @@ struct git_diff_callback {
 	void *payload;
 	int (*out_func)(void *, git_diff_m_buffer *, int);
 };
+typedef struct git_diff_callback git_diff_callback;
 
 /*
  * Fully configures not just how we generate diff's results,
@@ -35,6 +36,7 @@ struct git_diff_callback {
  */
 struct git_diffresults_conf {
 	unsigned long flags;
+	git_diff_callback *callback;
 };
 
 
