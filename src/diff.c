@@ -26,14 +26,6 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct {
-	/* begin..end of sequences a, b */
-	const long *begin_a, *end_a, *begin_b, *end_b;
-	/* the difference value of begin b, a */
-	const long *k;
-} middle_edit;
-
-
 /* 0 on success, error on failure. The char* file_path must be free'd by
  * the caller or a memory leak will occur */
 static int load_file(char *file_path, char *buffer, int *size)
