@@ -66,11 +66,3 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 	return 0;
 }
 
-/*int main()
-{
-	git_diff_data dd1, dd2;
-	long off1, lim1, off2, lim2, kvdf, kvdb;
-	int need_min;
-	xdl_recs_cmp(&dd1, off1, lim1, &dd2, off2, lim2, &kvdf, &kvdb, need_min/ *, xdalgoenv_t *xenv* /);
-}*/
-
