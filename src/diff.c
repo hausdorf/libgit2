@@ -24,6 +24,7 @@
  */
 #include "diff.h"
 
+// TODO: find out if Doxygen comments should be used internally like so
 /*!
  * Represents file data (binary or text) in memory.
  * Where the data variable points to user data and size is the size of that data
