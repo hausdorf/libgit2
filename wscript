@@ -153,6 +153,10 @@ def build_library(bld, build_type):
         sources.append('src/ppc/sha1.c')
     else:
         sources.append('src/block-sha1/sha1.c')
+
+    # libdiff source
+    sources = sources + directory.ant_glob('src/libdiff/*.c')
+
     #------------------------------
     # Build the main library
     #------------------------------
