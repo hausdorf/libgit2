@@ -4,7 +4,7 @@
 #include "git2/diff.h"
 
 struct git_diffresults_conf {
-}
+};
 
 // TODO: REMOVE
 // Keeping this because it's a good readable reference of what
