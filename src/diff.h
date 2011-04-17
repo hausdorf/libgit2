@@ -3,9 +3,22 @@
 
 #include "git2/diff.h"
 
+/*
+ * Represents file data (binary or text) in memory.
+ * Where the data variable points to user data and size is the size of that data
+ * This is used to hold the data from one diff file.
+ */
+struct git_diff_mem {
+	long size;
+	char *data;
+};
+typedef struct git_diff_mem git_diff_m_data;
+typedef struct git_diff_mem git_diff_m_buffer;
+
 struct git_diffresults_conf {
 	unsigned long flags;
 };
+
 
 // TODO: REMOVE
 // Keeping this because it's a good readable reference of what
