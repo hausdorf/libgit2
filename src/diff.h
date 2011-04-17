@@ -4,6 +4,7 @@
 #include "git2/diff.h"
 
 struct git_diffresults_conf {
+	unsigned long flags;
 };
 
 // TODO: REMOVE
