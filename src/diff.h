@@ -15,6 +15,11 @@ struct git_diff_mem {
 typedef struct git_diff_mem git_diff_m_data;
 typedef struct git_diff_mem git_diff_m_buffer;
 
+struct git_diff_callback {
+	void *payload;
+	int (*out_func)(void *, git_diff_m_buffer *, int);
+};
+
 struct git_diffresults_conf {
 	unsigned long flags;
 };
