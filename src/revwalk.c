@@ -191,7 +191,6 @@ static int commit_quick_parse(git_revwalk *walk, commit_object *commit, git_rawo
 	unsigned char *parents_start;
 
 	int i, parents = 0;
-	long commit_time;
 
 	buffer += STRLEN("tree ") + GIT_OID_HEXSZ + 1;
 
@@ -228,10 +227,10 @@ static int commit_quick_parse(git_revwalk *walk, commit_object *commit, git_rawo
 	if (buffer == NULL)
 		return GIT_EOBJCORRUPTED;
 
-	if (git__strtol32(&commit_time, (char *)buffer + 2, NULL, 10) < GIT_SUCCESS)
+	commit->time = strtol((char *)buffer + 2, NULL, 10);
+	if (commit->time == 0)
 		return GIT_EOBJCORRUPTED;
 
-	commit->time = (time_t)commit_time;
 	commit->parsed = 1;
 	return GIT_SUCCESS;
 }
