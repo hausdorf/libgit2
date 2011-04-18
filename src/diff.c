@@ -8,16 +8,11 @@
 static int load_file(char *file_path, char *buffer, int *size)
 {
 	FILE *file;
-	int result;
 	int read_result;
 
-	result = GIT_SUCCESS;
-
 	file = fopen(file_path, "rb");
-	if(!file) {
-		result = GIT_EINVALIDPATH;
-		goto cleanup;
-	}
+	if(!file)
+		return GIT_EINVALIDPATH;
 
 	/* Get the size of this file */
 	fseek(file, 0, SEEK_END);
@@ -26,21 +21,18 @@ static int load_file(char *file_path, char *buffer, int *size)
 
 	buffer=(char *)malloc(*size+1);
 	if (!buffer) {
-		result = GIT_ENOMEM;
-		goto cleanup;
+		fclose(file);
+		return GIT_ENOMEM;
 	}
 
 	read_result = fread(buffer, *size, 1, file);
 	if(read_result != *size) {
 		free(buffer);
-		result = GIT_ERROR;
+		fclose(file);
+		return GIT_ERROR;
 	}
 
-cleanup:
-	if(file)
-		fclose(file);
-
-	return result;
+	return GIT_SUCCESS;
 }
 
 int git_diff_no_index(git_diffresults_conf **results_conf,
