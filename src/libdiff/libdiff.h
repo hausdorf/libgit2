@@ -3,6 +3,12 @@
 
 #include "../common.h"
 
+/*
+ * Represents the variables required to run the diffing
+ * algorithm. For example, an array longs that hold the hashed
+ * value of every line in the data we're diffing, as well as
+ * the number of records are kept here.
+ */
 struct diff_environment {
 /*
 	chastore_t rcha;
