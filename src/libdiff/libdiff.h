@@ -41,6 +41,12 @@ struct git_diffresults_conf {
 	git_diff_callback *callback;
 };
 
+struct git_changeset {
+	struct git_changeset *next;
+	long i1, i2;
+	long chg1, chg2;
+};
+
 int diff(git_diff_m_data *data1, git_diff_m_data *data2,
 		git_diffresults_conf const *results_conf);
 
