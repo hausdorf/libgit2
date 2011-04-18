@@ -1,27 +1,3 @@
-/*
- * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, version 2,
- * as published by the Free Software Foundation.
- *
- * In addition to the permissions in the GNU General Public License,
- * the authors give you unlimited permission to link the compiled
- * version of this file into combinations with other programs,
- * and to distribute those combinations without any restriction
- * coming from the use of this file.  (The General Public License
- * restrictions do apply in other respects; for example, they cover
- * modification of the file, and distribution when not linked into
- * a combined executable.)
- *
- * This file is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, write to
- * the Free Software Foundation, 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301, USA.
- */
 #include "diff.h"
 #include <stdio.h>
 #include <string.h>
@@ -52,8 +28,8 @@ static int load_file(char *file_path, char *buffer, int *size)
 	return GIT_SUCCESS;
 }
 
-int git_diff_no_index(git_diffdata **diffdata, const char *filename1,
-		const char *filename2)
+int git_diff_no_index(git_diffresults_conf **results_conf,
+		const char *filename1, const char *filename2)
 {
 	char *buffer1 = NULL;
 	char *buffer2 = NULL;
@@ -160,7 +136,8 @@ static int get_filepath(char* results, git_repository *repo,
 		return GIT_SUCCESS;
 }
 
-int git_diff(git_diffdata **diffdata, git_commit *commit, git_repository *repo)
+int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
+		git_repository *repo)
 {
 	git_tree *tree;			/* The tree that we will be diffing */
 	git_tree_entry *entry;  /* Enteries in the tree we are diffing */
@@ -225,7 +202,7 @@ cleanup:
 	return error_status;
 }
 
-int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
+int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
 		git_index *index)
 {
 	/* TODO */
@@ -233,7 +210,7 @@ int git_diff_cached(git_diffdata **diffdata, git_commit *commit,
 }
 
 /* Assumes commit1 is newer then commit 2 */
-int git_diff_commits(git_diffdata **diffdata, git_commit *commit1,
+int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		git_commit *commit2)
 {
 	git_tree *tree1, *tree2;
