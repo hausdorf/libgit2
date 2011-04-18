@@ -85,29 +85,24 @@ static int file_exists(char *filename, char *location)
 	return 0;
 }
 
-/* 0 if success, error otherwise. Returns the tree of this commit, or the
- * HEAD tree if commit is NULL */
+/* Gets the tree of this commit, or the HEAD tree if commit is NULL.
+ * Returns 0 on success, error otherwise. */
 static int get_git_tree(git_tree *results, git_commit *commit)
 {
-	git_oid *tree_id;
 	git_reference *reference;
+	git_oid *tree_id;
+	int error;
 
-	/* Get the tree for this diff, head if commit is null, else the commits
-	 * tree */
 	if(!commit) {
-		if(git_reference_lookup(&reference, repo, "HEAD") < GIT_SUCCESS)
-			return approperate_error;
+		error = git_reference_lookup(&reference, repo, "HEAD");
+		if(error < GIT_SUCCESS)
+			return error;
 
 		tree_id = git_reference_oid(head);
-		if(git_tree_lookup(&tree, repo, tree_id) < GIT_SUCCESS)
-			return apporperate_error;
+		return git_tree_lookup(&tree, repo, tree_id);
 	}
-	else {
-		if(git_commit_tree(&tree, commit) < GIT_SUCCESS)
-			return approperate_error;
-	}
-
-	return GIT_SUCCESS;
+	else
+		return git_commit_tree(&tree, commit);
 }
 
 /* 0 on success, error on failure. The resulting char* must be freed by the
