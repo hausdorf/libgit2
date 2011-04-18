@@ -91,6 +91,10 @@ struct git_changeset {
 };
 // typdef'd in include/types.h -- part of the public API
 
+typedef int (*diff_results_hndlr)(diff_environment *diff_env,
+		git_changeset *diff, git_diff_callback *diff_cb,
+		git_diffresults_conf const *results_conf);
+
 int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf);
 
