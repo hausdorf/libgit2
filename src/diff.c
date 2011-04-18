@@ -10,7 +10,7 @@
 /* 0 on success, error on failure. The char* file_path must be free'd by
  * the caller or a memory leak will occur. The file contesnts are loaded
  * into the buffer, and the size of the buffer is loaded into size */
-static int load_file(const char *file_path, char *buffer, int *size)
+static int load_file(const char *file_path, char **buffer, int *size)
 {
 	FILE *file;
 	int read_result;
@@ -24,15 +24,15 @@ static int load_file(const char *file_path, char *buffer, int *size)
 	*size=ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	buffer=(char *)malloc(*size+1);
-	if (!buffer) {
+	*buffer=(char *)malloc(*size+1);
+	if (!*buffer) {
 		fclose(file);
 		return GIT_ENOMEM;
 	}
 
-	read_result = fread(buffer, *size, 1, file);
+	read_result = fread(*buffer, *size, 1, file);
 	if(read_result != *size) {
-		free(buffer);
+		free(*buffer);
 		fclose(file);
 		return GIT_ERROR;
 	}
@@ -49,11 +49,11 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 
 	assert(filepath1 && filepath2);
 
-	result = load_file(filepath1, buffer1, &buffer1_size);
+	result = load_file(filepath1, &buffer1, &buffer1_size);
 	if(result < GIT_SUCCESS)
 		goto cleanup;
 
-	result = load_file(filepath2, buffer2, &buffer2_size);
+	result = load_file(filepath2, &buffer2, &buffer2_size);
 	if(result < GIT_SUCCESS)
 		goto cleanup;
 
@@ -144,7 +144,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 	 * blob. If it doesn't exist, the file has been deleted from the filesystem
 	 * since this entry's commit */
 	if(file_exists(filepath)) {
-		error = load_file(filepath, file_buffer, &file_size);
+		error = load_file(filepath, &file_buffer, &file_size);
 		if(error < GIT_SUCCESS) {
 			free(filepath);
 			return error;
