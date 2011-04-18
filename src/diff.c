@@ -63,28 +63,19 @@ cleanup:
 	return result;
 }
 
-/* The git_oid is the SHA1 identifier for a blob. Therefore, i think the
- * fastest way to do this would be to take the sha1 of  the file on the local
- * filesystem and compare it to this git_oid. */
-static int compare_hashes(char *filename, git_oid *blob_id, int *result)
+/* A git_oid is the SHA1 hash of a blob, so we will just create a git_oid from
+ * the file_buffer and compare it to the blob. Returns 1 if they are the same,
+ * 0 otherwise */
+static int compare_hashes(char *file_buffer, git_oid *blob_id, int file_size)
 {
-	char *file;
-	int file_size;
-	git_oid file_id; /* The resulting SHA1 hash of the file */
+	git_oid file_id; 	/* The resulting SHA1 hash of the file */
 
-	if(load_file(filename, file, &file_size)  < 0)
-		return GIT_ENOMEM;
+	git_hash_buf(&file_id, (void *) file_buffer, file_size);
 
-	/* Compare the two git_oid */
-	git_hash_buf(&file_id, (void *) file, file_size);
 	if(file_id == *blob_id)
-		*result = 1;
+		return 1;
 	else
-		*result = 0;
-
-	/* Cleanup */
-	free(file);
-	return GIT_SUCCESS;
+		return 0;
 }
 
 /* Prone to change, maybe easier to pass repo in then char* location */
@@ -142,35 +133,34 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 	git_tree *tree;			/* The tree that we will be diffing */
 	git_tree_entry *entry;  /* Enteries in the tree we are diffing */
 	char *filepath;			/* Filepath to a file in the working directory*/
+	char *file_buffer;		/* Buffer for contents of a file */
+	int file_size;			/* The size of the file in the file_buffer */
 	int compare_results;	/* Results from the compare hash method */
 	int results;			/* Return result of this function */
 	int i;					/* Loop counter */
 
-	results = GIT_SUCCESS;
-
 	/* Get the tree we will be diffing */
-	if(get_git_tree(tree, commit) < 0) {
-		results = ERROR;
+	results = get_git_tree(tree, commit);
+	if(results < GIT_SUCCESS)
 		goto cleanup;
-	}
 
 	/* Compare the blobs in this tree with the files in the local filesystem */
 	for(i=0; i<get_tree_entrycount(tree); i++) {
 		entry = git_tree_entry_byindex(tree, i);
 
-		if(get_filepath(filepath, repo, entry) < 0) {
-			results = GIT_ENOMEM;
+		results = get_filepath(filepath, repo, entry);
+		if(results < GIT_SUCCESS)
 			goto cleanup;
-		}
 
 		if(file_exists(filepath)) {
-			if(compare_hashes(filepath, blob, &compare_results) < 0) {
-				results = GIT_ENOMEM;
+			results = load_file(filepath, file_buffer, &file_size);
+			if(results < GIT_SUCCESS)
 				goto cleanup;
-			}
 
-			if(!compare_results)
+			if(!compare_hashes(file_buffer, blob))
 				diff();
+
+			free(file_buffer);
 		}
 		else {
 			/* The file has been deleted from the file system */
@@ -198,6 +188,8 @@ cleanup:
 		git_tree_close(tree);
 	if(files_hash)
 		git_hashtable_free(files_hash);
+	if(file_buffer)
+		free(file_buffer);
 
 	return results;
 }
