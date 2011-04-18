@@ -3,6 +3,36 @@
 
 #include "../common.h"
 
+struct diff_environment {
+/*
+	chastore_t rcha;
+	// Number of records, which is DEFINITLY
+	// lines
+	long nrec;
+	// Size of rhash???
+	unsigned int hbits;
+	// A hash table of xrecord pointers; build in
+	// xdl_prepare_ctx()
+	xrecord_t **rhash;
+	// D-path start and end
+	long dstart, dend;
+	// All records
+	xrecord_t **recs;
+	// In xdl_recs_cmp, each of these chars is set to a "weight" -- usually
+	// 0 or 1 depending on whether that particular record has changed. So
+	// it's basically a bit vector made of chars
+	char *rchg;
+	// An ARRAY of longs that represent hashes; in xdl_recs_cmp(),
+	// we access it as an array.
+	long *rindex;
+	// # of records * size of records???
+	long nreff;
+	// A hash of the entire xdfile contents
+	unsigned long *ha;
+*/
+};
+typedef struct diff_environment diff_environment;
+
 /*
  * Represents file data (binary or text) in memory. Often
  * instances of these structs are the direct objects that
