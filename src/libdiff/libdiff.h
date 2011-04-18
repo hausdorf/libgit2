@@ -12,12 +12,12 @@
  * which are identical in execution, but conceptually different
  * and follow a different pipeline.
  */
-struct git_diff_mem {
+struct diff_mem {
 	size_t size;
 	char *data;
 };
-typedef struct git_diff_mem git_diff_m_data;
-typedef struct git_diff_mem git_diff_m_buffer;
+typedef struct diff_mem diff_mem_data;
+typedef struct diff_mem diff_mem_buffer;
 
 /*
  * Callback function; called directly after we perform the
@@ -26,7 +26,7 @@ typedef struct git_diff_mem git_diff_m_buffer;
  */
 struct git_diff_callback {
 	void *payload;
-	int (*out_func)(void *, git_diff_m_buffer *, int);
+	int (*out_func)(void *, diff_mem_buffer *, int);
 };
 typedef struct git_diff_callback git_diff_callback;
 
@@ -55,7 +55,7 @@ struct git_changeset {
 };
 // typdef'd in include/types.h -- part of the public API
 
-int diff(git_diff_m_data *data1, git_diff_m_data *data2,
+int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf);
 
 #endif

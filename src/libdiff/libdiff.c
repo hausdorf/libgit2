@@ -25,7 +25,7 @@
 #include "libdiff.h"
 
 // TODO: IMPLEMENT THIS
-int diff(git_diff_m_data *data1, git_diff_m_data *data2,
+int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf)
 {
 	return 0;
