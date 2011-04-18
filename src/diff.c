@@ -1,11 +1,16 @@
 #include "diff.h"
+#include "hash.h"
+#include "refs.h"
+#include "tree.h"
+#include "commit.h"
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 /* 0 on success, error on failure. The char* file_path must be free'd by
  * the caller or a memory leak will occur. The file contesnts are loaded
  * into the buffer, and the size of the buffer is loaded into size */
-static int load_file(char *file_path, char *buffer, int *size)
+static int load_file(const char *file_path, char *buffer, int *size)
 {
 	FILE *file;
 	int read_result;
@@ -36,20 +41,20 @@ static int load_file(char *file_path, char *buffer, int *size)
 }
 
 int git_diff_no_index(git_diffresults_conf **results_conf,
-		const char *filename1, const char *filename2)
+		const char *filepath1, const char *filepath2)
 {
 	char *buffer1, *buffer2;
 	int buffer1_size, buffer2_size;
 	int result;
 
-	assert(file1 && file2);
+	assert(filepath1 && filepath2);
 
-	result = load_file(file1, buffer1, &buffer1_size);
-	if(results < GIT_SUCCESS)
+	result = load_file(filepath1, buffer1, &buffer1_size);
+	if(result < GIT_SUCCESS)
 		goto cleanup;
 
-	result = load_file(file2, buffer2, &buffer2_size);
-	if(results < GIT_SUCCESS)
+	result = load_file(filepath2, buffer2, &buffer2_size);
+	if(result < GIT_SUCCESS)
 		goto cleanup;
 
 	diff();
@@ -66,20 +71,17 @@ cleanup:
 /* A git_oid is the SHA1 hash of a blob, so we will just create a git_oid from
  * the file_buffer and compare it to the blob. Returns 1 if they are the same,
  * 0 otherwise */
-static int compare_hashes(char *file_buffer, git_oid *blob_id, int file_size)
+static int compare_hashes(char *file_buffer, const git_oid *blob_id,
+		int file_size)
 {
 	git_oid file_id; 	/* The resulting SHA1 hash of the file */
-
 	git_hash_buf(&file_id, (void *) file_buffer, file_size);
 
-	if(file_id == *blob_id)
-		return 1;
-	else
-		return 0;
+	return git_oid_cmp(&file_id, blob_id);
 }
 
 /* Prone to change, maybe easier to pass repo in then char* location */
-static int file_exists(char *filename, char *location)
+static int file_exists(char *filename)
 {
 	/* TODO */
 	return 0;
@@ -87,10 +89,11 @@ static int file_exists(char *filename, char *location)
 
 /* Gets the tree of this commit, or the HEAD tree if commit is NULL.
  * Returns 0 on success, error otherwise. */
-static int get_git_tree(git_tree *results, git_commit *commit)
+static int get_git_tree(git_tree *results, git_repository *repo,
+		git_commit *commit)
 {
 	git_reference *reference;
-	git_oid *tree_id;
+	const git_oid *tree_id;
 	int error;
 
 	if(!commit) {
@@ -98,20 +101,20 @@ static int get_git_tree(git_tree *results, git_commit *commit)
 		if(error < GIT_SUCCESS)
 			return error;
 
-		tree_id = git_reference_oid(head);
-		return git_tree_lookup(&tree, repo, tree_id);
+		tree_id = git_reference_oid(reference);
+		return git_tree_lookup(&results, repo, tree_id);
 	}
 	else
-		return git_commit_tree(&tree, commit);
+		return git_commit_tree(&results, commit);
 }
 
 /* The resulting char* must be freed by caller or a memory leak will occur */
 static int get_filepath(char* results, git_repository *repo,
-						git_tree_entry *entry)
+		const git_tree_entry *entry)
 {
-		results = malloc (char *) sizeof(char) *
+		results = (char *) malloc(sizeof(char) *
 			   (strlen(git_repository_workdir(repo))
-			   + strlen(git_tree_entry_name(entry)));
+			   + strlen(git_tree_entry_name(entry))));
 
 		if(results == NULL)
 			return GIT_ENOMEM;
@@ -124,7 +127,7 @@ static int get_filepath(char* results, git_repository *repo,
 
 /* Gets the changes between the git_tree_entry and the local filesystem, and
  * saves them into **results_conf. Returns 0 on success, error otherwise */
-int get_file_changes(git_tree_entry *entry, git_repositoyr *repo,
+int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 		git_diffresults_conf **results_conf)
 {
 	char *filepath;		/* Filepath to a file in the working directory*/
@@ -148,7 +151,7 @@ int get_file_changes(git_tree_entry *entry, git_repositoyr *repo,
 		}
 
 		/* Check if the local file matches the git blob */
-		if(!compare_hashes(file_buffer, get_tree_entry_it(entry)))
+		if(!compare_hashes(file_buffer, git_tree_entry_id(entry), file_size))
 			diff();
 
 		free(file_buffer);
@@ -163,18 +166,18 @@ int get_file_changes(git_tree_entry *entry, git_repositoyr *repo,
 int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		git_repository *repo)
 {
-	git_tree *tree;			/* The tree that we will be diffing */
-	git_tree_entry *entry;  /* Enteries in the tree that we are diffing */
-	int error;				/* Return results of helper functions */
-	int i;					/* Loop counter */
+	git_tree *tree;				/* The tree that we will be diffing */
+	const git_tree_entry *entry;/* Enteries in the tree that we are diffing */
+	int error;					/* Return results of helper functions */
+	unsigned int i;				/* Loop counter */
 
 	/* Get the tree we will be diffing */
-	error = get_git_tree(tree, commit);
+	error = get_git_tree(tree, repo, commit);
 	if(error < GIT_SUCCESS)
 		return error;
 
 	/* Compare the blobs in this tree with the files in the local filesystem */
-	for(i=0; i<get_tree_entrycount(tree); i++) {
+	for(i=0; i<git_tree_entrycount(tree); i++) {
 		entry = git_tree_entry_byindex(tree, i);
 
 		error = get_file_changes(entry, repo, results_conf);
@@ -186,13 +189,15 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 
 	/* Check every file on the local filesystem, to catch any new files that
 	 * may have been created since the commit */
+	/*
 	for(each file in filesystem) {
 		entry = git_tree_entry_byname(tree, filename);
 
 		if(entry == NULL) {
-			/* This is a newly created file since the commit we are diffing */
+			This is a newly created file since the commit we are diffing
 		}
 	}
+	*/
 
 	git_tree_close(tree);
 	return GIT_SUCCESS;
