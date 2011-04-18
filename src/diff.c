@@ -112,17 +112,17 @@ static int get_git_tree(git_tree *results, git_repository *repo,
 static int get_filepath(char* results, git_repository *repo,
 		const git_tree_entry *entry)
 {
-		results = (char *) malloc(sizeof(char) *
-			   (strlen(git_repository_workdir(repo))
-			   + strlen(git_tree_entry_name(entry))));
+	results = (char *) malloc(sizeof(char) *
+		   (strlen(git_repository_workdir(repo))
+		   + strlen(git_tree_entry_name(entry))));
 
-		if(results == NULL)
-			return GIT_ENOMEM;
+	if(results == NULL)
+		return GIT_ENOMEM;
 
-		strcat(results, git_repository_workdir(repo));
-		strcat(results, git_tree_entry_name(entry));
+	strcat(results, git_repository_workdir(repo));
+	strcat(results, git_tree_entry_name(entry));
 
-		return GIT_SUCCESS;
+	return GIT_SUCCESS;
 }
 
 /* Gets the changes between the git_tree_entry and the local filesystem, and
@@ -217,25 +217,22 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		git_commit *commit2)
 {
 	git_tree *tree1, *tree2;
-	git_tree_entry *entry1, *entry2;
-	git_oid *blob1, *blob2;
-	char *filename;
+	const git_tree_entry *entry1, *entry2;
+	const git_oid *blob1, *blob2;
+	const char *filename;
 	int results;
-	int i;
+	unsigned int i;
 
-	results = GIT_SUCCESS;
+	results = git_commit_tree(&tree1, commit1);
+	if(results < GIT_SUCCESS)
+		goto cleanup;
 
-	if(git_commit_tree(&tree1, commit1) < GIT_SUCCESS) {
-		results = some_error;
+	results = git_commit_tree(&tree2, commit2);
+	if(results < GIT_SUCCESS)
 		goto cleanup;
-	}
-	if(git_commit_tree(&tree2, commit2) < GIT_SUCCESS) {
-		results = some_error;
-		goto cleanup;
-	}
 
 	/* Compare all the blobs in tree1 looking for differences between tree2 */
-	for(i=0; i<get_tree_entrycount(tree1); i++) {
+	for(i=0; i<git_tree_entrycount(tree1); i++) {
 		entry1 = git_tree_entry_byindex(tree1, i);
 		filename = git_tree_entry_name(entry1);
 
@@ -248,13 +245,13 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		else {
 			blob1 = git_tree_entry_id(entry1);
 			blob2 = git_tree_entry_id(entry1);
-			if(*blob1 != *blob2)
+			if(git_oid_cmp(blob1, blob2))
 				diff();
 		}
 	}
 
 	/* Check tree2 for files that were added between these two commits */
-	for(i=0; i<get_tree_entrycount(tree2); i++) {
+	for(i=0; i<git_tree_entrycount(tree2); i++) {
 		entry2 = git_tree_entry_byindex(tree2, i);
 		filename = git_tree_entry_name(entry2);
 
