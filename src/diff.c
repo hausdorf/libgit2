@@ -127,51 +127,70 @@ static int get_filepath(char* results, git_repository *repo,
 		return GIT_SUCCESS;
 }
 
+/* Gets the changes between the git_tree_entry and the local filesystem, and
+ * saves them into **results_conf. Returns 0 on success, error otherwise */
+int get_file_changes(git_tree_entry *entry, git_repositoyr *repo,
+		git_diffresults_conf **results_conf)
+{
+	char *filepath;		/* Filepath to a file in the working directory*/
+	char *file_buffer;	/* Buffer for contents of a file */
+	int file_size;		/* The size of the file in the file_buffer */
+	int error;			/* Holds error results of function calls */
+
+	/* Get the filepath from the entry */
+	error = get_filepath(filepath, repo, entry);
+	if(error < GIT_SUCCESS)
+		return error;
+
+	/* If the local file exists load it into memory and compare it with the
+	 * blob. If it doesn't exist, the file has been deleted from the filesystem
+	 * since this entry's commit */
+	if(file_exists(filepath)) {
+		error = load_file(filepath, file_buffer, &file_size);
+		if(error < GIT_SUCCESS) {
+			free(filepath);
+			return error;
+		}
+
+		/* Check if the local file matches the git blob */
+		if(!compare_hashes(file_buffer, get_tree_entry_it(entry)))
+			diff();
+
+		free(file_buffer);
+	}
+	else {
+	}
+
+	free(filepath);
+	return GIT_SUCCESS;
+}
+
 int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		git_repository *repo)
 {
 	git_tree *tree;			/* The tree that we will be diffing */
-	git_tree_entry *entry;  /* Enteries in the tree we are diffing */
-	char *filepath;			/* Filepath to a file in the working directory*/
-	char *file_buffer;		/* Buffer for contents of a file */
-	int file_size;			/* The size of the file in the file_buffer */
-	int compare_results;	/* Results from the compare hash method */
-	int results;			/* Return result of this function */
+	git_tree_entry *entry;  /* Enteries in the tree that we are diffing */
+	int error;				/* Return results of helper functions */
 	int i;					/* Loop counter */
 
 	/* Get the tree we will be diffing */
-	results = get_git_tree(tree, commit);
-	if(results < GIT_SUCCESS)
-		goto cleanup;
+	error = get_git_tree(tree, commit);
+	if(error < GIT_SUCCESS)
+		return error;
 
 	/* Compare the blobs in this tree with the files in the local filesystem */
 	for(i=0; i<get_tree_entrycount(tree); i++) {
 		entry = git_tree_entry_byindex(tree, i);
 
-		results = get_filepath(filepath, repo, entry);
-		if(results < GIT_SUCCESS)
-			goto cleanup;
-
-		if(file_exists(filepath)) {
-			results = load_file(filepath, file_buffer, &file_size);
-			if(results < GIT_SUCCESS)
-				goto cleanup;
-
-			if(!compare_hashes(file_buffer, blob))
-				diff();
-
-			free(file_buffer);
+		error = get_file_changes(entry, repo, results_conf);
+		if(error < GIT_SUCCESS) {
+			git_tree_close(tree);
+			return error;
 		}
-		else {
-			/* The file has been deleted from the file system */
-		}
-
-		free(filepath);
 	}
 
 	/* Check every file on the local filesystem, to catch any new files that
-	 * may have been created since the commit
-	 * TODO - implement this, and make it compatible with linux and word */
+	 * may have been created since the commit */
 	for(each file in filesystem) {
 		entry = git_tree_entry_byname(tree, filename);
 
@@ -180,18 +199,8 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		}
 	}
 
-/* Flag used with goto in case of errors to clean up the pointers */
-cleanup:
-	if(filepath)
-		free(filepath);
-	if(tree)
-		git_tree_close(tree);
-	if(files_hash)
-		git_hashtable_free(files_hash);
-	if(file_buffer)
-		free(file_buffer);
-
-	return results;
+	git_tree_close(tree);
+	return GIT_SUCCESS;
 }
 
 int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
