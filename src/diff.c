@@ -3,7 +3,8 @@
 #include <string.h>
 
 /* 0 on success, error on failure. The char* file_path must be free'd by
- * the caller or a memory leak will occur */
+ * the caller or a memory leak will occur. The file contesnts are loaded
+ * into the buffer, and the size of the buffer is loaded into size */
 static int load_file(char *file_path, char *buffer, int *size)
 {
 	FILE *file;
@@ -52,7 +53,6 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 		goto cleanup;
 	}
 
-	/* call diff on file1, file2 (don't forget to malloc diffdata) */
 	diff();
 
 cleanup:
@@ -61,10 +61,10 @@ cleanup:
 	if(buffer2)
 		free(buffer2);
 
-	return GIT_SUCCESS;
+	return result;
 }
 
-/* The git_oid is the sha1 identifier for a blob. Therefore, i think the
+/* The git_oid is the SHA1 identifier for a blob. Therefore, i think the
  * fastest way to do this would be to take the sha1 of  the file on the local
  * filesystem and compare it to this git_oid. */
 static int compare_hashes(char *filename, git_oid *blob_id, int *result)
@@ -95,13 +95,14 @@ static int file_exists(char *filename, char *location)
 	return 0;
 }
 
-/* 0 if success, error otherwise */
+/* 0 if success, error otherwise. Returns the tree of this commit, or the
+ * HEAD tree if commit is NULL */
 static int get_git_tree(git_tree *results, git_commit *commit)
 {
 	git_oid *tree_id;
 	git_reference *reference;
 
-	/* Get the tree for this diff, head if commit is null, else the commit
+	/* Get the tree for this diff, head if commit is null, else the commits
 	 * tree */
 	if(!commit) {
 		if(git_reference_lookup(&reference, repo, "HEAD") < GIT_SUCCESS)
@@ -141,16 +142,16 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 {
 	git_tree *tree;			/* The tree that we will be diffing */
 	git_tree_entry *entry;  /* Enteries in the tree we are diffing */
-	char *filepath;			/* filepath to a file in the working directory*/
-	int compare_results;	/* results from compare hash */
-	int error_status;		/* error status of this method */
-	int i;					/* loop counter */
+	char *filepath;			/* Filepath to a file in the working directory*/
+	int compare_results;	/* Results from the compare hash method */
+	int results;			/* Return result of this function */
+	int i;					/* Loop counter */
 
-	error_status = GIT_SUCCESS;
+	results = GIT_SUCCESS;
 
 	/* Get the tree we will be diffing */
 	if(get_git_tree(tree, commit) < 0) {
-		error_status = ERROR;
+		results = ERROR;
 		goto cleanup;
 	}
 
@@ -159,13 +160,13 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		entry = git_tree_entry_byindex(tree, i);
 
 		if(get_filepath(filepath, repo, entry) < 0) {
-			error_status = GIT_ENOMEM;
+			results = GIT_ENOMEM;
 			goto cleanup;
 		}
 
 		if(file_exists(filepath)) {
 			if(compare_hashes(filepath, blob, &compare_results) < 0) {
-				error_status = GIT_ENOMEM;
+				results = GIT_ENOMEM;
 				goto cleanup;
 			}
 
@@ -199,7 +200,7 @@ cleanup:
 	if(files_hash)
 		git_hashtable_free(files_hash);
 
-	return error_status;
+	return results;
 }
 
 int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
@@ -209,7 +210,9 @@ int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
     return 0;
 }
 
-/* Assumes commit1 is newer then commit 2 */
+/* Assumes commit1 is newer then commit 2. If this is not the case then the
+ * diff will be reveresed, ie the added stuff will show up as deleted and
+ * vice versa */
 int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		git_commit *commit2)
 {
@@ -222,7 +225,6 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 
 	results = GIT_SUCCESS;
 
-	/* Get the trees for this diff */
 	if(git_commit_tree(&tree1, commit1) < GIT_SUCCESS) {
 		results = some_error;
 		goto cleanup;
@@ -232,7 +234,7 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		goto cleanup;
 	}
 
-	/* Compare the blobs in these trees looking for differences */
+	/* Compare all the blobs in tree1 looking for differences between tree2 */
 	for(i=0; i<get_tree_entrycount(tree1); i++) {
 		entry1 = git_tree_entry_byindex(tree1, i);
 		filename = git_tree_entry_name(entry1);
@@ -244,17 +246,14 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 			/* this entry got deleted between commit1 and commit2 */
 		}
 		else {
-			/* Compare the SHA1's of both blobs to see if the file has
-			 * changed */
 			blob1 = git_tree_entry_id(entry1);
 			blob2 = git_tree_entry_id(entry1);
-			if(*blob1 == *blob2)
+			if(*blob1 != *blob2)
 				diff();
 		}
 	}
 
-	/* Go through tree2 to check for files that were added between
-	 * these commits */
+	/* Check tree2 for files that were added between these two commits */
 	for(i=0; i<get_tree_entrycount(tree2); i++) {
 		entry2 = git_tree_entry_byindex(tree2, i);
 		filename = git_tree_entry_name(entry2);
