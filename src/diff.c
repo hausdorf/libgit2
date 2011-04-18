@@ -3,6 +3,7 @@
 #include "refs.h"
 #include "tree.h"
 #include "commit.h"
+#include "libdiff/libdiff.h"
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -57,7 +58,7 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	if(result < GIT_SUCCESS)
 		goto cleanup;
 
-	diff();
+	diff(NULL, NULL, NULL);
 
 cleanup:
 	if(buffer1)
@@ -152,7 +153,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 
 		/* Check if the local file matches the git blob */
 		if(!compare_hashes(file_buffer, git_tree_entry_id(entry), file_size))
-			diff();
+			diff(NULL, NULL, NULL);
 
 		free(file_buffer);
 	}
@@ -246,7 +247,7 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 			blob1 = git_tree_entry_id(entry1);
 			blob2 = git_tree_entry_id(entry1);
 			if(git_oid_cmp(blob1, blob2))
-				diff();
+				diff(NULL, NULL, NULL);
 		}
 	}
 
