@@ -8,50 +8,57 @@
 static int load_file(char *file_path, char *buffer, int *size)
 {
 	FILE *file;
+	int result;
+	int read_result;
+
+	result = GIT_SUCCESS;
+
 	file = fopen(file_path, "rb");
+	if(!file) {
+		result = GIT_EINVALIDPATH;
+		goto cleanup;
+	}
 
-	if(!file)
-		return appropiate_error;
-
+	/* Get the size of this file */
 	fseek(file, 0, SEEK_END);
-	size=ftell(file);
+	*size=ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	/* Allocate memory */
-	buffer=(char *)malloc(size+1);
-	if (!buffer)
-		return GIT_ENOMEM;
+	buffer=(char *)malloc(*size+1);
+	if (!buffer) {
+		result = GIT_ENOMEM;
+		goto cleanup;
+	}
 
-	/* Read file contents into buffer */
-	fread(buffer, size, 1, file);
-	fclose(file);
+	read_result = fread(buffer, *size, 1, file);
+	if(read_result != *size) {
+		free(buffer);
+		result = GIT_ERROR;
+	}
 
-	return GIT_SUCCESS;
+cleanup:
+	if(file)
+		fclose(file);
+
+	return result;
 }
 
 int git_diff_no_index(git_diffresults_conf **results_conf,
 		const char *filename1, const char *filename2)
 {
-	char *buffer1 = NULL;
-	char *buffer2 = NULL;
+	char *buffer1, *buffer2;
 	int buffer1_size, buffer2_size;
-	int result = GIT_SUCCESS;
+	int result;
 
-	/* Insure all paramater are valid */
-	if(!file1 | !file2) {
-		result = appropiate_error;
-		goto cleanup;
-	}
+	assert(file1 && file2);
 
-	if(!load_file(file1, buffer1, &buffer1_size))
-		result = appropiate_error;
+	result = load_file(file1, buffer1, &buffer1_size);
+	if(results < GIT_SUCCESS)
 		goto cleanup;
-	}
 
-	if(!load_file(file2, buffer2, &buffer2_size)) {
-		result = appropiate_error;
+	result = load_file(file2, buffer2, &buffer2_size);
+	if(results < GIT_SUCCESS)
 		goto cleanup;
-	}
 
 	diff();
 
