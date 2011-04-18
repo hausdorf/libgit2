@@ -89,7 +89,7 @@ static int file_exists(char *filename)
 
 /* Gets the tree of this commit, or the HEAD tree if commit is NULL.
  * Returns 0 on success, error otherwise. */
-static int get_git_tree(git_tree *results, git_repository *repo,
+static int get_git_tree(git_tree **results, git_repository *repo,
 		git_commit *commit)
 {
 	git_reference *reference;
@@ -102,25 +102,25 @@ static int get_git_tree(git_tree *results, git_repository *repo,
 			return error;
 
 		tree_id = git_reference_oid(reference);
-		return git_tree_lookup(&results, repo, tree_id);
+		return git_tree_lookup(results, repo, tree_id);
 	}
 	else
-		return git_commit_tree(&results, commit);
+		return git_commit_tree(results, commit);
 }
 
 /* The resulting char* must be freed by caller or a memory leak will occur */
-static int get_filepath(char* results, git_repository *repo,
+static int get_filepath(char** results, git_repository *repo,
 		const git_tree_entry *entry)
 {
-	results = (char *) malloc(sizeof(char) *
+	*results = (char *) malloc(sizeof(char) *
 		   (strlen(git_repository_workdir(repo))
 		   + strlen(git_tree_entry_name(entry))));
 
 	if(results == NULL)
 		return GIT_ENOMEM;
 
-	strcat(results, git_repository_workdir(repo));
-	strcat(results, git_tree_entry_name(entry));
+	strcat(*results, git_repository_workdir(repo));
+	strcat(*results, git_tree_entry_name(entry));
 
 	return GIT_SUCCESS;
 }
@@ -136,7 +136,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 	int error;			/* Holds error results of function calls */
 
 	/* Get the filepath from the entry */
-	error = get_filepath(filepath, repo, entry);
+	error = get_filepath(&filepath, repo, entry);
 	if(error < GIT_SUCCESS)
 		return error;
 
@@ -172,7 +172,7 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 	unsigned int i;				/* Loop counter */
 
 	/* Get the tree we will be diffing */
-	error = get_git_tree(tree, repo, commit);
+	error = get_git_tree(&tree, repo, commit);
 	if(error < GIT_SUCCESS)
 		return error;
 
