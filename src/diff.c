@@ -105,19 +105,19 @@ static int get_git_tree(git_tree *results, git_commit *commit)
 		return git_commit_tree(&tree, commit);
 }
 
-/* 0 on success, error on failure. The resulting char* must be freed by the
- * caller */
+/* The resulting char* must be freed by caller or a memory leak will occur */
 static int get_filepath(char* results, git_repository *repo,
 						git_tree_entry *entry)
 {
-		filepath = malloc (char *) sizeof(char) *
-				   (strlen(git_repository_workdir(repo))
-				   + strlen(git_tree_entry_name(entry)));
-		if(filepath == NULL)
+		results = malloc (char *) sizeof(char) *
+			   (strlen(git_repository_workdir(repo))
+			   + strlen(git_tree_entry_name(entry)));
+
+		if(results == NULL)
 			return GIT_ENOMEM;
 
-		strcat(filepath, git_repository_workdir(repo));
-		strcat(filepath, git_tree_entry_name(entry));
+		strcat(results, git_repository_workdir(repo));
+		strcat(results, git_tree_entry_name(entry));
 
 		return GIT_SUCCESS;
 }
