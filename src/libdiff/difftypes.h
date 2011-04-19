@@ -3,20 +3,20 @@
 
 #include "../common.h"
 
-struct mem_store_node {
-	struct mem_store_iter *next;
+struct memstore_node {
+	struct memstore_iter *next;
 	long curr_idx;
 };
-typedef struct mem_store_node mem_store_node;
+typedef struct memstore_node memstore_node;
 
 // TODO: ADD COMMENT HERE
 // Equivalent to chastore_t
-struct mem_store {
+struct memstore {
 	// head and tail initially point to ancur; as we allocate more
 	// memory, the tail and head grow apart, but the alloc'd
 	// memory is linked by the chanode_t->next links, which usually
 	// point to the first address in the chastore allocated blocks
-	mem_store_node *head, *tail;
+	memstore_node *head, *tail;
 	// See xdl_cha_init:
 	// - isize is the # of bytes in the sort of struct we're using
 	size_t unit_size;
@@ -25,13 +25,14 @@ struct mem_store {
 	size_t store_size;
 	// Handles all the allocation of new memory from the chastore
 	// usually via xdl_cha_init()
-	mem_store_node *allocator;
+	memstore_node *allocator;
 	// Handles traversal of chastore objects
-	mem_store_node *iterator;
+	memstore_node *iterator;
 	// initially 0
+	// TODO: WTF is this again???
 	size_t scurr;
 };
-typedef struct mem_store mem_store;
+typedef struct memstore memstore;
 
 // TODO: FIGURE OUT WHAT THE EFF THIS DOES (I forgot)
 // TODO: ADD COMMENT HERE
@@ -60,7 +61,7 @@ struct record_classifier {
 	classd_record **classd_hash;
 	// The memory that rchash resides in
 	// TODO: IMPLEMENT chastore; not implemented yet
-	//chastore_t table_memory;
+	memstore table_memory;
 	// Number of elements in rchash
 	size_t count;
 

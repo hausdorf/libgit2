@@ -24,6 +24,7 @@
  */
 #include "libdiff.h"
 #include "diffhelpers.h"
+#include "memstore.h"
 
 
 
@@ -39,10 +40,20 @@ static int init_record_classifier(record_classifier *classifier, long size,
 {
 	classifier->hbits = hashbits((unsigned int) size);
 	classifier->table_size = 1 << classifier->hbits;
-	/*if (xdl_cha_init(&cf->ncha, sizeof(xdlclass_t), size / 4 + 1) < 0)
+
+	/// TODO: FIND OUT WHY IT'S size/4+1
+	if (memstore_init(&classifier->table_memory, sizeof(classd_record),
+			size / 4 + 1) < 0)
 	{
 		return -1;
+	}
+
+	/*if (!(recs = (xrecord_t **) xdl_malloc(narec * sizeof(xrecord_t *)))) {
+
+		xdl_cha_free(&xdf->rcha);
+		return -1;
 	}*/
+
 	return 0;
 }
 
