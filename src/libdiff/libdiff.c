@@ -25,7 +25,7 @@
 #include "libdiff.h"
 
 // TODO: COMMENT THIS FUNCTION
-int prepare_and_diff(diff_mem_data *data1, diff_mem_data *data2,
+int prepare_and_myers(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *diff_env)
 {
 	// TODO: COMMENT THESE VARS
@@ -68,7 +68,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 //		if(prepare_and_patience(data1, data2, &diff_env) < 0)
 //			return -1;
 
-	if(prepare_and_diff(data1, data2, &diff_env) < 0)
+	if(prepare_and_myers(data1, data2, &diff_env) < 0)
 	{
 		return -1;
 	}
