@@ -5,7 +5,7 @@
 
 struct memstore_node {
 	struct memstore_iter *next;
-	long curr_idx;
+	size_t curr_idx;
 };
 typedef struct memstore_node memstore_node;
 
