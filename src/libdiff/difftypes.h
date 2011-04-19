@@ -3,6 +3,36 @@
 
 #include "../common.h"
 
+struct mem_store_node {
+	struct mem_store_iter *next;
+	long curr_idx;
+};
+typedef struct mem_store_node mem_store_node;
+
+// TODO: ADD COMMENT HERE
+// Equivalent to chastore_t
+struct mem_store {
+	// head and tail initially point to ancur; as we allocate more
+	// memory, the tail and head grow apart, but the alloc'd
+	// memory is linked by the chanode_t->next links, which usually
+	// point to the first address in the chastore allocated blocks
+	mem_store_node *head, *tail;
+	// See xdl_cha_init:
+	// - isize is the # of bytes in the sort of struct we're using
+	long unit_size;
+	// - nsize is the # of bytes we want to reserve for the store,
+	// usually isize * the number of objects we want to store
+	long store_size;
+	// Handles all the allocation of new memory from the chastore
+	// usually via xdl_cha_init()
+	mem_store_node *ancur;
+	// Handles traversal of chastore objects
+	mem_store_node *sncur;
+	// initially 0
+	long scurr;
+};
+typedef struct mem_store mem_store;
+
 // TODO: FIGURE OUT WHAT THE EFF THIS DOES (I forgot)
 // TODO: ADD COMMENT HERE
 // Equivalent to xdlclass_t
