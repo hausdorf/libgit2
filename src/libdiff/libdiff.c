@@ -40,6 +40,8 @@ static int init_record_classifier(record_classifier *classifier, long size,
 {
 	classifier->hbits = hashbits((unsigned int) size);
 	classifier->table_size = 1 << classifier->hbits;
+
+	/// TODO: FIND OUT WHY IT'S size/4+1
 	if (memstore_init(&classifier->table_memory, sizeof(classd_record),
 			size / 4 + 1) < 0)
 	{
