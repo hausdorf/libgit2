@@ -84,10 +84,14 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	/* END TEST CODE */
 
 cleanup:
+	// FIXME: This is where #15 is happening. COMMENTING IT OUT
+	// IS A (BAD) WORKAROUND.
+	/*
 	if(buffer1)
 		free(buffer1);
 	if(buffer2)
 		free(buffer2);
+	*/
 
 	return result;
 }
