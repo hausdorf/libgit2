@@ -41,6 +41,9 @@ static int init_record_classifier(record_classifier *classifier, long size,
 int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *diff_env)
 {
+	// TODO: REMOVE ME WHEN YOU'RE DONE DEVELOPING THE ALGORITHM
+	printf("MYERS_ENVIRONMENT\n");
+
 	// TODO: WE GUESS TOTAL LINES IN data1 AND data2, BUT LATER
 	// ON, WE ACTUALLY FIND THE SPECIFIC TOTAL LINES IN BOTH;
 	// ARE BOTH OF THESE PROCESSES NECESSARY?
@@ -69,6 +72,9 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 int prepare_and_myers(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *diff_env)
 {
+	// TODO: REMOVE ME WHEN YOU'RE DONE DEVELOPING THE ALGORITHM
+	printf("PREPARE_AND_MYERS\n");
+
 	// TODO: COMMENT THESE VARS
 	long L;
 
@@ -97,6 +103,9 @@ int prepare_and_myers(diff_mem_data *data1, diff_mem_data *data2,
 int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf)
 {
+	// TODO: REMOVE ME WHEN YOU'RE DONE DEVELOPING THE ALGORITHM
+	printf("DIFF\n");
+
 	// TODO COMMENT THESE VARS
 	git_changeset *diff;
 	diff_environment diff_env;

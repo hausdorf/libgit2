@@ -57,6 +57,9 @@ static int load_file(const char *file_path, char **buffer, int *size)
 int git_diff_no_index(git_diffresults_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {
+	// TODO: REMOVE ME WHEN YOU'RE DONE DEVELOPING ALGORITHM
+	printf("DIFF_NO_INDEX\n");
+
 	diff_mem_data data1, data2;
 	char *buffer1, *buffer2;
 	int buffer1_size, buffer2_size;
@@ -64,6 +67,8 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 
 	assert(filepath1 && filepath2);
 
+	// FIXME: These calls fail and cause #15.
+	/*
 	result = load_file(filepath1, &buffer1, &buffer1_size);
 	if(result < GIT_SUCCESS)
 		goto cleanup;
@@ -71,6 +76,15 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	result = load_file(filepath2, &buffer2, &buffer2_size);
 	if(result < GIT_SUCCESS)
 		goto cleanup;
+	*/
+
+	// FIXME: The above commented-out code should populate
+	// these vars. They don't, and this is part of the
+	// workaround.
+	buffer1 = "SOME TEXT\nGOES HERE\n";
+	buffer1_size = 22;
+	buffer2 = "SOME OTHER TEXT\nGOES HERE\n";
+	buffer2_size = 28;
 
 	// TODO: IMPLEMENT THIS FOR REAL. THIS IS TEST CODE.
 	/* TEST CODE */
