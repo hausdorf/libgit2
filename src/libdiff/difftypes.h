@@ -25,9 +25,9 @@ struct mem_store {
 	long store_size;
 	// Handles all the allocation of new memory from the chastore
 	// usually via xdl_cha_init()
-	mem_store_node *ancur;
+	mem_store_node *allocator;
 	// Handles traversal of chastore objects
-	mem_store_node *sncur;
+	mem_store_node *iterator;
 	// initially 0
 	long scurr;
 };
