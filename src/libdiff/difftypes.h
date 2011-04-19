@@ -27,6 +27,7 @@ struct memstore {
 	// usually via xdl_cha_init()
 	memstore_node *allocator;
 	// Handles traversal of chastore objects
+	// TODO: FIND OUT IF THE iterator AND scurr ARE NECESSARY
 	memstore_node *iterator;
 	// initially 0
 	// TODO: WTF is this again???
