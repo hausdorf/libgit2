@@ -21,14 +21,20 @@ typedef struct classd_record classd_record;
 // TODO: ADD COMMENT HERE
 // Equivalent to xdlclassifier_t
 struct record_classifier {
-/*
+	// Used to find hsize -- the smallest power of 2 greater than param
+	// size in xdl_init_classifier
 	unsigned int hbits;
+	// Size of hash table rchash
 	long hsize;
+	// Hash table of classd_records
 	xdlclass_t **rchash;
+	// The memory that rchash resides in
 	chastore_t ncha;
+	// Number of elements in rchash
 	long count;
-	long flags;
-*/
+
+	// TODO: CLEANUP, definitely not needed
+	//long flags;
 };
 typedef struct record_classifier record_classifier;
 
