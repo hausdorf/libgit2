@@ -5,6 +5,18 @@
 
 // TODO: FIGURE OUT WHAT THE EFF THIS DOES (I forgot)
 // TODO: ADD COMMENT HERE
+typedef struct s_xdlclass {
+/*
+	struct s_xdlclass *next;
+	unsigned long ha;
+	char const *line;
+	long size;
+	long idx;
+*/
+} xdlclass_t;
+
+// TODO: FIGURE OUT WHAT THE EFF THIS DOES (I forgot)
+// TODO: ADD COMMENT HERE
 typedef struct s_xdlclassifier {
 /*
 	unsigned int hbits;
