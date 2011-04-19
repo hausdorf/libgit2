@@ -5,6 +5,7 @@
 
 // TODO: FIGURE OUT WHAT THE EFF THIS DOES (I forgot)
 // TODO: ADD COMMENT HERE
+// Equivalent to xdlclass_t
 struct classd_record {
 /*
 	struct s_xdlclass *next;
@@ -18,6 +19,7 @@ typedef struct classd_record classd_record;
 
 // TODO: FIGURE OUT WHAT THE EFF THIS DOES (I forgot)
 // TODO: ADD COMMENT HERE
+// Equivalent to xdlclassifier_t
 struct record_classifier {
 /*
 	unsigned int hbits;
@@ -31,6 +33,7 @@ struct record_classifier {
 typedef struct record_classifier record_classifier;
 
 // TODO: ADD COMMENT HERE
+// Equivalent to xdfile_t
 struct data_context {
 	// TODO: IMPLEMENT THIS MINIMALLY
 /*
