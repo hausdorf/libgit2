@@ -24,6 +24,12 @@
  */
 #include "libdiff.h"
 
+static int init_record_classifier(record_classifier *classifier, long size,
+		long flags)
+{
+	return 0;
+}
+
 // TODO: COMMENT THIS FUNCTION
 int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *diff_env)
