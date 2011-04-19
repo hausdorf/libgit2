@@ -46,7 +46,7 @@ typedef struct diff_environment diff_environment;
  * the maximum cost we're willing to incur before we switch
  * to a slightly different version of O(ND).
  */
-struct algo_environment {
+struct myers_conf {
 	// TODO: FIX THESE VAR NAMES
 	// mAxcost, thanks for the var name asshole
 	// maxcost is the square root of L (which
@@ -59,7 +59,7 @@ struct algo_environment {
 	long snake_cnt;
 	long heur_min;
 };
-typedef struct algo_environment algo_environment;
+typedef struct myers_conf myers_conf;
 
 /*
  * Represents file data (binary or text) in memory. Often
