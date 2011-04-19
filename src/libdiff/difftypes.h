@@ -19,17 +19,17 @@ struct mem_store {
 	mem_store_node *head, *tail;
 	// See xdl_cha_init:
 	// - isize is the # of bytes in the sort of struct we're using
-	long unit_size;
+	size_t unit_size;
 	// - nsize is the # of bytes we want to reserve for the store,
 	// usually isize * the number of objects we want to store
-	long store_size;
+	size_t store_size;
 	// Handles all the allocation of new memory from the chastore
 	// usually via xdl_cha_init()
 	mem_store_node *allocator;
 	// Handles traversal of chastore objects
 	mem_store_node *iterator;
 	// initially 0
-	long scurr;
+	size_t scurr;
 };
 typedef struct mem_store mem_store;
 
@@ -55,14 +55,14 @@ struct record_classifier {
 	// size in xdl_init_classifier
 	unsigned int hbits;
 	// Size of hash table rchash
-	long table_size;
+	size_t table_size;
 	// Hash table of classd_records
 	classd_record **classd_hash;
 	// The memory that rchash resides in
 	// TODO: IMPLEMENT chastore; not implemented yet
 	//chastore_t table_memory;
 	// Number of elements in rchash
-	long count;
+	size_t count;
 
 	// TODO: CLEANUP, definitely not needed
 	//long flags;
