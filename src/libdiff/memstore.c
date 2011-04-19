@@ -26,6 +26,12 @@
 
 int memstore_init(memstore *mem, long unit_size, long unit_count)
 {
+	mem->head = mem->tail = NULL;
+	mem->unit_size = unit_size;
+	mem->store_size = unit_size * unit_count;
+	mem->allocator = mem->iterator = NULL;
+	mem->scurr = 0;
+
 	return 0;
 }
 
