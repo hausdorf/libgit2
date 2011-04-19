@@ -10,6 +10,7 @@
  * the number of records are kept here.
  */
 struct diff_environment {
+	// TODO: IMPLEMENT THIS MINIMALLY
 /*
 	chastore_t rcha;
 	// Number of records, which is DEFINITLY
@@ -40,6 +41,7 @@ struct diff_environment {
 typedef struct diff_environment diff_environment;
 
 struct algo_environment {
+	// TODO: FIX THESE VAR NAMES
 	// mAxcost, thanks for the var name asshole
 	// maxcost is the square root of L (which
 	// xdiffi.c calls "ndiags"), unless L < 256,
