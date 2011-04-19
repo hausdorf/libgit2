@@ -27,7 +27,7 @@ struct record_classifier {
 	// Size of hash table rchash
 	long table_size;
 	// Hash table of classd_records
-	xdlclass_t **classd_hash;
+	classd_record **classd_hash;
 	// The memory that rchash resides in
 	// TODO: IMPLEMENT chastore; not implemented yet
 	//chastore_t table_memory;
