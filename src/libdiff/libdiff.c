@@ -27,6 +27,16 @@
 int prepare_and_diff(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *diff_env)
 {
+	long L;
+
+	long *k_diags;
+	long *k_diags_fwd;
+	long *k_diags_bkwd;
+
+	myers_conf conf;
+
+	// TODO: THIS FUNCTION IS NOT DONE YET
+
 	return 0;
 }
 
