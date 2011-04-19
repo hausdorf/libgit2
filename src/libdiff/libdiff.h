@@ -86,6 +86,7 @@ struct git_diffresults_conf {
  * facing API.
  */
 struct git_changeset {
+	// TODO: fix the member names here so they make more sense
 	struct git_changeset *next;
 	long i1, i2;
 	long chg1, chg2;
