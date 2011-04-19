@@ -52,10 +52,10 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 	// ON, WE ACTUALLY FIND THE SPECIFIC TOTAL LINES IN BOTH;
 	// ARE BOTH OF THESE PROCESSES NECESSARY?
 	// TODO: FIND OUT WHAT THE EFF THESE MAGICAL "+1"s do.
-	/*guess1 = guess_lines(data1) + 1;
+	guess1 = guess_lines(data1) + 1;
 	guess2 = guess_lines(data2) + 1;
 
-	if (xdl_init_classifier(&cf, enl1 + enl2 + 1, xpp->flags) < 0) {
+	/*if (xdl_init_classifier(&cf, enl1 + enl2 + 1, xpp->flags) < 0) {
 
 		return -1;
 	}*/
