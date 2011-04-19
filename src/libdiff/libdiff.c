@@ -37,6 +37,11 @@ int prepare_and_diff(diff_mem_data *data1, diff_mem_data *data2,
 
 	myers_conf conf;
 
+	// TODO: FIND OUT HOW TO CONSOLIDATE diffdata, implement these.
+	// Not needed particularly until the end of the function.
+	//diffdata dd1, dd2;
+
+
 	// TODO: THIS FUNCTION IS NOT DONE YET
 
 	return 0;
@@ -57,6 +62,11 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 		// xdiff/xemit.c
 		//default_results_hndlr;
 		NULL;
+
+	// TODO: IMPLEMENT PATIENCE DIFF
+//	if(diff_env->flags & DO_PATIENCE_DIFF)
+//		if(prepare_and_patience(data1, data2, &diff_env) < 0)
+//			return -1;
 
 	if(prepare_and_diff(data1, data2, &diff_env) < 0)
 	{
