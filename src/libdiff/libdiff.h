@@ -39,6 +39,20 @@ struct diff_environment {
 };
 typedef struct diff_environment diff_environment;
 
+struct algo_environment {
+	// mAxcost, thanks for the var name asshole
+	// maxcost is the square root of L (which
+	// xdiffi.c calls "ndiags"), unless L < 256,
+	// in which case, it becomes 256. We use this
+	// to determine when our LCS traversal has
+	// become too expensive, at which point we
+	// switch to ... uh... something else
+	long mxcost;
+	long snake_cnt;
+	long heur_min;
+};
+typedef struct algo_environment algo_environment;
+
 /*
  * Represents file data (binary or text) in memory. Often
  * instances of these structs are the direct objects that
