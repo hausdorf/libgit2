@@ -24,6 +24,13 @@
  */
 #include "libdiff.h"
 
+
+
+static int init_record_classifier(record_classifier *classifier, long size,
+		long flags);
+
+
+
 static int init_record_classifier(record_classifier *classifier, long size,
 		long flags)
 {
