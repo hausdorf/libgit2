@@ -50,6 +50,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 	// TODO COMMENT THESE VARS
 	git_changeset *diff;
 	diff_environment diff_env;
+	// TODO: ERROR CHECK THIS ASSIGNMENT???
 	diff_results_hndlr process_results = results_conf->results_hndlr ?
 		(diff_results_hndlr)results_conf->results_hndlr :
 		// TODO: IMPLEMENT the default_results_hndlr; it's in
