@@ -77,6 +77,8 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 		//default_results_hndlr;
 		NULL;
 
+	diff_env.flags = &results_conf->flags;
+
 	// TODO: IMPLEMENT PATIENCE DIFF
 //	if(diff_env->flags & DO_PATIENCE_DIFF)
 //		if(prepare_and_patience(data1, data2, &diff_env) < 0)

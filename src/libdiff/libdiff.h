@@ -43,6 +43,10 @@ typedef struct data_context data_context;
  */
 struct diff_environment {
 	// TODO: IMPLEMENT THIS MINIMALLY
+	data_context data_ctx1, data_ctx2;
+	// Flags points to the flags member of git_diffresults_conf,
+	// and is usually set in diff()
+	unsigned long *flags;
 /*
 	chastore_t rcha;
 	// Number of records, which is DEFINITLY
