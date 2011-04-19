@@ -23,6 +23,7 @@
  * Boston, MA 02110-1301, USA.
  */
 #include "libdiff.h"
+#include "diffhelpers.h"
 
 
 
