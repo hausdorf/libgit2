@@ -24,9 +24,11 @@
  */
 #include "libdiff.h"
 
+// TODO: COMMENT THIS FUNCTION
 int prepare_and_diff(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *diff_env)
 {
+	// TODO: COMMENT THESE VARS
 	long L;
 
 	long *k_diags;
@@ -40,10 +42,12 @@ int prepare_and_diff(diff_mem_data *data1, diff_mem_data *data2,
 	return 0;
 }
 
+// TODO: COMMENT THIS FUNCTION
 // TODO: IMPLEMENT THIS
 int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf)
 {
+	// TODO COMMENT THESE VARS
 	git_changeset *diff;
 	diff_environment diff_env;
 	diff_results_hndlr process_results = results_conf->results_hndlr ?
