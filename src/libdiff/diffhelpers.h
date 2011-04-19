@@ -9,6 +9,7 @@
  * We'll port them ourselves later.
  */
 // TODO: PORT THESE PROPERLY.
+unsigned int hashbits(unsigned int size);
 long xdl_mmfile_size(diff_mem_data *mmf);
 void *xdl_mmfile_next(diff_mem_data *mmf, long *size);
 void *xdl_mmfile_first(diff_mem_data *mmf, long *size);

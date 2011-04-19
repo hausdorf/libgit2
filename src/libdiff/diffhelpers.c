@@ -3,6 +3,21 @@
 // Taken DIRECTLY from xdiff/xutils.c
 #define XDL_GUESS_NLINES 256
 
+/**
+ * FUN FACT: This function finds the number of bitshifts required to generate the
+ * smallest power of two that is greater than either its size OR the bits in a
+ * char * the bytes in an int.
+ */
+// Taken DIRECTLY from xdiff/xutils.c
+unsigned int hashbits(unsigned int size)
+{
+	unsigned int val = 1, bits = 0;
+
+	// WHY THE FUCK ARE WE RECOMPUTING CHAR_BIT * sizeof(unsigned int) EVERY TIME???
+	for (; val < size && bits < CHAR_BIT * sizeof(unsigned int); val <<= 1, bits++);
+	return bits ? bits: 1;
+}
+
 // Taken DIRECTLY from xdiff/xutils.c
 // TODO: is this method necessary? Should we just call
 // the size member?
