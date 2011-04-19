@@ -29,6 +29,7 @@ struct mem_store {
 	// Handles traversal of chastore objects
 	mem_store_node *iterator;
 	// initially 0
+	// TODO: WTF is this again???
 	long scurr;
 };
 typedef struct mem_store mem_store;
