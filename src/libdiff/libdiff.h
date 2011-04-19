@@ -3,6 +3,19 @@
 
 #include "../common.h"
 
+// TODO: FIGURE OUT WHAT THE EFF THIS DOES (I forgot)
+// TODO: ADD COMMENT HERE
+typedef struct s_xdlclassifier {
+/*
+	unsigned int hbits;
+	long hsize;
+	xdlclass_t **rchash;
+	chastore_t ncha;
+	long count;
+	long flags;
+*/
+} xdlclassifier_t;
+
 // TODO: ADD COMMENT HERE
 struct data_context {
 	// TODO: IMPLEMENT THIS MINIMALLY
