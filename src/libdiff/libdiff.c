@@ -25,7 +25,7 @@
 #include "libdiff.h"
 
 // TODO: COMMENT THIS FUNCTION
-int prepare_myers(diff_mem_data *data1, diff_mem_data *data2,
+int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *diff_env)
 {
 	// TODO: WE GUESS TOTAL LINES IN data1 AND data2, BUT LATER
@@ -69,6 +69,10 @@ int prepare_and_myers(diff_mem_data *data1, diff_mem_data *data2,
 	// Not needed particularly until the end of the function.
 	//diffdata dd1, dd2;
 
+	if(myers_environment(data1, data2, diff_env) < 0)
+	{
+		return -1;
+	}
 
 	// TODO: THIS FUNCTION IS NOT DONE YET
 
