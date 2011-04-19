@@ -5,7 +5,7 @@
 
 // TODO: FIGURE OUT WHAT THE EFF THIS DOES (I forgot)
 // TODO: ADD COMMENT HERE
-typedef struct s_xdlclass {
+struct classd_record {
 /*
 	struct s_xdlclass *next;
 	unsigned long ha;
@@ -13,11 +13,12 @@ typedef struct s_xdlclass {
 	long size;
 	long idx;
 */
-} xdlclass_t;
+};
+typedef struct classd_record classd_record;
 
 // TODO: FIGURE OUT WHAT THE EFF THIS DOES (I forgot)
 // TODO: ADD COMMENT HERE
-typedef struct s_xdlclassifier {
+struct record_classifier {
 /*
 	unsigned int hbits;
 	long hsize;
@@ -26,7 +27,8 @@ typedef struct s_xdlclassifier {
 	long count;
 	long flags;
 */
-} xdlclassifier_t;
+};
+typedef struct record_classifier record_classifier;
 
 // TODO: ADD COMMENT HERE
 struct data_context {
