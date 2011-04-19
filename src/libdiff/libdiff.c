@@ -28,6 +28,13 @@
 int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf)
 {
+	git_changeset *diff;
+	diff_environment diff_env;
+	diff_results_hndlr process_results = results_conf->results_hndlr ?
+		(diff_results_hndlr)results_conf->results_hndlr :
+		// TODO: IMPLEMENT THIS
+		//default_results_hndlr;
+		NULL;
 	return 0;
 }
 
