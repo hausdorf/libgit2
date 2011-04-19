@@ -75,6 +75,7 @@ struct git_diffresults_conf {
 	// TODO: find out if this should be a size_t
 	unsigned long flags;
 	git_diff_callback *callback;
+	void (*results_hndlr)();
 };
 // typdef'd in include/types.h -- part of the public API
 
