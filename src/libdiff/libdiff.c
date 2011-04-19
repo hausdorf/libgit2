@@ -24,6 +24,12 @@
  */
 #include "libdiff.h"
 
+int prepare_and_diff(diff_mem_data *data1, diff_mem_data *data2,
+		diff_environment *diff_env)
+{
+	return 0;
+}
+
 // TODO: IMPLEMENT THIS
 int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf)
@@ -36,6 +42,11 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 		// xdiff/xemit.c
 		//default_results_hndlr;
 		NULL;
+
+	if(prepare_and_diff(data1, data2, &diff_env) < 0)
+	{
+		return -1;
+	}
 	return 0;
 }
 
