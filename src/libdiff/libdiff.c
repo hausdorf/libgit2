@@ -32,6 +32,8 @@ static int init_record_classifier(record_classifier *classifier, long size,
 
 
 
+// TODO: COMMENT HERE
+// TODO: COMPACT THIS METHOD -- WHAT CAN WE CUT OUT?
 static int init_record_classifier(record_classifier *classifier, long size,
 		long flags)
 {
