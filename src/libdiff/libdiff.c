@@ -47,6 +47,10 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 	{
 		return -1;
 	}
+
+	// TODO: IMPLEMENT THESE
+	// STEP 2: COMPACT AND BUILD SCRIPT
+	// STEP 3: CALL THE SPECIFIED CALLBACK FUNCTION
 	return 0;
 }
 
