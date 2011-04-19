@@ -92,6 +92,13 @@ struct git_changeset {
 };
 // typdef'd in include/types.h -- part of the public API
 
+/*
+ * Callback funciton that determines what we do with results;
+ * e.g., in the normal case of printing the diff to std out,
+ * this function will "assemble" the results into the correct
+ * string, and then ship them to the git_diff_callback function
+ * pointer to print them.
+ */
 typedef int (*diff_results_hndlr)(diff_environment *diff_env,
 		git_changeset *diff, git_diff_callback *diff_cb,
 		git_diffresults_conf const *results_conf);
