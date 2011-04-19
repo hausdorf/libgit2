@@ -61,7 +61,7 @@ struct record_classifier {
 	classd_record **classd_hash;
 	// The memory that rchash resides in
 	// TODO: IMPLEMENT chastore; not implemented yet
-	//chastore_t table_memory;
+	memstore table_memory;
 	// Number of elements in rchash
 	long count;
 
