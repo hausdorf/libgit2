@@ -35,6 +35,12 @@ static int init_record_classifier(record_classifier *classifier, long size,
 static int init_record_classifier(record_classifier *classifier, long size,
 		long flags)
 {
+	classifier->hbits = hashbits((unsigned int) size);
+	classifier->table_size = 1 << classifier->hbits;
+	/*if (xdl_cha_init(&cf->ncha, sizeof(xdlclass_t), size / 4 + 1) < 0)
+	{
+		return -1;
+	}*/
 	return 0;
 }
 
