@@ -32,6 +32,20 @@ int prepare_myers(diff_mem_data *data1, diff_mem_data *data2,
 	// ON, WE ACTUALLY FIND THE SPECIFIC TOTAL LINES IN BOTH;
 	// ARE BOTH OF THESE PROCESSES NECESSARY?
 	long guess_lines1, guess_lines2;
+	// TODO: FIGURE OUT HOW TO IMPLEMENT THE CLASSIFIER
+	/*xdlclassifier_t cf;
+
+	enl1 = xdl_guess_lines(mf1) + 1;
+	enl2 = xdl_guess_lines(mf2) + 1;
+
+	if (xdl_init_classifier(&cf, enl1 + enl2 + 1, xpp->flags) < 0) {
+
+		return -1;
+	}*/
+
+	/*if(prepare_ctx(data1, guess_lines1, diff_env->flags, &diff_env->data_ctx1) < 0)
+		return 0;*/
+
 
 	// TODO: THIE METHOD IS NOT DONE YET. IMPLEMENT IT.
 
@@ -80,7 +94,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 	diff_env.flags = &results_conf->flags;
 
 	// TODO: IMPLEMENT PATIENCE DIFF
-//	if(diff_env->flags & DO_PATIENCE_DIFF)
+//	if(results_conf->flags & DO_PATIENCE_DIFF)
 //		if(prepare_and_patience(data1, data2, &diff_env) < 0)
 //			return -1;
 
