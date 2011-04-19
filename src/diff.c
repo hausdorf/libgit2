@@ -8,6 +8,19 @@
 #include <string.h>
 #include <assert.h>
 
+
+
+static int load_file(const char *file_path, char **buffer, int *size);
+static int compare_hashes(char *file_buffer, const git_oid *blob_id,
+		int file_size);
+static int file_exists(char *filename);
+static int get_git_tree(git_tree **results, git_repository *repo,
+		git_commit *commit);
+static int get_filepath(char** results, git_repository *repo,
+		const git_tree_entry *entry);
+
+
+
 /* 0 on success, error on failure. The char* file_path must be free'd by
  * the caller or a memory leak will occur. The file contesnts are loaded
  * into the buffer, and the size of the buffer is loaded into size */
