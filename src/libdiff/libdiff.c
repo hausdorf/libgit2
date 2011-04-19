@@ -25,6 +25,20 @@
 #include "libdiff.h"
 
 // TODO: COMMENT THIS FUNCTION
+int prepare_myers(diff_mem_data *data1, diff_mem_data *data2,
+		diff_environment *diff_env)
+{
+	// TODO: WE GUESS TOTAL LINES IN data1 AND data2, BUT LATER
+	// ON, WE ACTUALLY FIND THE SPECIFIC TOTAL LINES IN BOTH;
+	// ARE BOTH OF THESE PROCESSES NECESSARY?
+	long guess_lines1, guess_lines2;
+
+	// TODO: THIE METHOD IS NOT DONE YET. IMPLEMENT IT.
+
+	return 0;
+}
+
+// TODO: COMMENT THIS FUNCTION
 int prepare_and_myers(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *diff_env)
 {
