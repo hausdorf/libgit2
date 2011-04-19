@@ -40,6 +40,12 @@ struct diff_environment {
 };
 typedef struct diff_environment diff_environment;
 
+/*
+ * Represents the inner variables required to run Myers O(ND)
+ * diffing algorithm. This includes guiding information like
+ * the maximum cost we're willing to incur before we switch
+ * to a slightly different version of O(ND).
+ */
 struct algo_environment {
 	// TODO: FIX THESE VAR NAMES
 	// mAxcost, thanks for the var name asshole
