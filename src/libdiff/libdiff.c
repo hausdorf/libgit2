@@ -44,15 +44,15 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 	// TODO: REMOVE ME WHEN YOU'RE DONE DEVELOPING THE ALGORITHM
 	printf("MYERS_ENVIRONMENT\n");
 
+	long guess1, guess2;
+	record_classifier classifier;
+
 	// TODO: WE GUESS TOTAL LINES IN data1 AND data2, BUT LATER
 	// ON, WE ACTUALLY FIND THE SPECIFIC TOTAL LINES IN BOTH;
 	// ARE BOTH OF THESE PROCESSES NECESSARY?
-	long guess_lines1, guess_lines2;
-	// TODO: FIGURE OUT HOW TO IMPLEMENT THE CLASSIFIER
-	/*xdlclassifier_t cf;
-
-	enl1 = xdl_guess_lines(mf1) + 1;
-	enl2 = xdl_guess_lines(mf2) + 1;
+	// TODO: FIND OUT WHAT THE EFF THESE MAGICAL "+1"s do.
+	/*guess1 = guess_lines(data1) + 1;
+	guess2 = guess_lines(data2) + 1;
 
 	if (xdl_init_classifier(&cf, enl1 + enl2 + 1, xpp->flags) < 0) {
 
