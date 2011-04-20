@@ -21,19 +21,19 @@ unsigned int hashbits(unsigned int size)
 // Taken DIRECTLY from xdiff/xutils.c
 // TODO: is this method necessary? Should we just call
 // the size member?
-long xdl_mmfile_size(diff_mem_data *mmf)
+long diff_mem_size(diff_mem_data *mmf)
 {
 	return mmf->size;
 }
 
 // Taken DIRECTLY from xdiff/xutils.c
-void *xdl_mmfile_next(diff_mem_data *mmf, long *size)
+void *diff_mem_next(diff_mem_data *mmf, long *size)
 {
 	return NULL;
 }
 
 // Taken DIRECTLY form xdiff/xutils.c
-void *xdl_mmfile_first(diff_mem_data *mmf, long *size)
+void *diff_mem_first(diff_mem_data *mmf, long *size)
 {
 	*size = mmf->size;
 	return mmf->data;
@@ -45,11 +45,11 @@ long guess_lines(diff_mem_data *mf)
 	long nl = 0, size, tsize = 0;
 	char const *data, *cur, *top;
 
-	if ((cur = data = xdl_mmfile_first(mf, &size)) != NULL) {
+	if ((cur = data = diff_mem_first(mf, &size)) != NULL) {
 		for (top = data + size; nl < XDL_GUESS_NLINES;) {
 			if (cur >= top) {
 				tsize += (long) (cur - data);
-				if (!(cur = data = xdl_mmfile_next(mf, &size)))
+				if (!(cur = data = diff_mem_next(mf, &size)))
 					break;
 				top = data + size;
 			}
@@ -63,7 +63,7 @@ long guess_lines(diff_mem_data *mf)
 	}
 
 	if (nl && tsize)
-		nl = xdl_mmfile_size(mf) / (tsize / nl);
+		nl = diff_mem_size(mf) / (tsize / nl);
 
 	return nl + 1;
 
