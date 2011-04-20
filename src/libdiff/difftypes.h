@@ -12,6 +12,7 @@ typedef struct memstore_node memstore_node;
 // TODO: ADD COMMENT HERE
 // Equivalent to chastore_t
 struct memstore {
+	// TODO: UPDATE THESE COMMENTS
 	// head and tail initially point to ancur; as we allocate more
 	// memory, the tail and head grow apart, but the alloc'd
 	// memory is linked by the chanode_t->next links, which usually
@@ -62,7 +63,7 @@ struct record_classifier {
 	classd_record **classd_hash;
 	// The memory that rchash resides in
 	// TODO: IMPLEMENT chastore; not implemented yet
-	memstore table_memory;
+	memstore table_mem;
 	// Number of elements in rchash
 	size_t count;
 
