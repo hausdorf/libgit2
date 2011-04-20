@@ -88,8 +88,8 @@ typedef struct record_classifier record_classifier;
 // Equivalent to xdfile_t
 struct data_context {
 	// TODO: IMPLEMENT THIS MINIMALLY
+	memstore table_mem;
 /*
-	chastore_t rcha;
 	// Number of records, which is DEFINITLY
 	// lines
 	long nrec;

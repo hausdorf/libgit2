@@ -39,6 +39,13 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 		data_context *data_ctx, diff_environment *diff_env)
 {
+	// Allocate memory for the hash table of records
+	if(memstore_init(&data_ctx->table_mem, sizeof(diff_record),
+			guessed_len / 4 + 1) < 0)
+	{
+		return -1;
+	}
+
 	return 0;
 }
 
