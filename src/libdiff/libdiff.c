@@ -36,12 +36,13 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 
 // TODO: COMMENT HERE
 // TODO: COMPACT THIS METHOD -- WHAT CAN BE LEFT OUT?
-static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
+static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 		data_context *data_ctx, diff_environment *diff_env)
 {
 	long i;
 	unsigned int hbits;
 	long num_recs, table_size, tmp_tbl_size;
+	unsigned long hash_val;
 	char const *blk, *cur, *top, *prev;
 	diff_record **records;
 	diff_record **records_hash;
@@ -84,6 +85,22 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 	// TODO: guessed_len is the *guessed* number of records (read: lines)
 	// why calculate the lines again here?
 	num_recs = 0;
+	if((cur = blk = diff_mem_first(data, &tmp_tbl_size)) != NULL)
+	{
+		for(top = blk + tmp_tbl_size;;)
+		{
+			if(cur >= top)
+			{
+				if(!(cur = blk = diff_mem_next(data, &tmp_tbl_size)))
+				{
+					break;
+				}
+				top = blk + tmp_tbl_size;
+			}
+			prev = cur;
+			// TODO: HASH THE RECORD HERE.
+		}
+	}
 
 	return 0;
 }
