@@ -37,8 +37,37 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 
 
 static int classify_record(record_classifier *classifier, diff_record **rhash,
-		usigned int hbits, diff_record *rec)
+		unsigned int hbits, diff_record *rec)
 {
+	long hi;
+	char const *line;
+	classd_record *rcrec;
+
+	line = rec->data;
+	hi = (long) XDL_HASHLONG(rec->ha, classifier->hbits);
+	for(rcrec = classifier->classd_hash[hi]; rcrec; rcrec = rcrec->next)
+		if(rcrec->ha == rec->ha && record_match(rcrec->line, rcrec->size,
+				rec->data, rec->size, classifier->flags))
+			break;
+
+	if(!rcrec) {
+		if(!(rcrec = memstore_alloc(&classifier->table_mem))) {
+			return -1;
+		}
+		rcrec->idx = classifier->count++;
+		rcrec->line = line;
+		rcrec->size = rec->size;
+		rcrec->ha = rec->ha;
+		rcrec->next = classifier->classd_hash[hi];
+		classifier->classd_hash[hi] = rcrec;
+	}
+
+	rec->ha = (unsigned long) rcrec->idx;
+
+	hi = (long) XDL_HASHLONG(rec->ha, hbits);
+	rec->next = rhash[hi];
+	rhash[hi] = rec;
+
 	return 0;
 }
 

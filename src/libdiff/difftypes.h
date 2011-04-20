@@ -7,6 +7,9 @@
 #define XDF_IGNORE_WHITESPACE_AT_EOL (1 << 4)
 #define XDF_PATIENCE_DIFF (1 << 5)
 #define XDF_WHITESPACE_FLAGS (XDF_IGNORE_WHITESPACE | XDF_IGNORE_WHITESPACE_CHANGE | XDF_IGNORE_WHITESPACE_AT_EOL)
+#define XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
+#define XDL_MASKBITS(b)		((1UL << (b)) - 1)
+#define XDL_HASHLONG(v,b)	(XDL_ADDBITS((unsigned long)(v), b) & XDL_MASKBITS(b))
 
 #include "../common.h"
 
@@ -59,13 +62,11 @@ typedef struct memstore memstore;
 // TODO: ADD COMMENT HERE
 // Equivalent to xdlclass_t
 struct classd_record {
-/*
-	struct s_xdlclass *next;
+	struct classd_record *next;
 	unsigned long ha;
 	char const *line;
 	long size;
 	long idx;
-*/
 };
 typedef struct classd_record classd_record;
 
@@ -87,7 +88,7 @@ struct record_classifier {
 	size_t count;
 
 	// TODO: CLEANUP, definitely not needed
-	//long flags;
+	long flags;
 };
 typedef struct record_classifier record_classifier;
 
