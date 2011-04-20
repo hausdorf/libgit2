@@ -152,8 +152,9 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 		return -1;
 	}
 
-	/*if(prepare_ctx(data1, guess_lines1, diff_env->flags, &diff_env->data_ctx1) < 0)
-		return 0;*/
+	if(prepare_data_ctx(data1, guess1, &diff_env->data_ctx1,
+			diff_env) < 0)
+		return 0;
 
 
 	// TODO: THIE METHOD IS NOT DONE YET. IMPLEMENT IT.
