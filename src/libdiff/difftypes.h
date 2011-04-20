@@ -13,8 +13,8 @@
 // TODO: ADD COMMENT HERE
 // Equivalent to xrecord_t
 struct diff_record {
-	struct xrecord *next;
-	char const *ptr;
+	struct diff_record *next;
+	char const *data;
 	long size;
 	unsigned long ha;
 };
