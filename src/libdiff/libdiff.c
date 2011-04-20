@@ -39,8 +39,10 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 		data_context *data_ctx, diff_environment *diff_env)
 {
+	long i;
 	unsigned int hbits;
-	long i, num_recs, table_size;
+	long num_recs, table_size, tmp_tbl_size;
+	char const *blk, *cur, *top, *prev;
 	diff_record **records;
 	diff_record **records_hash;
 
@@ -78,6 +80,10 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 	{
 		records_hash[i] = NULL;
 	}
+
+	// TODO: guessed_len is the *guessed* number of records (read: lines)
+	// why calculate the lines again here?
+	num_recs = 0;
 
 	return 0;
 }
