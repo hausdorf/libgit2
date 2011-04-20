@@ -194,6 +194,8 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 		}
 	}
 
+	// TODO: NOT QUITE DONE. SEE NEXT BITS.
+
 	/*
 	if (!(rchg = (char *) xdl_malloc((num_recs + 2) * sizeof(char)))) {
 
