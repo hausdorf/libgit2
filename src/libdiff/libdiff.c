@@ -31,8 +31,16 @@
 static int init_record_classifier(record_classifier *classifier, long size);
 static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 		data_context *data_ctx, diff_environment *diff_env);
+static int classify_record(record_classifier *classifier, diff_record **rhash,
+		unsigned int hbits, diff_record *rec);
 
 
+
+static int classify_record(record_classifier *classifier, diff_record **rhash,
+		usigned int hbits, diff_record *rec)
+{
+	return 0;
+}
 
 // TODO: COMMENT HERE
 // TODO: COMPACT THIS METHOD -- WHAT CAN BE LEFT OUT?
