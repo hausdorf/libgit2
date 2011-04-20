@@ -3,6 +3,62 @@
 // Taken DIRECTLY from xdiff/xutils.c
 #define XDL_GUESS_NLINES 256
 
+// Taken DIRECTLY form xdiff/xutils.c
+static unsigned long hash_record_with_whitespace(char const **data,
+		char const *top, long flags) {
+	unsigned long ha = 5381;
+	char const *ptr = *data;
+
+	for (; ptr < top && *ptr != '\n'; ptr++) {
+		if (XDL_ISSPACE(*ptr)) {
+			const char *ptr2 = ptr;
+			int at_eol;
+			while (ptr + 1 < top && XDL_ISSPACE(ptr[1])
+					&& ptr[1] != '\n')
+				ptr++;
+			at_eol = (top <= ptr + 1 || ptr[1] == '\n');
+			if (flags & XDF_IGNORE_WHITESPACE)
+				; /* already handled */
+			else if (flags & XDF_IGNORE_WHITESPACE_CHANGE
+				 && !at_eol) {
+				ha += (ha << 5);
+				ha ^= (unsigned long) ' ';
+			}
+			else if (flags & XDF_IGNORE_WHITESPACE_AT_EOL
+				 && !at_eol) {
+				while (ptr2 != ptr + 1) {
+					ha += (ha << 5);
+					ha ^= (unsigned long) *ptr2;
+					ptr2++;
+				}
+			}
+			continue;
+		}
+		ha += (ha << 5);
+		ha ^= (unsigned long) *ptr;
+	}
+	*data = ptr < top ? ptr + 1: ptr;
+
+	return ha;
+}
+
+// Taken DIRECTLY from xdiff/xutils.c
+unsigned long hash_record(char const **data, char const *top, long flags) {
+	unsigned long ha = 5381;
+	char const *ptr = *data;
+
+	if (flags & XDF_WHITESPACE_FLAGS)
+		return hash_record_with_whitespace(data, top, flags);
+
+	for (; ptr < top && *ptr != '\n'; ptr++) {
+		ha += (ha << 5);
+		ha ^= (unsigned long) *ptr;
+	}
+	*data = ptr < top ? ptr + 1: ptr;
+
+	return ha;
+}
+
 /**
  * FUN FACT: This function finds the number of bitshifts required to generate the
  * smallest power of two that is greater than either its size OR the bits in a

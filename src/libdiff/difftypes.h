@@ -1,6 +1,13 @@
 #ifndef INCLUDE_difftypes_h__
 #define INCLUDE_difftypes_h__
 
+#define XDL_ISSPACE(c) (isspace((unsigned char)(c)))
+#define XDF_IGNORE_WHITESPACE (1 << 2)
+#define XDF_IGNORE_WHITESPACE_CHANGE (1 << 3)
+#define XDF_IGNORE_WHITESPACE_AT_EOL (1 << 4)
+#define XDF_PATIENCE_DIFF (1 << 5)
+#define XDF_WHITESPACE_FLAGS (XDF_IGNORE_WHITESPACE | XDF_IGNORE_WHITESPACE_CHANGE | XDF_IGNORE_WHITESPACE_AT_EOL)
+
 #include "../common.h"
 
 // TODO: ADD COMMENT HERE
