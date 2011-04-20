@@ -70,7 +70,9 @@ unsigned int hashbits(unsigned int size)
 	unsigned int val = 1, bits = 0;
 
 	// WHY THE FUCK ARE WE RECOMPUTING CHAR_BIT * sizeof(unsigned int) EVERY TIME???
-	for (; val < size && bits < CHAR_BIT * sizeof(unsigned int); val <<= 1, bits++);
+	// Let's not do that anymore, try the following
+	unsigned int uint_bit = CHAR_BIT * sizeof(unsigned int);
+	for (; val < size && bits < uint_bit; val <<= 1, bits++);
 	return bits ? bits: 1;
 }
 
