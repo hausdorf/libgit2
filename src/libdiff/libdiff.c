@@ -49,14 +49,12 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 
 	// Allocate memory for the hash table of records
 	if(memstore_init(&data_ctx->table_mem, sizeof(diff_record),
-			guessed_len / 4 + 1) < 0)
-	{
+			(guessed_len >> 2) + 1) < 0) {
 		return -1;
 	}
 	// TODO: FIGURE OUT WTF THIS BIT DOES -- I FORGET
 	if(!(records = (diff_record **) malloc(guessed_len *
-			sizeof(diff_record *))))
-	{
+			sizeof(diff_record *)))) {
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
@@ -69,16 +67,14 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 	table_size = 1 << hbits;
 	// 2. Allocate memory required to store this table
 	if(!(records_hash = (diff_record **) malloc(guessed_len *
-			sizeof(diff_record *))))
-	{
+			sizeof(diff_record *)))) {
 		free(records);
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
 	// 3. Set every pointer in table to NULL
 	// TODO: FIND OUT IF THIS SHOULD BE DONE WITH MEMSET INSTEAD
-	for(i = 0; i < table_size; i++)
-	{
+	for(i = 0; i < table_size; i++) {
 		records_hash[i] = NULL;
 	}
 
@@ -115,8 +111,7 @@ static int init_record_classifier(record_classifier *classifier, long size)
 	/// TODO: FIND OUT WHY IT'S size/4+1
 	// Allocate memory for the hash table
 	if (memstore_init(&classifier->table_mem, sizeof(classd_record),
-			size / 4 + 1) < 0)
-	{
+			(size >> 2) + 1) < 0) {
 		return -1;
 	}
 
@@ -124,15 +119,13 @@ static int init_record_classifier(record_classifier *classifier, long size)
 	classifier->hbits = hashbits((unsigned int) size);
 	classifier->table_size = 1 << classifier->hbits;
 	if(!(classifier->classd_hash = (classd_record **) malloc(
-			classifier->table_size * sizeof(classd_record *))))
-	{
+			classifier->table_size * sizeof(classd_record *)))) {
 		memstore_free(&classifier->table_mem);
 		return -1;
 	}
 
 	// Zero out the hash table memory
-	for(i = 0; i < classifier->table_size; i++)
-	{
+	for(i = 0; i < classifier->table_size; i++) {
 		classifier->classd_hash[i] = NULL;
 	}
 
@@ -158,8 +151,7 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 	guess1 = guess_lines(data1) + 1;
 	guess2 = guess_lines(data2) + 1;
 
-	if(init_record_classifier(&classifier, guess1 + guess2 + 1) < 0)
-	{
+	if(init_record_classifier(&classifier, guess1 + guess2 + 1) < 0) {
 		return -1;
 	}
 
@@ -192,8 +184,7 @@ int prepare_and_myers(diff_mem_data *data1, diff_mem_data *data2,
 	// Not needed particularly until the end of the function.
 	//diffdata dd1, dd2;
 
-	if(myers_environment(data1, data2, diff_env) < 0)
-	{
+	if(myers_environment(data1, data2, diff_env) < 0) {
 		return -1;
 	}
 
@@ -228,8 +219,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 //		if(prepare_and_patience(data1, data2, &diff_env) < 0)
 //			return -1;
 
-	if(prepare_and_myers(data1, data2, &diff_env) < 0)
-	{
+	if(prepare_and_myers(data1, data2, &diff_env) < 0) {
 		return -1;
 	}
 
