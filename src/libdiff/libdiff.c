@@ -94,7 +94,8 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 				top = blk + tmp_tbl_size;
 			}
 			prev = cur;
-			// TODO: HASH THE RECORD HERE.
+			hash_val = hash_record(&cur, top, diff_env->flags);
+			// TODO: HASH THE RECORD HERE
 		}
 	}
 
