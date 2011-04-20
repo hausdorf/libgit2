@@ -50,8 +50,7 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 		return -1;
 	}
 	// TODO: FIGURE OUT WTF THIS BIT DOES -- I FORGET
-	if(!(records = (diff_record **) malloc(guessed_len *
-			sizeof(diff_record *)))) {
+	if(!(records = (diff_record **) malloc(guessed_len * sizeof(diff_record *)))) {
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
@@ -71,6 +70,7 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 	}
 	// 3. Set every pointer in table to NULL
 	// TODO: FIND OUT IF THIS SHOULD BE DONE WITH MEMSET INSTEAD
+	// I don't think you can with a double pointer
 	for(i = 0; i < table_size; i++) {
 		records_hash[i] = NULL;
 	}
