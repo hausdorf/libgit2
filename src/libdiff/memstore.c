@@ -41,5 +41,12 @@ void memstore_alloc(memstore *mem)
 
 void memstore_free(memstore *mem)
 {
+	memstore_node *cur, *tmp;
+
+	for(cur = mem->head; (tmp = cur) != NULL;)
+	{
+		cur = cur->next;
+		free(tmp);
+	}
 }
 
