@@ -47,14 +47,21 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 	diff_record *curr_record;
 	diff_record **records, **reallocd_records;
 	diff_record **records_hash;
+	unsigned long *ha;
+	char *rchg;
+	long *rindex;
 
 	// Allocate memory for the hash table of records
 	if(memstore_init(&data_ctx->table_mem, sizeof(diff_record),
 			(guessed_len >> 2) + 1) < 0) {
+
 		return -1;
 	}
 	// TODO: FIGURE OUT WTF THIS BIT DOES -- I FORGET
 	if(!(records = (diff_record **) malloc(guessed_len * sizeof(diff_record *)))) {
+
+		// FIXME: THERE WAS A MISTAKE HERE
+		//free(&data_ctx->table_mem);
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
@@ -66,8 +73,12 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 	hbits = hashbits((unsigned int) guessed_len);
 	table_size = 1 << hbits;
 	// 2. Allocate memory required to store this table
-	if(!(records_hash = (diff_record **) malloc(guessed_len *
+	// TODO: MAKE SURE THIS WAS CORRECT, BECAUSE THERE WAS ORIGINALLY A MISTAKE
+	// HERE. I originally wrote:
+	//if(!(records_hash = (diff_record **) malloc(guessed_len *
+	if(!(records_hash = (diff_record **) malloc(table_size *
 			sizeof(diff_record *)))) {
+
 		free(records);
 		memstore_free(&data_ctx->table_mem);
 		return -1;
@@ -91,7 +102,16 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 				top = blk + tmp_tbl_size;
 			}
 			prev = cur;
-			hash_val = hash_record(&cur, top, diff_env->flags);
+			// FIXME:
+			// THIS
+			// IS
+			// IM
+			// POR
+			// TANT.
+			// RIGHT NOW WE HAVE NO HELPER METHODS TO INITIALIZE THE git_diffresults_conf
+			// STRUCTS. THIS CAUSES THIS FLAG VARIABLE TO NOT BE ASSIGNED. THIS CAUSES
+			// A SEGFAULT. THIS NEEDS TO BE IMPLEMENTED.
+			hash_val = hash_record(&cur, top, 0 /**diff_env->flags*/);
 
 			// if number of records is greater than guessed length of records,
 			// realloc the amount of memory needed
@@ -99,6 +119,7 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 				guessed_len *= 2;
 				if(!(reallocd_records = (diff_record **) realloc(records,
 						guessed_len * sizeof(diff_record *)))) {
+
 					free(records_hash);
 					free(records);
 					memstore_free(&data_ctx->table_mem);
@@ -107,23 +128,75 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 				records = reallocd_records;
 			}
 
-			/*
 			// append a record to the hashtable
 			if(!(curr_record = memstore_alloc(&data_ctx->table_mem))) {
+
 				free(records_hash);
 				free(records);
-				free(&data_ctx->table_mem);
+				// TODO: Make sure this new line is right because THIS WAS
+				// ORIGINALLY A MISTAKE. Originally I wrote:
+				// free(&data_ctx->table_mem);
+				memstore_free(&data_ctx->table_mem);
 				return -1;
 			}
 			curr_record->data = prev;
 			curr_record->size = (long) (cur-prev);
 			curr_record->ha = hash_val;
 			records[num_recs++] = curr_record;
-			*/
 
-			// TODO: YOU'RE HERE.
+			/*
+			if (xdl_classify_record(cf, records_hash, hbits, curr_record) < 0) {
+
+				xdl_free(records_hash);
+				xdl_free(records);
+				xdl_cha_free(&xdf->rcha);
+				return -1;
+			}
+			*/
 		}
 	}
+
+	/*
+	if (!(rchg = (char *) xdl_malloc((num_recs + 2) * sizeof(char)))) {
+
+		xdl_free(records_hash);
+		xdl_free(records);
+		xdl_cha_free(&xdf->rcha);
+		return -1;
+	}
+	memset(rchg, 0, (num_recs + 2) * sizeof(char));
+
+	if (!(rindex = (long *) xdl_malloc((num_recs + 1) * sizeof(long)))) {
+
+		xdl_free(rchg);
+		xdl_free(records_hash);
+		xdl_free(records);
+		xdl_cha_free(&xdf->rcha);
+		return -1;
+	}
+	if (!(ha = (unsigned long *) xdl_malloc((num_recs + 1) * sizeof(unsigned long)))) {
+
+		xdl_free(rindex);
+		xdl_free(rchg);
+		xdl_free(records_hash);
+		xdl_free(records);
+		xdl_cha_free(&xdf->rcha);
+		return -1;
+	}
+
+	xdf->num_recs = num_recs;
+	xdf->records = recs;
+	xdf->hbits = hbits;
+	xdf->records_hash = records_hash;
+	// QUESTION: does this create a memory leak? We're not pointing to the same spot,
+	// and as far as I know, nothing else points here.
+	xdf->rchg = rchg + 1;
+	xdf->rindex = rindex;
+	xdf->nreff = 0;
+	xdf->ha = ha;
+	xdf->dstart = 0;
+	xdf->dend = num_recs - 1;
+	*/
 
 	return 0;
 }
