@@ -28,15 +28,13 @@
 
 
 
-static int init_record_classifier(record_classifier *classifier, long size,
-		long flags);
+static int init_record_classifier(record_classifier *classifier, long size);
 
 
 
 // TODO: COMMENT HERE
 // TODO: COMPACT THIS METHOD -- WHAT CAN WE CUT OUT?
-static int init_record_classifier(record_classifier *classifier, long size,
-		long flags)
+static int init_record_classifier(record_classifier *classifier, long size)
 {
 	long i;
 
@@ -86,8 +84,7 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 	guess1 = guess_lines(data1) + 1;
 	guess2 = guess_lines(data2) + 1;
 
-	if(init_record_classifier(&classifier, guess1 + guess2 + 1,
-			diff_env->flags) < 0)
+	if(init_record_classifier(&classifier, guess1 + guess2 + 1,) < 0)
 	{
 		return -1;
 	}
