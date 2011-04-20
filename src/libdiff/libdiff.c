@@ -46,7 +46,7 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 
 	// Allocate memory for the hash table of records
 	if(memstore_init(&data_ctx->table_mem, sizeof(diff_record),
-			guessed_len >> 2 + 1) < 0)
+			(guessed_len >> 2) + 1) < 0)
 	{
 		return -1;
 	}
@@ -92,7 +92,7 @@ static int init_record_classifier(record_classifier *classifier, long size)
 	/// TODO: FIND OUT WHY IT'S size/4+1
 	// Allocate memory for the hash table
 	if (memstore_init(&classifier->table_mem, sizeof(classd_record),
-			size / 4 + 1) < 0)
+			(size >> 2) + 1) < 0)
 	{
 		return -1;
 	}
