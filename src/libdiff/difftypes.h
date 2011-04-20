@@ -3,6 +3,8 @@
 
 #include "../common.h"
 
+// TODO: ADD COMMENT HERE
+// Equivalent to chanode_t
 struct memstore_node {
 	struct memstore_iter *next;
 	size_t curr_idx;
