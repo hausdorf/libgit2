@@ -30,7 +30,8 @@
 
 static int init_record_classifier(record_classifier *classifier, long size);
 static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
-		data_context *data_ctx, diff_environment *diff_env);
+		data_context *data_ctx, record_classifier *classifier,
+		diff_environment *diff_env);
 static int classify_record(record_classifier *classifier, diff_record **rhash,
 		unsigned int hbits, diff_record *rec);
 
@@ -74,7 +75,8 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 // TODO: COMMENT HERE
 // TODO: COMPACT THIS METHOD -- WHAT CAN BE LEFT OUT?
 static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
-		data_context *data_ctx, diff_environment *diff_env)
+		data_context *data_ctx, record_classifier *classifier,
+		diff_environment *diff_env)
 {
 	long i;
 	unsigned int hbits;
@@ -181,15 +183,14 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 			curr_record->ha = hash_val;
 			records[num_recs++] = curr_record;
 
-			/*
-			if (xdl_classify_record(cf, records_hash, hbits, curr_record) < 0) {
+			if (classify_record(classifier, records_hash, hbits,
+					curr_record) < 0) {
 
-				xdl_free(records_hash);
-				xdl_free(records);
-				xdl_cha_free(&xdf->rcha);
+				free(records_hash);
+				free(records);
+				memstore_free(&data_ctx->table_mem);
 				return -1;
 			}
-			*/
 		}
 	}
 
@@ -293,7 +294,7 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 	}
 
 	if(prepare_data_ctx(data1, guess1, &diff_env->data_ctx1,
-			diff_env) < 0)
+			&classifier, diff_env) < 0)
 		return 0;
 
 
