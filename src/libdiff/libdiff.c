@@ -183,6 +183,7 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 			curr_record->ha = hash_val;
 			records[num_recs++] = curr_record;
 
+			// TODO: WTF DOES THIS DO AGAIN?
 			if (classify_record(classifier, records_hash, hbits,
 					curr_record) < 0) {
 
@@ -194,49 +195,49 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 		}
 	}
 
-	// TODO: NOT QUITE DONE. SEE NEXT BITS.
+	// TODO TODO TODO: WTF DOES ALL THIS SHIT DO AGAIN?
+	// Let's take a look wherever the members allocated below are accessed
+	// and find out (this probably happens later in recs_cmp or something
 
-	/*
-	if (!(rchg = (char *) xdl_malloc((num_recs + 2) * sizeof(char)))) {
+	if (!(rchg = (char *) malloc((num_recs + 2) * sizeof(char)))) {
 
-		xdl_free(records_hash);
-		xdl_free(records);
-		xdl_cha_free(&xdf->rcha);
+		free(records_hash);
+		free(records);
+		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
 	memset(rchg, 0, (num_recs + 2) * sizeof(char));
 
-	if (!(rindex = (long *) xdl_malloc((num_recs + 1) * sizeof(long)))) {
+	if (!(rindex = (long *) malloc((num_recs + 1) * sizeof(long)))) {
 
-		xdl_free(rchg);
-		xdl_free(records_hash);
-		xdl_free(records);
-		xdl_cha_free(&xdf->rcha);
+		free(rchg);
+		free(records_hash);
+		free(records);
+		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
-	if (!(ha = (unsigned long *) xdl_malloc((num_recs + 1) * sizeof(unsigned long)))) {
+	if (!(ha = (unsigned long *) malloc((num_recs + 1) * sizeof(unsigned long)))) {
 
-		xdl_free(rindex);
-		xdl_free(rchg);
-		xdl_free(records_hash);
-		xdl_free(records);
-		xdl_cha_free(&xdf->rcha);
+		free(rindex);
+		free(rchg);
+		free(records_hash);
+		free(records);
+		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
 
-	xdf->num_recs = num_recs;
-	xdf->records = recs;
-	xdf->hbits = hbits;
-	xdf->records_hash = records_hash;
+	data_ctx->nrec = num_recs;
+	data_ctx->recs = records;
+	data_ctx->hbits = hbits;
+	data_ctx->rhash = records_hash;
 	// QUESTION: does this create a memory leak? We're not pointing to the same spot,
 	// and as far as I know, nothing else points here.
-	xdf->rchg = rchg + 1;
-	xdf->rindex = rindex;
-	xdf->nreff = 0;
-	xdf->ha = ha;
-	xdf->dstart = 0;
-	xdf->dend = num_recs - 1;
-	*/
+	data_ctx->rchg = rchg + 1;
+	data_ctx->rindex = rindex;
+	data_ctx->nreff = 0;
+	data_ctx->ha = ha;
+	data_ctx->dstart = 0;
+	data_ctx->dend = num_recs - 1;
 
 	return 0;
 }

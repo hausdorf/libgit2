@@ -96,8 +96,8 @@ typedef struct record_classifier record_classifier;
 // Equivalent to xdfile_t
 struct data_context {
 	// TODO: IMPLEMENT THIS MINIMALLY
+	// TODO: RENAME ALL THIS SHIT TO SOMETHING USEFUL
 	memstore table_mem;
-/*
 	// Number of records, which is DEFINITLY
 	// lines
 	long nrec;
@@ -105,11 +105,11 @@ struct data_context {
 	unsigned int hbits;
 	// A hash table of xrecord pointers; build in
 	// xdl_prepare_ctx()
-	xrecord_t **rhash;
+	diff_record **rhash;
 	// D-path start and end
 	long dstart, dend;
 	// All records
-	xrecord_t **recs;
+	diff_record **recs;
 	// In xdl_recs_cmp, each of these chars is set to a "weight" -- usually
 	// 0 or 1 depending on whether that particular record has changed. So
 	// it's basically a bit vector made of chars
@@ -121,7 +121,6 @@ struct data_context {
 	long nreff;
 	// A hash of the entire xdfile contents
 	unsigned long *ha;
-*/
 };
 typedef struct data_context data_context;
 
