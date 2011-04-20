@@ -37,6 +37,28 @@ int memstore_init(memstore *mem, long unit_size, long unit_count)
 
 void memstore_alloc(memstore *mem)
 {
+	memstore_node *allocator;
+	void *data;
+
+	if(!(allocator = mem->allocator) || allocator->curr_idx == mem->store_size) {
+		if(!(allocator = (memstore_node *) malloc(sizeof(memstore_node) +
+				mem->store_size))) {
+			return NULL;
+		}
+		allocator->curr_idx = 0;
+		allocator->next = NULL;
+		if(mem->tail)
+			mem->tail->next = allocator;
+		if(!mem->head)
+			mem->head = allocator;
+		mem->tail = allocator;
+		mem->allocator = allocator;
+	}
+
+	data = (char *) allocator + sizeof(memstore_node) + allocator->curr_idx;
+	allocator->curr_idx += mem->unit_size;
+
+	return data;
 }
 
 void memstore_free(memstore *mem)
