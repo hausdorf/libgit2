@@ -39,7 +39,10 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 		data_context *data_ctx, diff_environment *diff_env)
 {
-	diff_record **recs;
+	unsigned int hbits;
+	long i, num_recs, table_size;
+	diff_record **records;
+	diff_record **records_hash;
 
 	// Allocate memory for the hash table of records
 	if(memstore_init(&data_ctx->table_mem, sizeof(diff_record),
@@ -48,10 +51,32 @@ static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 		return -1;
 	}
 	// TODO: FIGURE OUT WTF THIS BIT DOES -- I FORGET
-	if(!(recs = (diff_record **) malloc(guessed_len * sizeof(diff_record *))))
+	if(!(records = (diff_record **) malloc(guessed_len *
+			sizeof(diff_record *))))
 	{
 		memstore_free(&data_ctx->table_mem);
 		return -1;
+	}
+
+	// Build a hashtable of diff_record pointers
+	//
+	// 1. Start by finding hashtable size -- the smallest power of 2 greater
+	// than guessed_len, the guessed number of records
+	hbits = hashbits((unsigned int) guessed_len);
+	table_size = 1 << hbits;
+	// 2. Allocate memory required to store this table
+	if(!(records_hash = (diff_record **) malloc(guessed_len *
+			sizeof(diff_record *))))
+	{
+		free(records);
+		memstore_free(&data_ctx->table_mem);
+		return -1;
+	}
+	// 3. Set every pointer in table to NULL
+	// TODO: FIND OUT IF THIS SHOULD BE DONE WITH MEMSET INSTEAD
+	for(i = 0; i < table_size; i++)
+	{
+		records_hash[i] = NULL;
 	}
 
 	return 0;
