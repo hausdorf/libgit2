@@ -9,10 +9,13 @@
  * We'll port them ourselves later.
  */
 // TODO: PORT THESE PROPERLY.
+static unsigned long hash_record_with_whitespace(char const **data,
+		char const *top, long flags);
+unsigned long hash_record(char const **data, char const *top, long flags);
 unsigned int hashbits(unsigned int size);
-long xdl_mmfile_size(diff_mem_data *mmf);
-void *xdl_mmfile_next(diff_mem_data *mmf, long *size);
-void *xdl_mmfile_first(diff_mem_data *mmf, long *size);
+long diff_mem_size(diff_mem_data *mmf);
+void *diff_mem_next(diff_mem_data *mmf, long *size);
+void *diff_mem_first(diff_mem_data *mmf, long *size);
 long guess_lines(diff_mem_data *mf);
 
 #endif
