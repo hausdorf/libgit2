@@ -38,22 +38,33 @@ static int init_record_classifier(record_classifier *classifier, long size,
 static int init_record_classifier(record_classifier *classifier, long size,
 		long flags)
 {
-	classifier->hbits = hashbits((unsigned int) size);
-	classifier->table_size = 1 << classifier->hbits;
+	long i;
 
 	/// TODO: FIND OUT WHY IT'S size/4+1
+	// Allocate memory for the hash table
 	if (memstore_init(&classifier->table_mem, sizeof(classd_record),
 			size / 4 + 1) < 0)
 	{
 		return -1;
 	}
 
+	// Build hashtable of classd_record pointers
+	classifier->hbits = hashbits((unsigned int) size);
+	classifier->table_size = 1 << classifier->hbits;
 	if(!(classifier->classd_hash = (classd_record **) malloc(
 			classifier->table_size * sizeof(classd_record *))))
 	{
 		memstore_free(&classifier->table_mem);
 		return -1;
 	}
+
+	// Zero out the hash table memory
+	for(i = 0; i < classifier->table_size; i++)
+	{
+		classifier->classd_hash[i] = NULL;
+	}
+
+	classifier->count = 0;
 
 	return 0;
 }
