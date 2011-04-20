@@ -29,15 +29,15 @@
 
 
 static int init_record_classifier(record_classifier *classifier, long size);
-static int prepare_data_ctx(diff_mem_data *data1, data_context *data_ctx,
-		diff_environment *diff_env);
+static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
+		data_context *data_ctx, diff_environment *diff_env);
 
 
 
-static int prepare_data_ctx(diff_mem_data *data1, data_context *data_ctx,
-		diff_environment *diff_env)
 // TODO: COMMENT HERE
 // TODO: COMPACT THIS METHOD -- WHAT CAN BE LEFT OUT?
+static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
+		data_context *data_ctx, diff_environment *diff_env)
 {
 	return 0;
 }
