@@ -44,7 +44,8 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 	long num_recs, table_size, tmp_tbl_size;
 	unsigned long hash_val;
 	char const *blk, *cur, *top, *prev;
-	diff_record **records;
+	diff_record *curr_record;
+	diff_record **records, **reallocd_records;
 	diff_record **records_hash;
 
 	// Allocate memory for the hash table of records
@@ -91,7 +92,36 @@ static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
 			}
 			prev = cur;
 			hash_val = hash_record(&cur, top, diff_env->flags);
-			// TODO: HASH THE RECORD HERE
+
+			// if number of records is greater than guessed length of records,
+			// realloc the amount of memory needed
+			if(num_recs >= guessed_len) {
+				guessed_len *= 2;
+				if(!(reallocd_records = (diff_record **) realloc(records,
+						guessed_len * sizeof(diff_record *)))) {
+					free(records_hash);
+					free(records);
+					memstore_free(&data_ctx->table_mem);
+					return -1;
+				}
+				records = reallocd_records;
+			}
+
+			/*
+			// append a record to the hashtable
+			if(!(curr_record = memstore_alloc(&data_ctx->table_mem))) {
+				free(records_hash);
+				free(records);
+				free(&data_ctx->table_mem);
+				return -1;
+			}
+			curr_record->data = prev;
+			curr_record->size = (long) (cur-prev);
+			curr_record->ha = hash_val;
+			records[num_recs++] = curr_record;
+			*/
+
+			// TODO: YOU'RE HERE.
 		}
 	}
 
