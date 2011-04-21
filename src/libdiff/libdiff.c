@@ -108,7 +108,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	diff_record **records, **reallocd_records;
 	diff_record **records_hash;
 	unsigned long *ha;
-	char *rchg;
+	char *weights;
 	long *rindex;
 
 	// Allocate memory for the hash table of records
@@ -214,18 +214,18 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	// Let's take a look wherever the members allocated below are accessed
 	// and find out (this probably happens later in recs_cmp or something
 
-	if (!(rchg = (char *) malloc((num_recs + 2) * sizeof(char)))) {
+	if (!(weights = (char *) malloc((num_recs + 2) * sizeof(char)))) {
 
 		free(records_hash);
 		free(records);
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
-	memset(rchg, 0, (num_recs + 2) * sizeof(char));
+	memset(weights, 0, (num_recs + 2) * sizeof(char));
 
 	if (!(rindex = (long *) malloc((num_recs + 1) * sizeof(long)))) {
 
-		free(rchg);
+		free(weights);
 		free(records_hash);
 		free(records);
 		memstore_free(&data_ctx->table_mem);
@@ -234,7 +234,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	if (!(ha = (unsigned long *) malloc((num_recs + 1) * sizeof(unsigned long)))) {
 
 		free(rindex);
-		free(rchg);
+		free(weights);
 		free(records_hash);
 		free(records);
 		memstore_free(&data_ctx->table_mem);
@@ -247,7 +247,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	data_ctx->rhash = records_hash;
 	// QUESTION: does this create a memory leak? We're not pointing to the same spot,
 	// and as far as I know, nothing else points here.
-	data_ctx->rchg = rchg + 1;
+	data_ctx->weights = weights + 1;
 	data_ctx->rindex = rindex;
 	data_ctx->nreff = 0;
 	data_ctx->ha = ha;

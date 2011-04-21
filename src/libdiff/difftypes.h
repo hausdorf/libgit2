@@ -121,9 +121,8 @@ struct data_context {
 	// In xdl_recs_cmp, each of these chars is set to a "weight" -- usually
 	// 0 or 1 depending on whether that particular record has changed. So
 	// it's basically a bit vector made of chars
-	char *rchg;
-	// An ARRAY of longs that represent hashes; in xdl_recs_cmp(),
-	// we access it as an array.
+	char *weights;
+	// An ARRAY of longs that represent hashes, used to access weights[]
 	long *rindex;
 	// # of records * size of records???
 	long nreff;
