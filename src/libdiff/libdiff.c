@@ -239,7 +239,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		return -1;
 	}
 
-	data_ctx->nrec = num_recs;
+	data_ctx->num_recs = num_recs;
 	data_ctx->recs = records;
 	data_ctx->hbits = hbits;
 	data_ctx->rhash = records_hash;

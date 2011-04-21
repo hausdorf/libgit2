@@ -103,9 +103,8 @@ struct data_context {
 	// TODO: IMPLEMENT THIS MINIMALLY
 	// TODO: RENAME ALL THIS SHIT TO SOMETHING USEFUL
 	memstore table_mem;
-	// Number of records, which is DEFINITLY
-	// lines
-	long nrec;
+	// Number of records, which, in the case of text files, is lines
+	long num_recs;
 	// Estimate of nrec; used because estimation is lots faster
 	// than actually counting the size.
 	size_t guessed_size;
