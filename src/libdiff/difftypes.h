@@ -139,15 +139,10 @@ typedef struct data_context data_context;
  * to a slightly different version of O(ND).
  */
 struct myers_conf {
-	// TODO: FIX THESE VAR NAMES
-	// mAxcost, thanks for the var name asshole
-	// maxcost is the square root of L (which
-	// xdiffi.c calls "ndiags"), unless L < 256,
-	// in which case, it becomes 256. We use this
-	// to determine when our LCS traversal has
-	// become too expensive, at which point we
-	// switch to ... uh... something else
-	long mxcost;
+	// We use this to determine when our LCS traversal has
+	// become too expensive, at which point we switch to
+	// something else
+	long maxcost;
 	long snake_cnt;
 	long heur_min;
 };
