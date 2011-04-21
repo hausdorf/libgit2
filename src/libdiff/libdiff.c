@@ -653,7 +653,23 @@ static struct entry *find_longest_common_sequence(struct hashmap *map)
 		if (i == longest)
 			longest++;
 	}
-    return NULL;
+
+	/* No common unique lines were found */
+	if (!longest) {
+		ld_free(sequence);
+		return NULL;
+	}
+
+	/* Adjust the 'next' members by iterating backwards */
+	entry = sequence[longest - 1];
+	entry->next = NULL;
+	while (entry->previous) {
+		entry->previous->next = entry;
+		entry = entry->previous;
+	}
+	ld_free(sequence);
+
+	return entry;
 }
 
 /*
