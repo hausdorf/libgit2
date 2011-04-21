@@ -329,9 +329,12 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 }
 
 // TODO: COMMENT THIS FUNCTION
-int prepare_and_myers(diff_mem_data *data1, diff_mem_data *data2,
-		diff_environment *diff_env)
+int prepare_and_myers(diff_environment *diff_env)
 {
+	// The data we're diffing
+	diff_mem_data *data1 = diff_env->data1;
+	diff_mem_data *data2 = diff_env->data2;
+
 	// TODO: COMMENT THESE VARS
 	long L;
 
@@ -362,6 +365,14 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 	// TODO COMMENT THESE VARS
 	git_changeset *diff;
 	diff_environment diff_env;
+
+	// Put the data we're diffing into the diff_environment
+	diff_env.data1 = data1;
+	diff_env.data2 = data2;
+
+	// Put the flags into the diff_environment
+	diff_env.flags = &results_conf->flags;
+
 	// TODO: ERROR CHECK THIS ASSIGNMENT???
 	diff_results_hndlr process_results = results_conf->results_hndlr ?
 		(diff_results_hndlr)results_conf->results_hndlr :
@@ -370,14 +381,12 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 		//default_results_hndlr;
 		NULL;
 
-	diff_env.flags = &results_conf->flags;
-
 	// TODO: IMPLEMENT PATIENCE DIFF
 //	if(results_conf->flags & DO_PATIENCE_DIFF)
 //		if(prepare_and_patience(data1, data2, &diff_env) < 0)
 //			return -1;
 
-	if(prepare_and_myers(data1, data2, &diff_env) < 0) {
+	if(prepare_and_myers(&diff_env) < 0) {
 		return -1;
 	}
 
