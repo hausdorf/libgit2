@@ -30,8 +30,7 @@
 
 static void free_classifier(record_classifier *cf);
 static int init_record_classifier(record_classifier *classifier, long size);
-static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
-		data_context *data_ctx, record_classifier *classifier,
+static int prepare_data_ctx(diff_mem_data *data1, data_context *data_ctx,
 		diff_environment *diff_env);
 static int classify_record(record_classifier *classifier, diff_record **rhash,
 		unsigned int hbits, diff_record *rec);
@@ -85,10 +84,12 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 
 // TODO: COMMENT HERE
 // TODO: COMPACT THIS METHOD -- WHAT CAN BE LEFT OUT?
-static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
-		data_context *data_ctx, record_classifier *classifier,
+static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		diff_environment *diff_env)
 {
+	record_classifier *classifier = &diff_env->classifier;
+	long guessed_len = data_ctx->guessed_size;
+
 	long i;
 	unsigned int hbits;
 	long num_recs, table_size, tmp_tbl_size;
@@ -313,12 +314,10 @@ int algo_environment(diff_environment *diff_env)
 		return -1;
 	}
 
-	/*
-	if(prepare_data_ctx(data1, data_ctx1, &classifier, diff_env) < 0)
+	if(prepare_data_ctx(data1, data_ctx1, diff_env) < 0)
 		return 0;
 
-	if(prepare_data_ctx(data2, guess2, &diff_env->data_ctx2,
-			&classifier, diff_env) < 0)
+	if(prepare_data_ctx(data2, data_ctx2, diff_env) < 0)
 		return 0;
 
 	free_classifier(&classifier);
@@ -333,7 +332,6 @@ int algo_environment(diff_environment *diff_env)
 	//	xdl_free_ctx(&xe->xdf1);
 	//	return -1;
 	//}
-	*/
 
 	return 0;
 }
