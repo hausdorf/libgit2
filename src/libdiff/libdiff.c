@@ -561,6 +561,8 @@ static void insert_record(int line, struct hashmap *map, int pass)
  * @param count1 The number of lines in data1
  * @param line2 The starting line from data2
  * @param count2 The number of lines in data2
+ *
+ * @return 0 if successful, -1 if fail
  */
 static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf,
@@ -605,7 +607,18 @@ static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 static int binary_search(struct entry **sequence, int longest,
 		struct entry *entry)
 {
+	int left = -1, right = longest;
 
+	while (left + 1 < right) {
+		int middle = (left + right) / 2;
+		/* by construction, no two entries can be equal */
+		if (sequence[middle]->line2 > entry->line2)
+			right = middle;
+		else
+			left = middle;
+	}
+	/* return the index in "sequence", not the sequence length */
+	return left;
 }
 
 /*
