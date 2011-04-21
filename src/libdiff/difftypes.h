@@ -19,6 +19,8 @@ struct diff_record {
 	struct diff_record *next;
 	char const *data;
 	long size;
+	// "Linearized" hash -- first record's is 0, second record's
+	// is 0 or 1, and so on.
 	unsigned long hash;
 };
 typedef struct diff_record diff_record;
