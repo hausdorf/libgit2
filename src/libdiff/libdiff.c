@@ -308,7 +308,7 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 			&classifier, diff_env) < 0)
 		return 0;
 
-	if(prepare_data_ctx(data1, guess2, &diff_env->data_ctx2,
+	if(prepare_data_ctx(data2, guess2, &diff_env->data_ctx2,
 			&classifier, diff_env) < 0)
 		return 0;
 
