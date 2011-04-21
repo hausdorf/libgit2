@@ -365,7 +365,7 @@ int algo_environment(diff_environment *diff_env)
 int prepare_and_myers(diff_environment *diff_env)
 {
 	// TODO: COMMENT THESE VARS
-	long L;
+	long ndiags;
 
 	long *k_diags;
 	long *k_diags_fwd;
@@ -379,6 +379,11 @@ int prepare_and_myers(diff_environment *diff_env)
 
 	if(algo_environment(diff_env) < 0) {
 		return -1;
+	}
+
+	ndiags = diff_env->data_ctx1.nreff + diff_env->data_ctx2.nreff + 3;
+	if(!(k_diags = (long *) malloc((2 * ndiags + 2) * sizeof(long)))) {
+		free_env(diff_env);
 	}
 
 	// TODO: THIS FUNCTION IS NOT DONE YET
