@@ -375,8 +375,10 @@ int recursive_compare(parsed_data *data1, long left1, long right1,
 	unsigned long const *hshd_recs1 = data1->hshd_recs,
 			*hshd_recs2 = data2->hshd_recs;
 
+	// Compare data1 and data2 from the BEGINNING; break on inequality
 	for(; left1 < right1 && left2 < right2 &&
 			hshd_recs1[left1] == hshd_recs2[left2]; left1++, left2++);
+	// Compare data1 and data2 from the END; break on inequality
 	for(; left1 < right1 && left2 < right2 &&
 			hshd_recs1[right1-1] == hshd_recs2[right2-1]; right1--, right2--);
 
