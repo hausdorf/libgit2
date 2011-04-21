@@ -476,10 +476,10 @@ int do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
  */
 static void insert_record(int line, struct hashmap *map, int pass)
 {
-	// Assign the records from the appropriate pass
+	/* Assign the records from the appropriate pass */
 	diff_record **records = pass == 1 ? map->env->data_ctx1.recs
 										: map->env->data_ctx2.recs;
-	// Grab the record corresponding to the line we are looking at
+	/* Grab the record corresponding to the line we are looking at */
 	diff_record *record = records[line - 1], *other;
 
 	/*
@@ -522,6 +522,10 @@ static void insert_record(int line, struct hashmap *map, int pass)
 		return;
 	}
 
+	/* No need to store entries if we are on the second pass */
+	if (pass == 2)
+		return;
+
 	/* Map line and hash */
 	map->entries[index].line1 = line;
 	map->entries[index].hash = record->hash;
@@ -538,7 +542,6 @@ static void insert_record(int line, struct hashmap *map, int pass)
 
 	map->last = map->entries + index;
 	map->record_count++;
-
 }
 
 /*
@@ -560,7 +563,30 @@ static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *env, struct hashmap *result,
 		int line1, int count1, int line2, int count2)
 {
-    return 0;
+	result->file1 = data1;
+	result->file2 = data2;
+	result->results_conf = results_conf;
+	result->env = env;
+
+	/* We know exactly how large we want the hash map */
+	result->alloc = count1 * 2;
+	result->entries = (struct entry *)
+		ld_malloc(result->alloc * sizeof(struct entry));
+
+	if (!result->entries)
+		return -1;
+	
+	memset(result->entries, 0, result->alloc * sizeof(struct entry));
+
+	/* First, fill with entries from the first file */
+	while (count1--)
+		insert_record(line1++, result, 1);
+
+	/* Then search for matches in the second file */
+	while (count2--)
+		insert_record(line2++, result, 2);
+
+	return 0;
 }
 
 /*
@@ -571,7 +597,7 @@ static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 static int binary_search(struct entry **sequence, int longest,
 		struct entry *entry)
 {
-    return 0;
+
 }
 
 /*
