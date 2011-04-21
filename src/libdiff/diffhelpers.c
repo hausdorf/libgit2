@@ -18,6 +18,7 @@ long bogosqrt(long n) {
 	return i;
 }
 
+
 // Taken DIRECTLY form xdiff/xutils.c
 int record_match(const char *l1, long s1, const char *l2, long s2, long flags)
 {
@@ -87,6 +88,7 @@ int record_match(const char *l1, long s1, const char *l2, long s2, long flags)
 	return 1;
 }
 
+
 // Taken DIRECTLY form xdiff/xutils.c
 static unsigned long hash_record_with_whitespace(char const **data,
 		char const *top, long flags) {
@@ -126,6 +128,7 @@ static unsigned long hash_record_with_whitespace(char const **data,
 	return ha;
 }
 
+
 // Taken DIRECTLY from xdiff/xutils.c
 unsigned long hash_record(char const **data, char const *top, long flags) {
 	unsigned long ha = 5381;
@@ -143,7 +146,8 @@ unsigned long hash_record(char const **data, char const *top, long flags) {
 	return ha;
 }
 
-/**
+
+/*
  * FUN FACT: This function finds the number of bitshifts required to generate the
  * smallest power of two that is greater than either its size OR the bits in a
  * char * the bytes in an int.
@@ -160,6 +164,7 @@ unsigned int hashbits(unsigned int size)
 	return bits ? bits: 1;
 }
 
+
 // Taken DIRECTLY from xdiff/xutils.c
 // TODO: is this method necessary? Should we just call
 // the size member?
@@ -168,11 +173,13 @@ long diff_mem_size(diff_mem_data *mmf)
 	return mmf->size;
 }
 
+
 // Taken DIRECTLY from xdiff/xutils.c
 void *diff_mem_next(diff_mem_data *mmf, long *size)
 {
 	return NULL;
 }
+
 
 // Taken DIRECTLY form xdiff/xutils.c
 void *diff_mem_first(diff_mem_data *mmf, long *size)
@@ -180,6 +187,7 @@ void *diff_mem_first(diff_mem_data *mmf, long *size)
 	*size = mmf->size;
 	return mmf->data;
 }
+
 
 // Taken DIRECTLY from xdiff/xutils.c
 long guess_lines(diff_mem_data *mf)
