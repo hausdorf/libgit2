@@ -287,25 +287,33 @@ static int init_record_classifier(record_classifier *classifier, long size)
 }
 
 // TODO: COMMENT THIS FUNCTION
-int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
-		diff_environment *diff_env)
+int algo_environment(diff_environment *diff_env)
 {
-	long guess1, guess2;
+	// The raw content we're diffing
+	diff_mem_data *data1 = diff_env->data1;
+	diff_mem_data *data2 = diff_env->data2;
+
+	// Represents context we use in the diffing algorithm
+	data_context *data_ctx1 = &diff_env->data_ctx1;
+	data_context *data_ctx2 = &diff_env->data_ctx2;
+
 	record_classifier classifier;
 
 	// TODO: WE GUESS TOTAL LINES IN data1 AND data2, BUT LATER
 	// ON, WE ACTUALLY FIND THE SPECIFIC TOTAL LINES IN BOTH;
 	// ARE BOTH OF THESE PROCESSES NECESSARY?
 	// TODO: FIND OUT WHAT THE EFF THESE MAGICAL "+1"s do.
-	guess1 = guess_lines(data1) + 1;
-	guess2 = guess_lines(data2) + 1;
+	// Guess the size of both data1 and data2, and combine in a special way
+	// to come up with the size "guess" we use to initialize things like
+	// the record_classifier
+	long total_size_guess = (data_ctx1->guessed_size = guess_lines(data1) + 1) +
+		(data_ctx2->guessed_size = guess_lines(data2) + 1) + 1;
 
-	if(init_record_classifier(&classifier, guess1 + guess2 + 1) < 0) {
+	if(init_record_classifier(&classifier, total_size_guess) < 0) {
 		return -1;
 	}
 
-	if(prepare_data_ctx(data1, guess1, &diff_env->data_ctx1,
-			&classifier, diff_env) < 0)
+	if(prepare_data_ctx(data1, data_ctx1, &classifier, diff_env) < 0)
 		return 0;
 
 	if(prepare_data_ctx(data2, guess2, &diff_env->data_ctx2,
@@ -331,10 +339,6 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 // TODO: COMMENT THIS FUNCTION
 int prepare_and_myers(diff_environment *diff_env)
 {
-	// The data we're diffing
-	diff_mem_data *data1 = diff_env->data1;
-	diff_mem_data *data2 = diff_env->data2;
-
 	// TODO: COMMENT THESE VARS
 	long L;
 
@@ -348,7 +352,7 @@ int prepare_and_myers(diff_environment *diff_env)
 	// Not needed particularly until the end of the function.
 	//diffdata dd1, dd2;
 
-	if(myers_environment(data1, data2, diff_env) < 0) {
+	if(algo_environment(diff_env) < 0) {
 		return -1;
 	}
 
