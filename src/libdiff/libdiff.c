@@ -196,7 +196,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 			curr_record->hash = hash_val;
 			records[num_recs++] = curr_record;
 
-			// TODO: WTF DOES THIS DO AGAIN?
+			// FIXME: CLASSIFY RECORD AND THE LIKE DO NOT APPEAR TO DO ANYTHING
 			if (classify_record(classifier, records_hash, hbits,
 					curr_record) < 0) {
 
