@@ -581,7 +581,7 @@ static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 	/* We know exactly how large we want the hash map */
 	result->alloc = count1 * 2;
 	result->entries = (struct entry *)
-		ld_malloc(result->alloc * sizeof(struct entry));
+		ld__malloc(result->alloc * sizeof(struct entry));
 
 	if (!result->entries)
 		return -1;
@@ -634,7 +634,7 @@ static int binary_search(struct entry **sequence, int longest,
 static struct entry *find_longest_common_sequence(struct hashmap *map)
 {
 	struct entry **sequence =
-		ld_malloc(map->record_count * sizeof(struct entry *));
+		ld__malloc(map->record_count * sizeof(struct entry *));
 	size_t longest = 0, i;
 	struct entry *entry;
 
@@ -656,7 +656,7 @@ static struct entry *find_longest_common_sequence(struct hashmap *map)
 
 	/* No common unique lines were found */
 	if (!longest) {
-		ld_free(sequence);
+		ld__free(sequence);
 		return NULL;
 	}
 
@@ -667,7 +667,7 @@ static struct entry *find_longest_common_sequence(struct hashmap *map)
 		entry->previous->next = entry;
 		entry = entry->previous;
 	}
-	ld_free(sequence);
+	ld__free(sequence);
 
 	return entry;
 }
