@@ -3,6 +3,21 @@
 // Taken DIRECTLY from xdiff/xutils.c
 #define XDL_GUESS_NLINES 256
 
+
+// TODO: REPLACE THIS WITH THE Q3_SQRT()??
+// Taken DIRECTLY form xdiff/xutils.c
+long bogosqrt(long n) {
+	long i;
+
+	/*
+	 * Classical integer square root approximation using shifts.
+	 */
+	for (i = 1; n > 0; n >>= 2)
+		i <<= 1;
+
+	return i;
+}
+
 // Taken DIRECTLY form xdiff/xutils.c
 int record_match(const char *l1, long s1, const char *l2, long s2, long flags)
 {
