@@ -16,7 +16,7 @@ static int load_file(const char *file_path, char **buffer, int *size)
 	FILE *file;
 	int read_result;
 
-	file = fopen(file_path, "r");
+	file = fopen(file_path, "rb");
 	if(!file)
 		return GIT_EINVALIDPATH;
 
@@ -31,9 +31,10 @@ static int load_file(const char *file_path, char **buffer, int *size)
 		return GIT_ENOMEM;
 	}
 
-	read_result = fread(*buffer, *size, 1, file);
+	read_result = fread(*buffer, 1, *size, file);
 	if(read_result != *size) {
 		free(*buffer);
+		*buffer = NULL;
 		fclose(file);
 		return GIT_ERROR;
 	}
