@@ -300,8 +300,23 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 			&classifier, diff_env) < 0)
 		return 0;
 
+	if(prepare_data_ctx(data1, guess2, &diff_env->data_ctx2,
+			&classifier, diff_env) < 0)
+		return 0;
 
-	// TODO: THIE METHOD IS NOT DONE YET. IMPLEMENT IT.
+	// TODO: IMPLEMENT THIS FUNCTION
+	//free_classifier(&classifier);
+
+	// TODO TODO TODO: Patience diff will require that we optimize
+	// these contexts for it. The following is the code for this
+	// optimization from xdl_prepare_env
+	//if (!(xpp->flags & XDF_PATIENCE_DIFF) &&
+	//		xdl_optimize_ctxs(&xe->xdf1, &xe->xdf2) < 0) {
+
+	//	xdl_free_ctx(&xe->xdf2);
+	//	xdl_free_ctx(&xe->xdf1);
+	//	return -1;
+	//}
 
 	return 0;
 }
