@@ -123,16 +123,11 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		return -1;
 	}
 
-	// Build a hashtable of diff_record pointers
-	//
-	// 1. Start by finding hashtable size -- the smallest power of 2 greater
-	// than guessed_len, the guessed number of records
+	// Find hashtable size -- the smallest power of 2 greater than guessed_len,
+	// the guessed number of records
 	hbits = hashbits((unsigned int) guessed_len);
 	table_size = 1 << hbits;
-	// 2. Allocate memory required to store this table
-	// TODO: MAKE SURE THIS WAS CORRECT, BECAUSE THERE WAS ORIGINALLY A MISTAKE
-	// HERE. I originally wrote:
-	//if(!(records_hash = (diff_record **) malloc(guessed_len *
+	// Allocate memory required to store this table
 	if(!(records_hash = (diff_record **) malloc(table_size *
 			sizeof(diff_record *)))) {
 
@@ -140,7 +135,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
-	// 3. Set every pointer in table to NULL
+	// Set every pointer in table to NULL
 	// TODO: FIND OUT IF THIS SHOULD BE DONE WITH MEMSET INSTEAD
 	// I don't think you can with a double pointer
 	for(i = 0; i < table_size; i++) {
