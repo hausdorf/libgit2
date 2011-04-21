@@ -633,6 +633,26 @@ static int binary_search(struct entry **sequence, int longest,
  */
 static struct entry *find_longest_common_sequence(struct hashmap *map)
 {
+	struct entry **sequence =
+		ld_malloc(map->record_count * sizeof(struct entry *));
+	size_t longest = 0, i;
+	struct entry *entry;
+
+	/*
+	 * Could we use fewer comparisons by making this a while loop?
+	 * entry = map->first
+	 * while (entry->next) {...
+	 * ?
+	 */
+	for (entry = map->first; entry; entry = entry->next) {
+		if (!entry->line2 || entry->line2 == NON_UNIQUE)
+			continue;
+		i = binary_search(sequence, longest, entry);
+		entry->previous = i < 0 ? NULL : sequence[i];
+		sequence[++i] = entry;
+		if (i == longest)
+			longest++;
+	}
     return NULL;
 }
 
