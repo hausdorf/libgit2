@@ -62,6 +62,9 @@ typedef struct memstore memstore;
 // TODO: ADD COMMENT HERE
 // Equivalent to xdlclass_t
 struct classd_record {
+	// Implements chaining in the hash table at
+	// record_classifier.classd_hash; values hashed to the same
+	// location will be chained via these "next" links
 	struct classd_record *next;
 	unsigned long ha;
 	char const *line;
@@ -79,7 +82,9 @@ struct record_classifier {
 	unsigned int hbits;
 	// Size of hash table rchash
 	size_t table_size;
-	// Hash table of classd_records
+	// Hash table of classd_records. Implemented by chaining:
+	// classd_record has a member called *next to chain together the
+	// values that are hashed at teh same location.
 	classd_record **classd_hash;
 	// The memory that rchash resides in
 	// TODO: IMPLEMENT chastore; not implemented yet
