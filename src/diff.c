@@ -25,7 +25,7 @@ static int load_file(const char *file_path, char **buffer, int *size)
 	*size=ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	*buffer=(char *)malloc(*size+1);
+	*buffer = malloc(*size+1);
 	if (*buffer == NULL) {
 		fclose(file);
 		return GIT_ENOMEM;
@@ -99,20 +99,29 @@ static int file_exists(char *filename)
 static int get_git_tree(git_tree **results, git_repository *repo,
 		git_commit *commit)
 {
-	git_reference *reference;
-	const git_oid *tree_id;
+	git_reference *sym_ref;		/* Symbolic reference, used for head */
+	git_reference *direct_ref;	/* Direct reference, resolved from sym_ref */
+	const git_oid *oid;
 	int error;
 
 	if(!commit) {
-		error = git_reference_lookup(&reference, repo, "HEAD");
+		/* Get the reference for the repo's head */
+		error = git_reference_lookup(&sym_ref, repo, "HEAD");
 		if(error < GIT_SUCCESS)
 			return error;
 
-		tree_id = git_reference_oid(reference);
-		return git_tree_lookup(results, repo, tree_id);
+		/* Convert the symbolic reference to a direct reference so we
+		 * can get the git_oid from it */
+		error = git_reference_resolve(&direct_ref, sym_ref);
+		if(error < GIT_SUCCESS)
+			return error;
+
+		/* Get the head commit */
+		oid = git_reference_oid(direct_ref);
+		git_commit_lookup(&commit, repo, oid);
 	}
-	else
-		return git_commit_tree(results, commit);
+
+	return git_commit_tree(results, commit);
 }
 
 /* The resulting char* must be freed by caller or a memory leak will occur */
