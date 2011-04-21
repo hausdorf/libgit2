@@ -101,6 +101,9 @@ struct data_context {
 	// Number of records, which is DEFINITLY
 	// lines
 	long nrec;
+	// Estimate of nrec; used because estimation is lots faster
+	// than actually counting the size.
+	size_t guessed_size;
 	// Size of rhash???
 	unsigned int hbits;
 	// A hash table of xrecord pointers; build in
@@ -212,6 +215,9 @@ struct diff_environment {
 	diff_mem_data *data1, *data2;
 
 	data_context data_ctx1, data_ctx2;
+
+	// git_changeset NEEDED???
+	// myers_conf NEEDED???
 
 	// Flags points to the flags member of git_diffresults_conf,
 	// and is usually set in diff()
