@@ -45,6 +45,7 @@ static void free_classifier(record_classifier *cf) {
 	memstore_free(&cf->table_mem);
 }
 
+
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
 static int classify_record(record_classifier *classifier, diff_record **rhash,
@@ -88,6 +89,7 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 
 	return 0;
 }
+
 
 // TODO: COMMENT HERE
 // TODO: COMPACT THIS METHOD -- WHAT CAN BE LEFT OUT?
@@ -288,6 +290,7 @@ static int init_record_classifier(record_classifier *classifier, long size)
 	return 0;
 }
 
+
 // TODO: COMMENT THIS FUNCTION
 int algo_environment(diff_environment *diff_env)
 {
@@ -340,6 +343,7 @@ int algo_environment(diff_environment *diff_env)
 	return 0;
 }
 
+
 // TODO: COMMENT THIS FUNCTION
 int prepare_and_myers(diff_environment *diff_env)
 {
@@ -364,6 +368,7 @@ int prepare_and_myers(diff_environment *diff_env)
 
 	return 0;
 }
+
 
 // TODO: COMMENT THIS FUNCTION
 // TODO: IMPLEMENT THIS
@@ -403,6 +408,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 	// STEP 3: CALL THE SPECIFIED CALLBACK FUNCTION
 	return 0;
 }
+
 
 /*********************
  * Patience diff lives here
