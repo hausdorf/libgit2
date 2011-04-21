@@ -414,6 +414,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
  *    -- and unfinished stuff, too.
  ********************/
 
+#define NON_UNIQUE ULONG_MAX
 
 /*
  * This is a hash mapping from line hash to line numbers in the first
@@ -444,7 +445,7 @@ struct hashmap {
 	size_t has_matches;
 	diff_mem_data *file1, *file2;
 	diff_environment *env;
-	git_diffresults_conf const results_conf;
+	git_diffresults_conf const *results_conf;
 };
 
 /* Declare functions */
@@ -471,10 +472,56 @@ int do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
  * Insert record entries
  * @param line The line number
  * @param map The hashmap to store the entries
- * @param which Which diff file/blob: 1 for first, 2 for second
+ * @param pass Which diff file/blob: 1 for first, 2 for second
  */
-static void insert_record(int line, struct hashmap *map, int which)
+static void insert_record(int line, struct hashmap *map, int pass)
 {
+	// Assign the records from the appropriate pass
+	diff_record **records = pass == 1 ? map->env->data_ctx1.recs
+										: map->env->data_ctx2.recs;
+	// Grab the record corresponding to the line we are looking at
+	diff_record *record = records[line - 1], *other;
+
+	/*
+	 * After xdl_prepare_env() (or more precisely, due to
+	 * xdl_classify_record()), the "ha" member of the records (AKA lines)
+	 * is _not_ the hash anymore, but a linearized version of it.  In
+	 * other words, the "ha" member is guaranteed to start with 0 and
+	 * the second record's ha can only be 0 or 1, etc.
+	 *
+	 * So we multiply ha by 2 in the hope that the hashing was
+	 * "unique enough".
+	 */
+	size_t index = (size_t)((record->hash << 1) % map->alloc);
+
+	while (map->entries[index].line1) {
+		/*
+		 * Set other to the record corresponding to the line we are on
+		 * This seems to be comparing file1 to file1 at times
+		 * If we are on pass = 1, then diff_record will be equal to
+		 * data_ctx1->recs[line-1], which other gets set to here
+		 * TODO: see if this can be bypassed once
+		 */
+		other = map->env->data_ctx1.recs[map->entries[index].line1 - 1];
+		if (map->entries[index].hash != record->hash ||
+				!record_match(record->data, record->size,
+					other->data, other->size,
+					map->results_conf->flags)) {
+			if (++index >= map->alloc)
+				index = 0;
+			continue;
+		}
+		if (pass == 2)
+			map->has_matches = 1;
+		if (pass == 1 || map->entries[index].line2)
+			map->entries[index].line2 = NON_UNIQUE;
+		else
+			map->entries[index].line2 = line;
+
+		/* If all the entries match, bail early */
+		return;
+	}
+
 }
 
 /*
