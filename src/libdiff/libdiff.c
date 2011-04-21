@@ -320,7 +320,10 @@ int algo_environment(diff_environment *diff_env)
 	if(prepare_data_ctx(data2, data_ctx2, diff_env) < 0)
 		return 0;
 
-	free_classifier(&classifier);
+	// FIXME: Is this smart to do? It's a member of diff_env, which means
+	// it's getting carried around the interface. Do we want to haul NULL
+	// around?
+	free_classifier(classifier);
 
 	// TODO TODO TODO: Patience diff will require that we optimize
 	// these contexts for it. The following is the code for this
