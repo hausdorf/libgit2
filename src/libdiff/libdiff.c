@@ -415,7 +415,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
  */
 struct hashmap {
 	int nr, alloc;
-    struct entry {
+	struct entry {
 		size_t hash;
 
 		/*
@@ -431,7 +431,7 @@ struct hashmap {
 		 * initially, "next" reflects only the order in file1.
 		 */
 		struct entry *next, *previous;
-    } *entires, *first, *last;
+	} *entires, *first, *last;
 
 	/* were common records found? */
 	size_t has_matches;
@@ -456,15 +456,15 @@ static void insert_record(int line, struct hashmap *map, int which);
  * It is assumed that env has been prepared using xdl_prepare().
  */
 /*
-static int fill_hashmap(mmfile_t *file1, mmfile_t *file2,
-                        xpparam_t const *xpp, xdfenv_t *env,
-                        struct hashmap *result,
-                        int line1, int count1, int line2, int count2)
+	static int fill_hashmap(mmfile_t *file1, mmfile_t *file2,
+	xpparam_t const *xpp, xdfenv_t *env,
+	struct hashmap *result,
+	int line1, int count1, int line2, int count2)
 */
 static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
-						git_diffresults_conf const *results_conf,
-						diff_environment *env, struct hashmap *result,
-						int line1, int count1, int line2, int count2);
+		git_diffresults_conf const *results_conf,
+		diff_environment *env, struct hashmap *result,
+		int line1, int count1, int line2, int count2);
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
@@ -472,7 +472,7 @@ static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
  * line2, as we construct the sequence with entries ordered by line1).
  */
 static int binary_search(struct entry **sequence, int longest,
-							struct entry *entry);
+		struct entry *entry);
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
@@ -493,9 +493,9 @@ static struct entry *find_longest_common_sequence(struct hashmap *map);
 static int match(struct hashmap *map, int line1, int line2);
 
 /*
-static int patience_diff(mmfile_t *file1, mmfile_t *file2,
-		xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2);
+	static int patience_diff(mmfile_t *file1, mmfile_t *file2,
+	xpparam_t const *xpp, xdfenv_t *env,
+	int line1, int count1, int line2, int count2);
 */
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
@@ -505,9 +505,9 @@ static int patience_diff(mmfile_t *file1, mmfile_t *file2,
  * This function assumes that env was prepared with xdl_prepare_env().
  */
 static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
-							git_diffresults_conf const *results_conf,
-							diff_environment *env,
-							int line1, int count1, int line2, int count2);
+		git_diffresults_conf const *results_conf,
+		diff_environment *env,
+		int line1, int count1, int line2, int count2);
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
@@ -526,9 +526,9 @@ static int fall_back_to_classic_diff(struct hashmap *map,
  * Entry point to patience diff
  */
 /*
-int xdl_do_patience_diff(mmfile_t *file1, mmfile_t *file2,
-		xpparam_t const *xpp, xdfenv_t *env)
-*/
+	int xdl_do_patience_diff(mmfile_t *file1, mmfile_t *file2,
+	xpparam_t const *xpp, xdfenv_t *env)
+	*/
 int xdl_do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		git_diffresults_conf const *results_conf, diff_environment *env);
 
