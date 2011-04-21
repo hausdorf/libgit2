@@ -57,9 +57,6 @@ static int load_file(const char *file_path, char **buffer, int *size)
 int git_diff_no_index(git_diffresults_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {
-	// TODO: REMOVE ME WHEN YOU'RE DONE DEVELOPING ALGORITHM
-	printf("DIFF_NO_INDEX\n");
-
 	diff_mem_data data1, data2;
 	char *buffer1, *buffer2;
 	int buffer1_size, buffer2_size;
