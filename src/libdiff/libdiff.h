@@ -5,7 +5,6 @@
 #include "difftypes.h"
 
 
-
 // TODO: COMMENT HERE
 // TODO: IS THIS STRUCT EVEN NECESSARY?
 struct parsed_data {
@@ -24,6 +23,7 @@ struct parsed_data {
 };
 typedef struct parsed_data parsed_data;
 
+
 /*
  * Represents the inner variables required to run Myers O(ND)
  * diffing algorithm. This includes guiding information like
@@ -40,6 +40,10 @@ struct myers_conf {
 };
 typedef struct myers_conf myers_conf;
 
+
+#define ld__malloc(x) git__malloc(x)
+#define ld__free(ptr) free(ptr)
+#define ld__realloc(ptr,x) git__realloc(ptr,x)
 
 
 int diff(diff_mem_data *data1, diff_mem_data *data2,
