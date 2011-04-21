@@ -16,7 +16,7 @@ static int load_file(const char *file_path, char **buffer, int *size)
 	FILE *file;
 	int read_result;
 
-	file = fopen(file_path, "rb");
+	file = fopen(file_path, "r");
 	if(!file)
 		return GIT_EINVALIDPATH;
 
@@ -26,7 +26,7 @@ static int load_file(const char *file_path, char **buffer, int *size)
 	fseek(file, 0, SEEK_SET);
 
 	*buffer=(char *)malloc(*size+1);
-	if (!*buffer) {
+	if (*buffer == NULL) {
 		fclose(file);
 		return GIT_ENOMEM;
 	}
@@ -48,7 +48,10 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	int buffer1_size, buffer2_size;
 	int result;
 
+	/* verify and initialize variables */
 	assert(filepath1 && filepath2);
+	buffer1 = NULL;
+	buffer2 = NULL;
 
 	result = load_file(filepath1, &buffer1, &buffer1_size);
 	if(result < GIT_SUCCESS)
@@ -58,7 +61,9 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	if(result < GIT_SUCCESS)
 		goto cleanup;
 
+	/*
 	diff(NULL, NULL, NULL);
+	*/
 
 cleanup:
 	if(buffer1)
@@ -272,11 +277,3 @@ cleanup:
 
 	return results;
 }
-
-/*int main()
-{
-	git_diff_data dd1, dd2;
-	long off1, lim1, off2, lim2, kvdf, kvdb;
-	int need_min;
-	xdl_recs_cmp(&dd1, off1, lim1, &dd2, off2, lim2, &kvdf, &kvdb, need_min/ *, xdalgoenv_t *xenv* /);
-}*/
