@@ -364,27 +364,32 @@ int algo_environment(diff_environment *diff_env)
 // TODO: COMMENT THIS FUNCTION
 int prepare_and_myers(diff_environment *diff_env)
 {
-	// TODO: COMMENT THESE VARS
-	long ndiags;
+	long ndiags;    // Equivalent to Myers' "L" parameter; total
+	                // combined len of both things we're diffing
 
-	long *k_diags;
-	long *k_diags_fwd;
-	long *k_diags_bkwd;
+	long *k_diags;  // mem for both fwd and bwd K-diagonals allocd here
+	long *k_fwd;    // points to the fwd K-diag inside k_diags
+	long *k_bwd;    // points to the bwd K-diag inside k_diags
 
 	myers_conf conf;
 
-	// TODO: FIND OUT HOW TO CONSOLIDATE diffdata, implement these.
-	// Not needed particularly until the end of the function.
-	//diffdata dd1, dd2;
-
+	// Setup and acquire information we need to perform diff
 	if(algo_environment(diff_env) < 0) {
 		return -1;
 	}
 
+	// Allocate memory for the forward and backward K diagonals
 	ndiags = diff_env->data_ctx1.nreff + diff_env->data_ctx2.nreff + 3;
 	if(!(k_diags = (long *) malloc((2 * ndiags + 2) * sizeof(long)))) {
 		free_env(diff_env);
 	}
+
+	// point k_fwd and k_bwd to the appropriate location in memory allocd
+	// at *k_diags
+	k_fwd = k_diags;
+	k_bwd = k_diags + ndiags;
+	k_fwd += diff_env->data_ctx2.nreff + 1;
+	k_bwd += diff_env->data_ctx2.nreff + 1;
 
 	// TODO: THIS FUNCTION IS NOT DONE YET
 
