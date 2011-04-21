@@ -19,7 +19,7 @@ struct diff_record {
 	struct diff_record *next;
 	char const *data;
 	long size;
-	unsigned long ha;
+	unsigned long hash;
 };
 typedef struct diff_record diff_record;
 
@@ -66,7 +66,7 @@ struct classd_record {
 	// record_classifier.classd_hash; values hashed to the same
 	// location will be chained via these "next" links
 	struct classd_record *next;
-	unsigned long ha;
+	unsigned long hash;
 	char const *line;
 	long size;
 	long idx;
