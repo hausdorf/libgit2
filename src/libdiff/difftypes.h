@@ -126,8 +126,8 @@ struct data_context {
 	long *keys;
 	// # of records * size of records???
 	long nreff;
-	// A hash of the entire xdfile contents
-	unsigned long *ha;
+	// Array; each element is the hash of corresponding record in the data
+	unsigned long *hshd_recs;
 };
 typedef struct data_context data_context;
 

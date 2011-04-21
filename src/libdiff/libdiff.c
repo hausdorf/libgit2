@@ -107,7 +107,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	diff_record *curr_record;
 	diff_record **records, **reallocd_records;
 	diff_record **records_hash;
-	unsigned long *ha;
+	unsigned long *hshd_recs;
 	char *weights;
 	long *keys;
 
@@ -210,10 +210,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		}
 	}
 
-	// TODO TODO TODO: WTF DOES ALL THIS SHIT DO AGAIN?
-	// Let's take a look wherever the members allocated below are accessed
-	// and find out (this probably happens later in recs_cmp or something
-
+	// alloc space for weights array
 	if (!(weights = (char *) malloc((num_recs + 2) * sizeof(char)))) {
 
 		free(records_hash);
@@ -223,6 +220,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	}
 	memset(weights, 0, (num_recs + 2) * sizeof(char));
 
+	// alloc space for keys array
 	if (!(keys = (long *) malloc((num_recs + 1) * sizeof(long)))) {
 
 		free(weights);
@@ -231,7 +229,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
-	if (!(ha = (unsigned long *) malloc((num_recs + 1) * sizeof(unsigned long)))) {
+	if (!(hshd_recs = (unsigned long *) malloc((num_recs + 1) * sizeof(unsigned long)))) {
 
 		free(keys);
 		free(weights);
@@ -250,7 +248,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	data_ctx->weights = weights + 1;
 	data_ctx->keys = keys;
 	data_ctx->nreff = 0;
-	data_ctx->ha = ha;
+	data_ctx->hshd_recs = hshd_recs;
 	data_ctx->dstart = 0;
 	data_ctx->dend = num_recs - 1;
 
