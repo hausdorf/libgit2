@@ -674,11 +674,14 @@ static struct entry *find_longest_common_sequence(struct hashmap *map)
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
- * calls xdl_recmatch
  */
 static int match(struct hashmap *map, int line1, int line2)
 {
-    return 0;
+	diff_record *record1 = map->env->data_ctx1.recs[line1 - 1];
+	diff_record *record2 = map->env->data_ctx2.recs[line2 - 1];
+
+	return record_match(record1->data, record1->size,
+			record2->data, record2->size, map->results_conf->flags);
 }
 
 /*
@@ -698,7 +701,7 @@ static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		diff_environment *env,
 		int line1, int count1, int line2, int count2)
 {
-    return 0;
+	return 0;
 }
 
 /*
@@ -707,7 +710,59 @@ static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 static int walk_common_sequence(struct hashmap *map, struct entry *first,
 		int line1, int count1, int line2, int count2)
 {
-    return 0;
+	int end1 = line1 + count1, end2 = line2 + count2;
+	int next1, next2;
+
+	for (;;) {
+		/* Try to grow the line ranges of common lines */
+		if (first) {
+			next1 = first->line1;
+			next2 = first->line2;
+			while (next1 > line1 && next2 > line2 &&
+					match(map, next1 - 1, next2 - 1)) {
+				next1--;
+				next2--;
+			}
+		} else {
+			next1 = end1;
+			next2 = end2;
+		}
+		while (line1 < next1 && line2 < next2 &&
+				match(map, line1, line2)) {
+			line1++;
+			line2++;
+		}
+
+		/* Recurse */
+		if (next1 > line1 || next2 > line2) {
+			struct hashmap submap;
+
+			memset(&submap, 0, sizeof(submap));
+			if (patience_diff(map->file1, map->file2,
+						map->results_conf, map->env,
+						line1, next1 - line1,
+						line2, next2 - line2)) {
+				return -1;
+			}
+		}
+
+		if (!first)
+			return 0;
+
+		/* Get next non-matching lines */
+		while (first->next &&
+				first->next->line1 == first->line1 + 1 &&
+				first->next->line2 == first->line2 + 1)
+			first = first->next;
+
+		line1 = first->line1 + 1;
+		line2 = first->line2 + 1;
+
+		/* Reposition next */
+		first = first->next;
+	}
+
+	/* Should be returning 0 here, I think */
 }
 
 /*
