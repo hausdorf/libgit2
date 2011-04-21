@@ -28,6 +28,7 @@
 
 
 
+static void free_classifier(record_classifier *cf);
 static int init_record_classifier(record_classifier *classifier, long size);
 static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
 		data_context *data_ctx, record_classifier *classifier,
@@ -36,6 +37,12 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 		unsigned int hbits, diff_record *rec);
 
 
+
+static void free_classifier(record_classifier *cf) {
+
+	free(cf->classd_hash);
+	memstore_free(&cf->table_mem);
+}
 
 static int classify_record(record_classifier *classifier, diff_record **rhash,
 		unsigned int hbits, diff_record *rec)
@@ -305,7 +312,7 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 		return 0;
 
 	// TODO: IMPLEMENT THIS FUNCTION
-	//free_classifier(&classifier);
+	free_classifier(&classifier);
 
 	// TODO TODO TODO: Patience diff will require that we optimize
 	// these contexts for it. The following is the code for this
