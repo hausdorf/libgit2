@@ -48,36 +48,43 @@ static void free_classifier(record_classifier *cf) {
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
 static int classify_record(record_classifier *classifier, diff_record **rhash,
-		unsigned int hbits, diff_record *rec)
+		unsigned int hbits, diff_record *record)
 {
-	long hi;
+	long hash_idx;
 	char const *line;
 	classd_record *rcrec;
 
-	line = rec->data;
-	hi = (long) XDL_HASHLONG(rec->ha, classifier->hbits);
-	for(rcrec = classifier->classd_hash[hi]; rcrec; rcrec = rcrec->next)
-		if(rcrec->ha == rec->ha && record_match(rcrec->line, rcrec->size,
-				rec->data, rec->size, classifier->flags))
+	line = record->data;
+	// Turn record's raw hash value into an index for the hash table
+	hash_idx = (long) XDL_HASHLONG(record->hash, classifier->hbits);
+	// Look through the elements at that hash location; break if we actually find
+	// parameter "record" at that location
+	for(rcrec = classifier->classd_hash[hash_idx]; rcrec; rcrec = rcrec->next)
+		if(rcrec->hash == record->hash && record_match(rcrec->line, rcrec->size,
+				record->data, record->size, classifier->flags))
 			break;
 
+	// If we've NOT found "record" in classifier's hash table, insert it:
 	if(!rcrec) {
 		if(!(rcrec = memstore_alloc(&classifier->table_mem))) {
 			return -1;
 		}
+		// Increment count of elements in classifier's hash table
 		rcrec->idx = classifier->count++;
 		rcrec->line = line;
-		rcrec->size = rec->size;
-		rcrec->ha = rec->ha;
-		rcrec->next = classifier->classd_hash[hi];
-		classifier->classd_hash[hi] = rcrec;
+		rcrec->size = record->size;
+		rcrec->hash = record->hash;
+		// next and rcrec will point to the same location
+		rcrec->next = classifier->classd_hash[hash_idx];
+		classifier->classd_hash[hash_idx] = rcrec;
 	}
 
-	rec->ha = (unsigned long) rcrec->idx;
+	// Insert record into the hash table
+	record->hash = (unsigned long) rcrec->idx;
 
-	hi = (long) XDL_HASHLONG(rec->ha, hbits);
-	rec->next = rhash[hi];
-	rhash[hi] = rec;
+	hash_idx = (long) XDL_HASHLONG(record->hash, hbits);
+	record->next = rhash[hash_idx];
+	rhash[hash_idx] = record;
 
 	return 0;
 }
@@ -192,7 +199,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 			}
 			curr_record->data = prev;
 			curr_record->size = (long) (cur-prev);
-			curr_record->ha = hash_val;
+			curr_record->hash = hash_val;
 			records[num_recs++] = curr_record;
 
 			// TODO: WTF DOES THIS DO AGAIN?
