@@ -39,10 +39,32 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
+static void free_ctx(data_context *ctx) {
+
+	free(ctx->rhash);
+	free(ctx->weights);
+	free(ctx->keys - 1);
+	free(ctx->hshd_recs);
+	free(ctx->recs);
+	memstore_free(&ctx->table_mem);
+}
+
+
+// TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
+// PORT IT PROPERLY
 static void free_classifier(record_classifier *cf) {
 
 	free(cf->classd_hash);
 	memstore_free(&cf->table_mem);
+}
+
+
+// TODO: WE NEED TO BE ABSOLUTELY CERTAIN THAT THIS IS CORRECT
+void free_env(diff_environment *diff_env) {
+
+	free_ctx(&diff_env->data_ctx1);
+	free_ctx(&diff_env->data_ctx2);
+	free_classifier(&diff_env->classifier);
 }
 
 
