@@ -7,6 +7,7 @@
 
 
 // TODO: COMMENT HERE
+// TODO: IS THIS STRUCT EVEN NECESSARY?
 struct diffdata {
 	long num_recs;
 	// This is DEFINITELY an array of hashes; in
