@@ -109,7 +109,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	diff_record **records_hash;
 	unsigned long *ha;
 	char *weights;
-	long *rindex;
+	long *keys;
 
 	// Allocate memory for the hash table of records
 	if(memstore_init(&data_ctx->table_mem, sizeof(diff_record),
@@ -223,7 +223,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	}
 	memset(weights, 0, (num_recs + 2) * sizeof(char));
 
-	if (!(rindex = (long *) malloc((num_recs + 1) * sizeof(long)))) {
+	if (!(keys = (long *) malloc((num_recs + 1) * sizeof(long)))) {
 
 		free(weights);
 		free(records_hash);
@@ -233,7 +233,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	}
 	if (!(ha = (unsigned long *) malloc((num_recs + 1) * sizeof(unsigned long)))) {
 
-		free(rindex);
+		free(keys);
 		free(weights);
 		free(records_hash);
 		free(records);
@@ -248,7 +248,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	// QUESTION: does this create a memory leak? We're not pointing to the same spot,
 	// and as far as I know, nothing else points here.
 	data_ctx->weights = weights + 1;
-	data_ctx->rindex = rindex;
+	data_ctx->keys = keys;
 	data_ctx->nreff = 0;
 	data_ctx->ha = ha;
 	data_ctx->dstart = 0;

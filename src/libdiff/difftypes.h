@@ -123,7 +123,7 @@ struct data_context {
 	// it's basically a bit vector made of chars
 	char *weights;
 	// An ARRAY of longs that represent hashes, used to access weights[]
-	long *rindex;
+	long *keys;
 	// # of records * size of records???
 	long nreff;
 	// A hash of the entire xdfile contents
