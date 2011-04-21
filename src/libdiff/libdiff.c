@@ -297,7 +297,7 @@ int algo_environment(diff_environment *diff_env)
 	data_context *data_ctx1 = &diff_env->data_ctx1;
 	data_context *data_ctx2 = &diff_env->data_ctx2;
 
-	record_classifier classifier;
+	record_classifier *classifier = &diff_env->classifier;
 
 	// TODO: WE GUESS TOTAL LINES IN data1 AND data2, BUT LATER
 	// ON, WE ACTUALLY FIND THE SPECIFIC TOTAL LINES IN BOTH;
@@ -309,10 +309,11 @@ int algo_environment(diff_environment *diff_env)
 	long total_size_guess = (data_ctx1->guessed_size = guess_lines(data1) + 1) +
 		(data_ctx2->guessed_size = guess_lines(data2) + 1) + 1;
 
-	if(init_record_classifier(&classifier, total_size_guess) < 0) {
+	if(init_record_classifier(classifier, total_size_guess) < 0) {
 		return -1;
 	}
 
+	/*
 	if(prepare_data_ctx(data1, data_ctx1, &classifier, diff_env) < 0)
 		return 0;
 
@@ -332,6 +333,7 @@ int algo_environment(diff_environment *diff_env)
 	//	xdl_free_ctx(&xe->xdf1);
 	//	return -1;
 	//}
+	*/
 
 	return 0;
 }

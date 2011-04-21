@@ -216,6 +216,8 @@ struct diff_environment {
 
 	data_context data_ctx1, data_ctx2;
 
+	record_classifier classifier;
+
 	// git_changeset NEEDED???
 	// myers_conf NEEDED???
 
