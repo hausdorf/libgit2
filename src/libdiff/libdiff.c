@@ -413,11 +413,14 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
  * Thar be dragons!
  *    -- and unfinished stuff, too.
  ********************/
+
+
 /*
  * This is a hash mapping from line hash to line numbers in the first
  * and second file/blob
  */
 struct hashmap {
+    // TODO: Figure out what nr and alloc do
 	int nr, alloc;
 	struct entry {
 		size_t hash;
@@ -435,7 +438,7 @@ struct hashmap {
 		 * initially, "next" reflects only the order in file1.
 		 */
 		struct entry *next, *previous;
-	} *entires, *first, *last;
+	} *entries, *first, *last;
 
 	/* were common records found? */
 	size_t has_matches;
@@ -443,13 +446,36 @@ struct hashmap {
 	diff_environment *env;
 	git_diffresults_conf const results_conf;
 };
+
+/* Declare functions */
+static void insert_record(int line, struct hashmap *map, int which);
+static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
+		git_diffresults_conf const *results_conf,
+		diff_environment *env, struct hashmap *result,
+		int line1, int count1, int line2, int count2);
+static int binary_search(struct entry **sequence, int longest,
+		struct entry *entry);
+static struct entry *find_longest_common_sequence(struct hashmap *map);
+static int match(struct hashmap *map, int line1, int line2);
+static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
+		git_diffresults_conf const *results_conf,
+		diff_environment *env,
+		int line1, int count1, int line2, int count2);
+static int walk_common_sequence(struct hashmap *map, struct entry *first,
+		int line1, int count1, int line2, int count2);
+static int fall_back_to_classic_diff(struct hashmap *map,
+		int line1, int count1, int line2, int count2);
+int do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
+		git_diffresults_conf const *results_conf, diff_environment *env);
 /**
  * Insert record entries
  * @param line The line number
  * @param map The hashmap to store the entries
  * @param which Which diff file/blob: 1 for first, 2 for second
  */
-static void insert_record(int line, struct hashmap *map, int which);
+static void insert_record(int line, struct hashmap *map, int which)
+{
+}
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
@@ -468,7 +494,10 @@ static void insert_record(int line, struct hashmap *map, int which);
 static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf,
 		diff_environment *env, struct hashmap *result,
-		int line1, int count1, int line2, int count2);
+		int line1, int count1, int line2, int count2)
+{
+    return 0;
+}
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
@@ -476,7 +505,10 @@ static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
  * line2, as we construct the sequence with entries ordered by line1).
  */
 static int binary_search(struct entry **sequence, int longest,
-		struct entry *entry);
+		struct entry *entry)
+{
+    return 0;
+}
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
@@ -488,13 +520,19 @@ static int binary_search(struct entry **sequence, int longest,
  * item per sequence length: the sequence with the smallest last
  * element (in terms of line2).
  */
-static struct entry *find_longest_common_sequence(struct hashmap *map);
+static struct entry *find_longest_common_sequence(struct hashmap *map)
+{
+    return NULL;
+}
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
  * calls xdl_recmatch
  */
-static int match(struct hashmap *map, int line1, int line2);
+static int match(struct hashmap *map, int line1, int line2)
+{
+    return 0;
+}
 
 /*
 	static int patience_diff(mmfile_t *file1, mmfile_t *file2,
@@ -511,19 +549,28 @@ static int match(struct hashmap *map, int line1, int line2);
 static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		git_diffresults_conf const *results_conf,
 		diff_environment *env,
-		int line1, int count1, int line2, int count2);
+		int line1, int count1, int line2, int count2)
+{
+    return 0;
+}
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
  */
 static int walk_common_sequence(struct hashmap *map, struct entry *first,
-		int line1, int count1, int line2, int count2);
+		int line1, int count1, int line2, int count2)
+{
+    return 0;
+}
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
  */
 static int fall_back_to_classic_diff(struct hashmap *map,
-		int line1, int count1, int line2, int count2);
+		int line1, int count1, int line2, int count2)
+{
+    return 0;
+}
 
 /*
  * PORTED DIRECTLY FROM xdiff with only modifications to the types
@@ -534,5 +581,8 @@ static int fall_back_to_classic_diff(struct hashmap *map,
 	xpparam_t const *xpp, xdfenv_t *env)
 	*/
 int xdl_do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
-		git_diffresults_conf const *results_conf, diff_environment *env);
+		git_diffresults_conf const *results_conf, diff_environment *env)
+{
+    return 0;
+}
 
