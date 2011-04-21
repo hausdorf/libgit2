@@ -115,11 +115,8 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 
 		return -1;
 	}
-	// TODO: FIGURE OUT WTF THIS BIT DOES -- I FORGET
 	if(!(records = (diff_record **) malloc(guessed_len * sizeof(diff_record *)))) {
 
-		// FIXME: THERE WAS A MISTAKE HERE
-		//free(&data_ctx->table_mem);
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
@@ -191,9 +188,6 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 
 				free(records_hash);
 				free(records);
-				// TODO: Make sure this new line is right because THIS WAS
-				// ORIGINALLY A MISTAKE. Originally I wrote:
-				// free(&data_ctx->table_mem);
 				memstore_free(&data_ctx->table_mem);
 				return -1;
 			}
