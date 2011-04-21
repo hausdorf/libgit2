@@ -9,6 +9,7 @@
  * We'll port them ourselves later.
  */
 // TODO: PORT THESE PROPERLY.
+long bogosqrt(long n);
 int record_match(const char *l1, long s1, const char *l2, long s2, long flags);
 // TODO: REMOVE THIS STATIC DECLARATION?
 static unsigned long hash_record_with_whitespace(char const **data,
