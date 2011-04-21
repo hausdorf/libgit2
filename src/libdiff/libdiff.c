@@ -30,8 +30,7 @@
 
 static void free_classifier(record_classifier *cf);
 static int init_record_classifier(record_classifier *classifier, long size);
-static int prepare_data_ctx(diff_mem_data *data1, long guessed_len,
-		data_context *data_ctx, record_classifier *classifier,
+static int prepare_data_ctx(diff_mem_data *data1, data_context *data_ctx,
 		diff_environment *diff_env);
 static int classify_record(record_classifier *classifier, diff_record **rhash,
 		unsigned int hbits, diff_record *rec);
@@ -85,10 +84,12 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 
 // TODO: COMMENT HERE
 // TODO: COMPACT THIS METHOD -- WHAT CAN BE LEFT OUT?
-static int prepare_data_ctx(diff_mem_data *data, long guessed_len,
-		data_context *data_ctx, record_classifier *classifier,
+static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		diff_environment *diff_env)
 {
+	record_classifier *classifier = &diff_env->classifier;
+	long guessed_len = data_ctx->guessed_size;
+
 	long i;
 	unsigned int hbits;
 	long num_recs, table_size, tmp_tbl_size;
@@ -287,32 +288,42 @@ static int init_record_classifier(record_classifier *classifier, long size)
 }
 
 // TODO: COMMENT THIS FUNCTION
-int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
-		diff_environment *diff_env)
+int algo_environment(diff_environment *diff_env)
 {
-	long guess1, guess2;
-	record_classifier classifier;
+	// The raw content we're diffing
+	diff_mem_data *data1 = diff_env->data1;
+	diff_mem_data *data2 = diff_env->data2;
+
+	// Represents context we use in the diffing algorithm
+	data_context *data_ctx1 = &diff_env->data_ctx1;
+	data_context *data_ctx2 = &diff_env->data_ctx2;
+
+	record_classifier *classifier = &diff_env->classifier;
 
 	// TODO: WE GUESS TOTAL LINES IN data1 AND data2, BUT LATER
 	// ON, WE ACTUALLY FIND THE SPECIFIC TOTAL LINES IN BOTH;
 	// ARE BOTH OF THESE PROCESSES NECESSARY?
 	// TODO: FIND OUT WHAT THE EFF THESE MAGICAL "+1"s do.
-	guess1 = guess_lines(data1) + 1;
-	guess2 = guess_lines(data2) + 1;
+	// Guess the size of both data1 and data2, and combine in a special way
+	// to come up with the size "guess" we use to initialize things like
+	// the record_classifier
+	long total_size_guess = (data_ctx1->guessed_size = guess_lines(data1) + 1) +
+		(data_ctx2->guessed_size = guess_lines(data2) + 1) + 1;
 
-	if(init_record_classifier(&classifier, guess1 + guess2 + 1) < 0) {
+	if(init_record_classifier(classifier, total_size_guess) < 0) {
 		return -1;
 	}
 
-	if(prepare_data_ctx(data1, guess1, &diff_env->data_ctx1,
-			&classifier, diff_env) < 0)
+	if(prepare_data_ctx(data1, data_ctx1, diff_env) < 0)
 		return 0;
 
-	if(prepare_data_ctx(data2, guess2, &diff_env->data_ctx2,
-			&classifier, diff_env) < 0)
+	if(prepare_data_ctx(data2, data_ctx2, diff_env) < 0)
 		return 0;
 
-	free_classifier(&classifier);
+	// FIXME: Is this smart to do? It's a member of diff_env, which means
+	// it's getting carried around the interface. Do we want to haul NULL
+	// around?
+	free_classifier(classifier);
 
 	// TODO TODO TODO: Patience diff will require that we optimize
 	// these contexts for it. The following is the code for this
@@ -329,8 +340,7 @@ int myers_environment(diff_mem_data *data1, diff_mem_data *data2,
 }
 
 // TODO: COMMENT THIS FUNCTION
-int prepare_and_myers(diff_mem_data *data1, diff_mem_data *data2,
-		diff_environment *diff_env)
+int prepare_and_myers(diff_environment *diff_env)
 {
 	// TODO: COMMENT THESE VARS
 	long L;
@@ -345,7 +355,7 @@ int prepare_and_myers(diff_mem_data *data1, diff_mem_data *data2,
 	// Not needed particularly until the end of the function.
 	//diffdata dd1, dd2;
 
-	if(myers_environment(data1, data2, diff_env) < 0) {
+	if(algo_environment(diff_env) < 0) {
 		return -1;
 	}
 
@@ -362,6 +372,14 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 	// TODO COMMENT THESE VARS
 	git_changeset *diff;
 	diff_environment diff_env;
+
+	// Put the data we're diffing into the diff_environment
+	diff_env.data1 = data1;
+	diff_env.data2 = data2;
+
+	// Put the flags into the diff_environment
+	diff_env.flags = &results_conf->flags;
+
 	// TODO: ERROR CHECK THIS ASSIGNMENT???
 	diff_results_hndlr process_results = results_conf->results_hndlr ?
 		(diff_results_hndlr)results_conf->results_hndlr :
@@ -370,14 +388,12 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 		//default_results_hndlr;
 		NULL;
 
-	diff_env.flags = &results_conf->flags;
-
 	// TODO: IMPLEMENT PATIENCE DIFF
 //	if(results_conf->flags & DO_PATIENCE_DIFF)
 //		if(prepare_and_patience(data1, data2, &diff_env) < 0)
 //			return -1;
 
-	if(prepare_and_myers(data1, data2, &diff_env) < 0) {
+	if(prepare_and_myers(&diff_env) < 0) {
 		return -1;
 	}
 

@@ -101,6 +101,9 @@ struct data_context {
 	// Number of records, which is DEFINITLY
 	// lines
 	long nrec;
+	// Estimate of nrec; used because estimation is lots faster
+	// than actually counting the size.
+	size_t guessed_size;
 	// Size of rhash???
 	unsigned int hbits;
 	// A hash table of xrecord pointers; build in
@@ -123,47 +126,6 @@ struct data_context {
 	unsigned long *ha;
 };
 typedef struct data_context data_context;
-
-/*
- * Represents the variables required to run the diffing
- * algorithm. For example, an array longs that hold the hashed
- * value of every line in the data we're diffing, as well as
- * the number of records are kept here.
- */
-struct diff_environment {
-	// TODO: IMPLEMENT THIS MINIMALLY
-	data_context data_ctx1, data_ctx2;
-	// Flags points to the flags member of git_diffresults_conf,
-	// and is usually set in diff()
-	unsigned long *flags;
-/*
-	chastore_t rcha;
-	// Number of records, which is DEFINITLY
-	// lines
-	long nrec;
-	// Size of rhash???
-	unsigned int hbits;
-	// A hash table of xrecord pointers; build in
-	// xdl_prepare_ctx()
-	xrecord_t **rhash;
-	// D-path start and end
-	long dstart, dend;
-	// All records
-	xrecord_t **recs;
-	// In xdl_recs_cmp, each of these chars is set to a "weight" -- usually
-	// 0 or 1 depending on whether that particular record has changed. So
-	// it's basically a bit vector made of chars
-	char *rchg;
-	// An ARRAY of longs that represent hashes; in xdl_recs_cmp(),
-	// we access it as an array.
-	long *rindex;
-	// # of records * size of records???
-	long nreff;
-	// A hash of the entire xdfile contents
-	unsigned long *ha;
-*/
-};
-typedef struct diff_environment diff_environment;
 
 /*
  * Represents the inner variables required to run Myers O(ND)
@@ -239,6 +201,57 @@ struct git_changeset {
 	long chg1, chg2;
 };
 // typdef'd in include/types.h -- part of the public API
+
+/*
+ * Represents the variables required to run the diffing
+ * algorithm. For example, an array longs that hold the hashed
+ * value of every line in the data we're diffing, as well as
+ * the number of records are kept here.
+ */
+struct diff_environment {
+	// TODO: IMPLEMENT THIS MINIMALLY
+	// We're diffing data2 against data1; diff generated will be the set
+	// of changes required to change data1 into data2
+	diff_mem_data *data1, *data2;
+
+	data_context data_ctx1, data_ctx2;
+
+	record_classifier classifier;
+
+	// git_changeset NEEDED???
+	// myers_conf NEEDED???
+
+	// Flags points to the flags member of git_diffresults_conf,
+	// and is usually set in diff()
+	unsigned long *flags;
+/*
+	chastore_t rcha;
+	// Number of records, which is DEFINITLY
+	// lines
+	long nrec;
+	// Size of rhash???
+	unsigned int hbits;
+	// A hash table of xrecord pointers; build in
+	// xdl_prepare_ctx()
+	xrecord_t **rhash;
+	// D-path start and end
+	long dstart, dend;
+	// All records
+	xrecord_t **recs;
+	// In xdl_recs_cmp, each of these chars is set to a "weight" -- usually
+	// 0 or 1 depending on whether that particular record has changed. So
+	// it's basically a bit vector made of chars
+	char *rchg;
+	// An ARRAY of longs that represent hashes; in xdl_recs_cmp(),
+	// we access it as an array.
+	long *rindex;
+	// # of records * size of records???
+	long nreff;
+	// A hash of the entire xdfile contents
+	unsigned long *ha;
+*/
+};
+typedef struct diff_environment diff_environment;
 
 /*
  * Callback funciton that determines what we do with results;
