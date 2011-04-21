@@ -90,7 +90,7 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	data2.data = buffer2;
 	data2.size = buffer2_size;
 
-	diff(&data1, &data1, *results_conf);
+	diff(&data1, &data2, *results_conf);
 
 	/* END TEST CODE */
 
