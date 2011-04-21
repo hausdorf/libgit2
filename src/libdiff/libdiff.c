@@ -38,12 +38,16 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 
 
 
+// TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
+// PORT IT PROPERLY
 static void free_classifier(record_classifier *cf) {
 
 	free(cf->classd_hash);
 	memstore_free(&cf->table_mem);
 }
 
+// TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
+// PORT IT PROPERLY
 static int classify_record(record_classifier *classifier, diff_record **rhash,
 		unsigned int hbits, diff_record *rec)
 {
