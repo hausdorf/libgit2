@@ -28,6 +28,7 @@
 
 
 
+// Default values for Myers algorithm parameters
 #define XDL_MAX_COST_MIN 256
 #define XDL_HEUR_MIN_COST 256
 #define XDL_SNAKE_CNT 20

@@ -41,6 +41,7 @@ struct myers_conf {
 typedef struct myers_conf myers_conf;
 
 
+// libdiff memory allocation by default is handled through libgit's
 #define ld__malloc(x) git__malloc(x)
 #define ld__free(ptr) free(ptr)
 #define ld__realloc(ptr,x) git__realloc(ptr,x)
