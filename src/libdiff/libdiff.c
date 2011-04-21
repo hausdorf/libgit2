@@ -368,6 +368,57 @@ int algo_environment(diff_environment *diff_env)
 }
 
 
+int recursive_compare(parsed_data *data1, long left1, long right1,
+		parsed_data *data2, long left2, long right2)
+{
+	unsigned long const *hshd_recs1 = data1->hshd_recs,
+			*hshd_recs2 = data2->hshd_recs;
+
+	for(; left1 < right1 && left2 < right2 &&
+			hshd_recs1[left1] == hshd_recs2[left2]; left1++, left2++);
+	for(; left1 < right1 && left2 < right2 &&
+			hshd_recs1[right1-1] == hshd_recs2[right2-1]; right1--, right2--);
+
+	if (left1 == right1) {
+		char *weights2 = data2->weights;
+		long *keys2 = data2->keys;
+
+		// these edges are non-diagonal, so set their weight to 1
+		for (; left2 < right2; left2++)
+			weights2[keys2[left2]] = 1;
+	} else if (left2 == right2) {
+		char *weights1 = data1->weights;
+		long *keys1 = data1->keys;
+
+		// these edges are non-diagonal, so set their weight to 1
+		for (; left1 < right1; left1++)
+			weights1[keys1[left1]] = 1;
+	} else {
+		/*
+		xdpsplit_t spl;
+		spl.i1 = spl.i2 = 0;
+
+		if (xdl_split(ha1, left1, right1, ha2, left2, right2, kvdf, kvdb,
+			      need_min, &spl, xenv) < 0) {
+
+			return -1;
+		}
+
+		if (xdl_recs_cmp(data1, left1, spl.i1, data2, left2, spl.i2,
+				 kvdf, kvdb, spl.min_lo, xenv) < 0 ||
+		    xdl_recs_cmp(data1, spl.i1, right1, data2, spl.i2, right2,
+				 kvdf, kvdb, spl.min_hi, xenv) < 0) {
+
+			return -1;
+		}
+		*/
+	}
+
+
+	return 0;
+}
+
+
 // TODO: COMMENT THIS FUNCTION
 int prepare_and_myers(diff_environment *diff_env)
 {
