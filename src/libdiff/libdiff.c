@@ -28,6 +28,13 @@
 
 
 
+#define XDL_MAX_COST_MIN 256
+#define XDL_HEUR_MIN_COST 256
+#define XDL_SNAKE_CNT 20
+#define XDL_K_HEUR 4
+
+
+
 static void free_classifier(record_classifier *cf);
 static int init_record_classifier(record_classifier *classifier, long size);
 static int prepare_data_ctx(diff_mem_data *data1, data_context *data_ctx,
@@ -371,6 +378,8 @@ int prepare_and_myers(diff_environment *diff_env)
 	long *k_fwd;    // points to the fwd K-diag inside k_diags
 	long *k_bwd;    // points to the bwd K-diag inside k_diags
 
+	parsed_data data1, data2;
+
 	myers_conf conf;
 
 	// Setup and acquire information we need to perform diff
@@ -390,6 +399,23 @@ int prepare_and_myers(diff_environment *diff_env)
 	k_bwd = k_diags + ndiags;
 	k_fwd += diff_env->data_ctx2.nreff + 1;
 	k_bwd += diff_env->data_ctx2.nreff + 1;
+
+	// set up parameters for Myers
+	conf.maxcost = bogosqrt(ndiags);
+	if(conf.maxcost < XDL_MAX_COST_MIN)
+		conf.maxcost = XDL_MAX_COST_MIN;
+	conf.snake_cnt = XDL_SNAKE_CNT;
+	conf.heur_min = XDL_HEUR_MIN_COST;
+
+	// Put data we got from algo_environment into parsed_data instances
+	data1.num_recs = diff_env->data_ctx1.nreff;
+	data1.hshd_recs = diff_env->data_ctx1.hshd_recs;
+	data1.weights = diff_env->data_ctx1.weights;
+	data1.keys = diff_env->data_ctx1.keys;
+	data2.num_recs = diff_env->data_ctx2.nreff;
+	data2.hshd_recs = diff_env->data_ctx2.hshd_recs;
+	data2.weights = diff_env->data_ctx2.weights;
+	data2.keys = diff_env->data_ctx2.keys;
 
 	// TODO: THIS FUNCTION IS NOT DONE YET
 

@@ -8,7 +8,7 @@
 
 // TODO: COMMENT HERE
 // TODO: IS THIS STRUCT EVEN NECESSARY?
-struct diffdata {
+struct parsed_data {
 	long num_recs;
 	// This is DEFINITELY an array of hashes; in
 	// xdl_recs_cmp we access it as such
@@ -22,7 +22,7 @@ struct diffdata {
 	// made of chars
 	char *weights;
 };
-typedef struct diffdata diffdata;
+typedef struct parsed_data parsed_data;
 
 /*
  * Represents the inner variables required to run Myers O(ND)
