@@ -421,8 +421,8 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
  * and second file/blob
  */
 struct hashmap {
-    // TODO: Figure out what nr and alloc do
-	int nr, alloc;
+    // TODO: Figure out what alloc does
+	int record_count, alloc;
 	struct entry {
 		size_t hash;
 
@@ -521,6 +521,23 @@ static void insert_record(int line, struct hashmap *map, int pass)
 		/* If all the entries match, bail early */
 		return;
 	}
+
+	/* Map line and hash */
+	map->entries[index].line1 = line;
+	map->entries[index].hash = record->hash;
+
+	/* Set first entry, if not set */
+	if (!map->first)
+		map->first = map->entries + index;
+
+	/* Update linked list, setting last and next to last */
+	if (map->last) {
+		map->last->next = map->entries + index;
+		map->entries[index].previous = map->last;
+	}
+
+	map->last = map->entries + index;
+	map->record_count++;
 
 }
 
