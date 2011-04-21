@@ -545,26 +545,30 @@ static void insert_record(int line, struct hashmap *map, int pass)
 }
 
 /*
- * PORTED DIRECTLY FROM xdiff with only modifications to the types
+ * PORTED xdiff/xpatience.c from git
  * This function has to be called for each recursion into the inter-hunk
  * parts, as previously non-unique lines can become unique when being
  * restricted to a smaller part of the files.
  *
  * It is assumed that env has been prepared using xdl_prepare().
+ *
+ * @param data1 First blob of data, from a file or elsewhere (may not be needed)
+ * @param data2 First blob of data, from a file or elsewhere (may not be needed)
+ * @param results_conf We'll use the flags from this
+ * @param env Already contains data[12]
+ * @param result Hashmap to fill
+ * @param line1 The starting line from data1
+ * @param count1 The number of lines in data1
+ * @param line2 The starting line from data2
+ * @param count2 The number of lines in data2
  */
-/*
-	static int fill_hashmap(mmfile_t *file1, mmfile_t *file2,
-	xpparam_t const *xpp, xdfenv_t *env,
-	struct hashmap *result,
-	int line1, int count1, int line2, int count2)
-*/
 static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf,
 		diff_environment *env, struct hashmap *result,
 		int line1, int count1, int line2, int count2)
 {
-	result->file1 = data1;
-	result->file2 = data2;
+	result->file1 = data1; /* maybe? result->file1 = env->data1 */
+	result->file2 = data2; /* "" */
 	result->results_conf = results_conf;
 	result->env = env;
 
