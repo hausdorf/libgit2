@@ -229,6 +229,8 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
+
+	// alloc space for array that will hold the hashes of every record
 	if (!(hshd_recs = (unsigned long *) malloc((num_recs + 1) * sizeof(unsigned long)))) {
 
 		free(keys);
