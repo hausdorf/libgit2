@@ -124,7 +124,7 @@ struct data_context {
 	char *weights;
 	// An ARRAY of longs that represent hashes, used to access weights[]
 	long *keys;
-	// # of records * size of records???
+	// Total freed records
 	long nreff;
 	// Array; each element is the hash of corresponding record in the data
 	unsigned long *hshd_recs;
