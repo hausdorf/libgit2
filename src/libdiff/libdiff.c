@@ -567,6 +567,10 @@ static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *env, struct hashmap *result,
 		int line1, int count1, int line2, int count2)
 {
+	/*
+	 * If env already has data1/2, then there is no reason to pass
+	 * in two data structs
+	 */
 	result->file1 = data1; /* maybe? result->file1 = env->data1 */
 	result->file2 = data2; /* "" */
 	result->results_conf = results_conf;
