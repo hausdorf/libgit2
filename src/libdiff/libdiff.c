@@ -634,7 +634,6 @@ int recursive_compare(parsed_data *data1, long left1, long right1,
 		}
 	}
 
-
 	return 0;
 }
 
@@ -696,8 +695,6 @@ int prepare_and_myers(diff_environment *diff_env)
 	}
 
 	free(k_diags);
-
-	// TODO: THIS FUNCTION IS NOT DONE YET
 
 	return 0;
 }
