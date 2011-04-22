@@ -138,6 +138,8 @@ static int get_filepath(char** results, git_repository *repo,
 	strcat(*results, git_repository_workdir(repo));
 	strcat(*results, git_tree_entry_name(entry));
 
+	printf(*results);
+	printf("\n");
 	return GIT_SUCCESS;
 }
 
@@ -179,11 +181,38 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 	return GIT_SUCCESS;
 }
 
+/* Recursivly diffs a git_tree, navigating down every tree in this
+ * entry and diffing all the blobs to the local filesystem */
+int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
+	 	git_repository *repo, git_tree *tree)
+{
+	const git_tree_entry *entry;
+	git_object *object;
+
+	/* Check every tree entry. If one points to another tree go through all
+	 * of the entries in that tree. If one points to a blob diff that blob
+	 * with the local file system */
+	for(i=0; i<git_tree_entrycount(tree); i++) {
+		entry = git_tree_entry_byindex(tree, i);
+		git_tree_entry_2object(&object, repo, entry);
+		if(git_object_type(*obj) == GIT_OBJ_TREE)
+			/* TODO call this method again with this new tree object */
+		else {
+			error = get_file_changes(entry, repo, results_conf);
+			if(error < GIT_SUCCESS)
+				return error;
+		}
+	}
+
+	return GIT_SUCCESS;
+}
+
+/* Recursivly goes through this tree to all other trees this points to,
+ * checing all of the blobs */
 int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		git_repository *repo)
 {
 	git_tree *tree;				/* The tree that we will be diffing */
-	const git_tree_entry *entry;/* Enteries in the tree that we are diffing */
 	int error;					/* Return results of helper functions */
 	unsigned int i;				/* Loop counter */
 
@@ -192,15 +221,11 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 	if(error < GIT_SUCCESS)
 		return error;
 
-	/* Compare the blobs in this tree with the files in the local filesystem */
-	for(i=0; i<git_tree_entrycount(tree); i++) {
-		entry = git_tree_entry_byindex(tree, i);
-
-		error = get_file_changes(entry, repo, results_conf);
-		if(error < GIT_SUCCESS) {
-			git_tree_close(tree);
-			return error;
-		}
+	/* Preform the diff of everything in the tree */
+	error = diff_tree_to_filesystem(results_conf, repo, tree);
+	if(error < GIT_SUCCESS) {
+		git_tree_close(tree);
+		return error;
 	}
 
 	/* Check every file on the local filesystem, to catch any new files that
