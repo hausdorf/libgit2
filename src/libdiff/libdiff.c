@@ -366,13 +366,11 @@ int xdl_build_script(diff_environment *xe, git_changeset **xscr) {
 			for (l1 = i1; rchg1[i1 - 1]; i1--);
 			for (l2 = i2; rchg2[i2 - 1]; i2--);
 
-			/*
 			if (!(xch = xdl_add_change(cscr, i1, i2, l1 - i1, l2 - i2))) {
 				xdl_free_script(cscr);
 				return -1;
 			}
 			cscr = xch;
-			*/
 		}
 
 	*xscr = cscr;
