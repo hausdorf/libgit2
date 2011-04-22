@@ -23,6 +23,17 @@ struct parsed_data {
 };
 typedef struct parsed_data parsed_data;
 
+// TODO: COMMENT HERE
+// TODO: This may be a silly struct
+struct split {
+	// i1 and i2 are x and y per the Myers O(ND) paper
+	long i1, i2;
+	// DEPRECATED: git does not use the flag XDF_NEEDS_MINIMAL anymore, so these
+	// do not get used
+	int min_lo, min_hi;
+};
+typedef struct split split;
+
 
 /*
  * Represents the inner variables required to run Myers O(ND)
