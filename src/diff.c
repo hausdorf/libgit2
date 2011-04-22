@@ -93,21 +93,24 @@ static int get_git_tree(git_tree **results, git_repository *repo,
 }
 
 /* The resulting char* must be freed by caller or a memory leak will occur */
-static int get_filepath(char** results, git_repository *repo,
+static int get_filepath(char** results, git_repository *repo, char *subdir,
 		const git_tree_entry *entry)
 {
 	size_t dir_length;
 	size_t file_length;
+	size_t subdir_length;
 
 	dir_length = strlen(git_repository_workdir(repo));
 	file_length = strlen(git_tree_entry_name(entry));
+	subdir_length = strlen(subdir);
 
-	*results = git__malloc(dir_length + file_length + 1);
+	*results = git__malloc(dir_length + file_length + subdir_length + 1);
 
-	if(results == NULL)
+	if(*results == NULL)
 		return GIT_ENOMEM;
 
 	strcpy(*results, git_repository_workdir(repo));
+	strcat(*results, subdir);
 	strcat(*results, git_tree_entry_name(entry));
 
 	printf("%s", *results);
@@ -119,10 +122,10 @@ static int get_filepath(char** results, git_repository *repo,
 /* Gets the changes between the git_tree_entry and the local filesystem, and
  * saves them into **results_conf. Returns 0 on success, error otherwise */
 int get_file_changes(const git_tree_entry *entry, git_repository *repo,
-		git_diffresults_conf **results_conf)
+		char *subdir, git_diffresults_conf **results_conf)
 {
 	char *filepath;				/* Path to a file in the working directory*/
-	gitfo_buf buffer;		/* Buffer to hold the contects of a file */
+	gitfo_buf buffer;			/* Buffer to hold the contects of a file */
 	int error;					/* Holds error results of function calls */
 
 	/* Verify and initialize data */
@@ -131,7 +134,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 	buffer.data = NULL;
 
 	/* Get the file path from the entry */
-	error = get_filepath(&filepath, repo, entry);
+	error = get_filepath(&filepath, repo, subdir, entry);
 	if(error < GIT_SUCCESS)
 		return error;
 
@@ -160,13 +163,40 @@ cleanup:
 	return GIT_SUCCESS;
 }
 
-/* Recursivly diffs a git_tree, navigating down every tree in this
- * entry and diffing all the blobs to the local filesystem */
-int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
-	 	git_repository *repo, git_tree *tree)
+static int get_subdir(char **new_subdir, char *subdir,
+		const git_tree_entry *entry)
 {
-	git_tree *sub_tree; /* Holder for a sub tree that this tree points to */
+	size_t original_length;
+	size_t entry_length;
+
+	original_length = strlen(subdir);
+	entry_length = strlen(git_tree_entry_name(entry));
+
+	/* +2, one for the null character terminator, and one for an extra '/' that
+	 * needs to be placed after the new subdir to make a valid filepath */
+	*new_subdir = git__malloc(original_length + entry_length + 2);
+
+	if(*new_subdir == NULL)
+		return GIT_ENOMEM;
+
+	strcpy(*new_subdir, subdir);
+	strcat(*new_subdir, git_tree_entry_name(entry));
+	strcat(*new_subdir, "/"); /* TODO - will this work for windows? */
+
+	return GIT_SUCCESS;
+}
+
+/* Recursivly diffs a git_tree, navigating down every tree in this
+ * entry and diffing all the blobs to the local filesystem. The subdir
+ * char array is so that we can figure out what sub directory (tree) we
+ * are in as we recursivly go through the trees, and build the correct
+ * filepatch to the local filesystem */
+int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
+	 	git_repository *repo, git_tree *tree, char* subdir)
+{
 	const git_tree_entry *entry;
+	git_tree *sub_tree; /* Holder for a sub tree that this tree points to */
+	char *new_subdir;
 	git_object *object;
 	unsigned int i;
 	int error;
@@ -177,12 +207,19 @@ int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
 	for(i=0; i<git_tree_entrycount(tree); i++) {
 		entry = git_tree_entry_byindex(tree, i);
 		git_tree_entry_2object(&object, repo, entry);
+
 		if(git_object_type(object) == GIT_OBJ_TREE) {
+			/* Get the sub directory and sub tree so that we can recurisly
+			 * go through all the trees */
+			get_subdir(&new_subdir, subdir, entry);
 			git_tree_lookup(&sub_tree, repo, git_object_id(object));
-			diff_tree_to_filesystem(results_conf, repo, sub_tree);
+
+			diff_tree_to_filesystem(results_conf, repo, sub_tree, new_subdir);
+
+			free(new_subdir);
 		}
 		else {
-			error = get_file_changes(entry, repo, results_conf);
+			error = get_file_changes(entry, repo, subdir, results_conf);
 			if(error < GIT_SUCCESS)
 				return error;
 		}
@@ -206,7 +243,7 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		return error;
 
 	/* Preform the diff of everything in the tree */
-	error = diff_tree_to_filesystem(results_conf, repo, tree);
+	error = diff_tree_to_filesystem(results_conf, repo, tree, "");
 	if(error < GIT_SUCCESS) {
 		git_tree_close(tree);
 		return error;
