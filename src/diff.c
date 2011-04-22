@@ -3,88 +3,62 @@
 #include "refs.h"
 #include "tree.h"
 #include "commit.h"
+#include "fileops.h"
 #include "libdiff/libdiff.h"
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
 
 
-
-static int load_file(const char *file_path, char **buffer, int *size);
-static int compare_hashes(char *file_buffer, const git_oid *blob_id,
-		int file_size);
-static int file_exists(char *filename);
-static int get_git_tree(git_tree **results, git_repository *repo,
-		git_commit *commit);
-static int get_filepath(char** results, git_repository *repo,
-		const git_tree_entry *entry);
-
-
-
-/* 0 on success, error on failure. The char* file_path must be free'd by
- * the caller or a memory leak will occur. The file contesnts are loaded
- * into the buffer, and the size of the buffer is loaded into size */
-static int load_file(const char *file_path, char **buffer, int *size)
-{
-	FILE *file;
-	int read_result;
-
-	file = fopen(file_path, "rb");
-	if(!file)
-		return GIT_EINVALIDPATH;
-
-	/* Get the size of this file */
-	fseek(file, 0, SEEK_END);
-	*size=ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	*buffer=(char *)malloc(*size+1);
-	if (!*buffer) {
-		fclose(file);
-		return GIT_ENOMEM;
-	}
-
-	read_result = fread(*buffer, *size, 1, file);
-	if(read_result != *size) {
-		free(*buffer);
-		fclose(file);
-		return GIT_ERROR;
-	}
-
-	return GIT_SUCCESS;
-}
-
 int git_diff_no_index(git_diffresults_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {
 	diff_mem_data data1, data2;
 	char *buffer1, *buffer2;
-	int buffer1_size, buffer2_size;
-	int result;
+	size_t buffer1_size, buffer2_size;
+	int result = GIT_SUCCESS;
+    git_file file1, file2;
 
+	/* Verify and initialize variables */
 	assert(filepath1 && filepath2);
+	buffer1 = NULL;
+	buffer2 = NULL;
 
-	// FIXME: These calls fail and cause #15.
-	/*
-	result = load_file(filepath1, &buffer1, &buffer1_size);
-	if(result < GIT_SUCCESS)
+    /* Check if files exist at given paths */
+    if(gitfo_exists(filepath1) || gitfo_exists(filepath2)) {
+        result = GIT_EINVALIDPATH;
+        goto cleanup;
+    }
+    /* Check if either given path is a directory */
+    if(gitfo_isdir(filepath1) || gitfo_isdir(filepath2)) {
+        result = GIT_EINVALIDPATH;
+        goto cleanup;
+    }
+
+    /* Open file1 and read contents */
+	file1 = gitfo_open(filepath1, 0);
+	if(file1 == GIT_EOSERR) {
+        result = file1;
 		goto cleanup;
+    }
+    buffer1_size = (size_t)(gitfo_size(file1));
+    result = gitfo_read(file1, buffer1, buffer1_size);
+    gitfo_close(file1);
+    if(result < GIT_SUCCESS)
+        goto cleanup;
 
-	result = load_file(filepath2, &buffer2, &buffer2_size);
-	if(result < GIT_SUCCESS)
+    /* Open file2 and read contents */
+	file2 = gitfo_open(filepath2, 0);
+	if(file2 == GIT_EOSERR) {
+        result = file2;
 		goto cleanup;
-	*/
+    }
+    buffer2_size = (size_t)(gitfo_size(file2));
+    result = gitfo_read(file2, buffer2, buffer2_size);
+    gitfo_close(file2);
+    if(result < GIT_SUCCESS)
+        goto cleanup;
 
-	// FIXME: The above commented-out code should populate
-	// these vars. They don't, and this is part of the
-	// workaround.
-	buffer1 = "SOME TEXT\nGOES HERE\n";
-	buffer1_size = 22;
-	buffer2 = "SOME OTHER TEXT\nGOES HERE\n";
-	buffer2_size = 28;
-
-	// TODO: IMPLEMENT THIS FOR REAL. THIS IS TEST CODE.
-	/* TEST CODE */
 	data1.data = buffer1;
 	data1.size = buffer1_size;
 	data2.data = buffer2;
@@ -92,17 +66,11 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 
 	diff(&data1, &data2, *results_conf);
 
-	/* END TEST CODE */
-
 cleanup:
-	// FIXME: This is where #15 is happening. COMMENTING IT OUT
-	// IS A (BAD) WORKAROUND.
-	/*
 	if(buffer1)
 		free(buffer1);
 	if(buffer2)
 		free(buffer2);
-	*/
 
 	return result;
 }
@@ -119,47 +87,59 @@ static int compare_hashes(char *file_buffer, const git_oid *blob_id,
 	return git_oid_cmp(&file_id, blob_id);
 }
 
-/* Prone to change, maybe easier to pass repo in then char* location */
-static int file_exists(char *filename)
-{
-	/* TODO */
-	return 0;
-}
-
 /* Gets the tree of this commit, or the HEAD tree if commit is NULL.
  * Returns 0 on success, error otherwise. */
 static int get_git_tree(git_tree **results, git_repository *repo,
 		git_commit *commit)
 {
-	git_reference *reference;
-	const git_oid *tree_id;
+	git_reference *sym_ref;		/* Symbolic reference, used for head */
+	git_reference *direct_ref;	/* Direct reference, resolved from sym_ref */
+	const git_oid *oid;
 	int error;
 
 	if(!commit) {
-		error = git_reference_lookup(&reference, repo, "HEAD");
+		/* Get the reference for the repo's head */
+		error = git_reference_lookup(&sym_ref, repo, "HEAD");
 		if(error < GIT_SUCCESS)
 			return error;
 
-		tree_id = git_reference_oid(reference);
-		return git_tree_lookup(results, repo, tree_id);
+		/* Convert the symbolic reference to a direct reference so we
+		 * can get the git_oid from it */
+		error = git_reference_resolve(&direct_ref, sym_ref);
+		if(error < GIT_SUCCESS)
+			return error;
+
+		/* Get the head commit */
+		oid = git_reference_oid(direct_ref);
+		git_commit_lookup(&commit, repo, oid);
 	}
-	else
-		return git_commit_tree(results, commit);
+
+	return git_commit_tree(results, commit);
 }
 
 /* The resulting char* must be freed by caller or a memory leak will occur */
 static int get_filepath(char** results, git_repository *repo,
 		const git_tree_entry *entry)
 {
-	*results = (char *) malloc(sizeof(char) *
-		   (strlen(git_repository_workdir(repo))
-		   + strlen(git_tree_entry_name(entry))));
+	size_t dir_length;
+	size_t file_length;
+
+	dir_length = strlen(git_repository_workdir(repo));
+	file_length = strlen(git_tree_entry_name(entry));
+
+	*results = git__malloc(dir_length + file_length + 1);
 
 	if(results == NULL)
 		return GIT_ENOMEM;
 
-	strcat(*results, git_repository_workdir(repo));
+	strcpy(*results, git_repository_workdir(repo));
 	strcat(*results, git_tree_entry_name(entry));
+
+	/* Explicitally null terminate this string */
+	*results[dir_length + file_length - 1] = '\0';
+
+	printf("%s", *results);
+	printf("\n");
 
 	return GIT_SUCCESS;
 }
@@ -169,44 +149,97 @@ static int get_filepath(char** results, git_repository *repo,
 int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 		git_diffresults_conf **results_conf)
 {
-	char *filepath;		/* Filepath to a file in the working directory*/
-	char *file_buffer;	/* Buffer for contents of a file */
-	int file_size;		/* The size of the file in the file_buffer */
-	int error;			/* Holds error results of function calls */
+	char *filepath;				/* Path to a file in the working directory*/
+	char *file_buffer;			/* Buffer for contents of a file */
+	size_t file_size;			/* The size of the file in the file_buffer */
+	int error;					/* Holds error results of function calls */
+    git_file file;				/* Tracks the file */
 
-	/* Get the filepath from the entry */
+	/* Get the file path from the entry */
 	error = get_filepath(&filepath, repo, entry);
 	if(error < GIT_SUCCESS)
 		return error;
 
-	/* If the local file exists load it into memory and compare it with the
-	 * blob. If it doesn't exist, the file has been deleted from the filesystem
-	 * since this entry's commit */
-	if(file_exists(filepath)) {
-		error = load_file(filepath, &file_buffer, &file_size);
-		if(error < GIT_SUCCESS) {
-			free(filepath);
-			return error;
-		}
+	/* Error if a directory is passed to this, shouldn't' happen */
+	/* TODO - this is returning true even when the file is valid, can be
+	 * read, and is vey much so not a directory */
+	if(gitfo_isdir(filepath)) {
+		free(filepath);
+		return GIT_EINVALIDPATH;
+	}
 
-		/* Check if the local file matches the git blob */
-		if(!compare_hashes(file_buffer, git_tree_entry_id(entry), file_size))
-			diff(NULL, NULL, NULL);
+	/* If the file is no longer present, it has been deleted since this entries
+	 * commit */
+	/* TODO - this is returning true even when the file is valid, can be
+	 * read, and is vey much so not a directory */
+    if(gitfo_exists(filepath)) {
+		/* TODO - Mark this file as deleted in the diff */
+        free(filepath);
+        return GIT_SUCCESS;
+    }
 
+    /* Open file and read contents */
+	file = gitfo_open(filepath, 0);
+	if(file == GIT_EOSERR) {
+		free(filepath);
+		return file;
+    }
+    file_size = (size_t)(gitfo_size(file));
+    error = gitfo_read(file, file_buffer, file_size);
+    gitfo_close(file);
+    if(error < GIT_SUCCESS) {
+		free(filepath);
 		free(file_buffer);
-	}
-	else {
+		return error;
 	}
 
+	/* Check if the local file matches the git blob, and diff it if not */
+	if(!compare_hashes(file_buffer, git_tree_entry_id(entry), file_size))
+		diff(NULL, NULL, NULL);
+
+	free(file_buffer);
 	free(filepath);
+
 	return GIT_SUCCESS;
 }
 
+/* Recursivly diffs a git_tree, navigating down every tree in this
+ * entry and diffing all the blobs to the local filesystem */
+int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
+	 	git_repository *repo, git_tree *tree)
+{
+	git_tree *sub_tree; /* Holder for a sub tree that this tree points to */
+	const git_tree_entry *entry;
+	git_object *object;
+	unsigned int i;
+	int error;
+
+	/* Check every tree entry. If one points to another tree go through all
+	 * of the entries in that tree. If one points to a blob diff that blob
+	 * with the local file system */
+	for(i=0; i<git_tree_entrycount(tree); i++) {
+		entry = git_tree_entry_byindex(tree, i);
+		git_tree_entry_2object(&object, repo, entry);
+		if(git_object_type(object) == GIT_OBJ_TREE) {
+			git_tree_lookup(&sub_tree, repo, git_object_id(object));
+			diff_tree_to_filesystem(results_conf, repo, sub_tree);
+		}
+		else {
+			error = get_file_changes(entry, repo, results_conf);
+			if(error < GIT_SUCCESS)
+				return error;
+		}
+	}
+
+	return GIT_SUCCESS;
+}
+
+/* Recursivly goes through this tree to all other trees this points to,
+ * checing all of the blobs */
 int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		git_repository *repo)
 {
 	git_tree *tree;				/* The tree that we will be diffing */
-	const git_tree_entry *entry;/* Enteries in the tree that we are diffing */
 	int error;					/* Return results of helper functions */
 	unsigned int i;				/* Loop counter */
 
@@ -215,15 +248,11 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 	if(error < GIT_SUCCESS)
 		return error;
 
-	/* Compare the blobs in this tree with the files in the local filesystem */
-	for(i=0; i<git_tree_entrycount(tree); i++) {
-		entry = git_tree_entry_byindex(tree, i);
-
-		error = get_file_changes(entry, repo, results_conf);
-		if(error < GIT_SUCCESS) {
-			git_tree_close(tree);
-			return error;
-		}
+	/* Preform the diff of everything in the tree */
+	error = diff_tree_to_filesystem(results_conf, repo, tree);
+	if(error < GIT_SUCCESS) {
+		git_tree_close(tree);
+		return error;
 	}
 
 	/* Check every file on the local filesystem, to catch any new files that
@@ -250,7 +279,7 @@ int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
 }
 
 /* Assumes commit1 is newer then commit 2. If this is not the case then the
- * diff will be reveresed, ie the added stuff will show up as deleted and
+ * diff will be reversed, i.e. the added stuff will show up as deleted and
  * vice versa */
 int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		git_commit *commit2)
@@ -275,7 +304,7 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		entry1 = git_tree_entry_byindex(tree1, i);
 		filename = git_tree_entry_name(entry1);
 
-		/* Entry1 is guarenteed to exist, Entry2 may or may not exist */
+		/* Entry1 is guaranteed to exist, Entry2 may or may not exist */
 		entry2 = git_tree_entry_byname(tree2, filename);
 
 		if(!entry2) {
@@ -294,7 +323,7 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		entry2 = git_tree_entry_byindex(tree2, i);
 		filename = git_tree_entry_name(entry2);
 
-		/* Entry2 is guarenteed to exist, Entry1 may or may not exist */
+		/* Entry2 is guaranteed to exist, Entry1 may or may not exist */
 		entry1 = git_tree_entry_byname(tree2, filename);
 
 		if(!entry1) {
@@ -310,4 +339,3 @@ cleanup:
 
 	return results;
 }
-
