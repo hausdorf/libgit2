@@ -14,7 +14,6 @@
 static int load_file(const char *file_path, char **buffer, int *size);
 static int compare_hashes(char *file_buffer, const git_oid *blob_id,
 		int file_size);
-static int file_exists(char *filename);
 static int get_git_tree(git_tree **results, git_repository *repo,
 		git_commit *commit);
 static int get_filepath(char** results, git_repository *repo,
@@ -131,13 +130,6 @@ static int compare_hashes(char *file_buffer, const git_oid *blob_id,
 	git_hash_buf(&file_id, (void *) file_buffer, file_size);
 
 	return git_oid_cmp(&file_id, blob_id);
-}
-
-/* Prone to change, maybe easier to pass repo in then char* location */
-static int file_exists(char *filename)
-{
-	/* TODO */
-	return 0;
 }
 
 /* Gets the tree of this commit, or the HEAD tree if commit is NULL.
