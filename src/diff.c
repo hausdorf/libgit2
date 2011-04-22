@@ -25,7 +25,7 @@ static int load_file(const char *file_path, char **buffer, int *size)
 	*size=ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	*buffer = malloc(*size+1);
+	*buffer = git__malloc(*size+1);
 	if (*buffer == NULL) {
 		fclose(file);
 		return GIT_ENOMEM;
@@ -128,7 +128,7 @@ static int get_git_tree(git_tree **results, git_repository *repo,
 static int get_filepath(char** results, git_repository *repo,
 		const git_tree_entry *entry)
 {
-	*results = (char *) malloc(sizeof(char) *
+	*results = git__malloc(sizeof(char) *
 		   (strlen(git_repository_workdir(repo))
 		   + strlen(git_tree_entry_name(entry))));
 
