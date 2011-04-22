@@ -543,7 +543,7 @@ static long myers(unsigned long const *hshd_recs1, long left1, long right1,
 
 		// Enough is enough. We spent too much time here and now we collect
 		// the furthest reaching path using the (i1 + i2) measure.
-		if (ec >= conf->mxcost) {
+		if (ec >= conf->maxcost) {
 			long fbest, fbest1, bbest, bbest1;
 
 			fbest = fbest1 = -1;
