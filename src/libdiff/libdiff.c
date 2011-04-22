@@ -753,7 +753,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
  * and second file/blob
  */
 struct hashmap {
-    // TODO: Figure out what nr and alloc do
+	// TODO: Figure out what nr and alloc do
 	int nr, alloc;
 	struct entry {
 		size_t hash;
@@ -875,7 +875,7 @@ static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 		diff_environment *env, struct hashmap *result,
 		int line1, int count1, int line2, int count2)
 {
-    return 0;
+	return 0;
 }
 
 /*
@@ -886,7 +886,7 @@ static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 static int binary_search(struct entry **sequence, int longest,
 		struct entry *entry)
 {
-    return 0;
+	return 0;
 }
 
 /*
@@ -901,7 +901,7 @@ static int binary_search(struct entry **sequence, int longest,
  */
 static struct entry *find_longest_common_sequence(struct hashmap *map)
 {
-    return NULL;
+	return NULL;
 }
 
 /*
@@ -910,7 +910,7 @@ static struct entry *find_longest_common_sequence(struct hashmap *map)
  */
 static int match(struct hashmap *map, int line1, int line2)
 {
-    return 0;
+	return 0;
 }
 
 /*
@@ -930,7 +930,7 @@ static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		diff_environment *env,
 		int line1, int count1, int line2, int count2)
 {
-    return 0;
+	return 0;
 }
 
 /*
@@ -939,7 +939,7 @@ static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 static int walk_common_sequence(struct hashmap *map, struct entry *first,
 		int line1, int count1, int line2, int count2)
 {
-    return 0;
+	return 0;
 }
 
 /*
@@ -948,7 +948,7 @@ static int walk_common_sequence(struct hashmap *map, struct entry *first,
 static int fall_back_to_classic_diff(struct hashmap *map,
 		int line1, int count1, int line2, int count2)
 {
-    return 0;
+	return 0;
 }
 
 /*
@@ -962,6 +962,6 @@ static int fall_back_to_classic_diff(struct hashmap *map,
 int xdl_do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		git_diffresults_conf const *results_conf, diff_environment *env)
 {
-    return 0;
+	return 0;
 }
 
