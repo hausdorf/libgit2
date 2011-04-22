@@ -321,6 +321,26 @@ static int init_record_classifier(record_classifier *classifier, long size)
 }
 
 
+// TODO: COMMENT HERE
+// TODO: This is a direct port from xdiff/xdiffi.c. Port properly
+static git_changeset *xdl_add_change(git_changeset *xscr, long i1, long i2, long chg1, long chg2) {
+	git_changeset *xch;
+
+	if (!(xch = (git_changeset *) ld_malloc(sizeof(git_changeset))))
+		return NULL;
+
+	xch->next = xscr;
+	xch->i1 = i1;
+	xch->i2 = i2;
+	xch->chg1 = chg1;
+	xch->chg2 = chg2;
+
+	return xch;
+}
+
+
+// TODO: Comment here.
+// TODO: Direct port from xdiff/xdiffi.c Port properly.
 int xdl_build_script(diff_environment *xe, git_changeset **xscr) {
 	git_changeset *cscr = NULL, *xch;
 	char *rchg1 = xe->data_ctx1.weights, *rchg2 = xe->data_ctx2.weights;
