@@ -54,11 +54,11 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 // PORT IT PROPERLY
 static void free_ctx(data_context *ctx) {
 
-	free(ctx->rhash);
-	free(ctx->weights);
-	free(ctx->keys - 1);
-	free(ctx->hshd_recs);
-	free(ctx->recs);
+	ld__free(ctx->rhash);
+	ld__free(ctx->weights);
+	ld__free(ctx->keys - 1);
+	ld__free(ctx->hshd_recs);
+	ld__free(ctx->recs);
 	memstore_free(&ctx->table_mem);
 }
 
@@ -67,7 +67,7 @@ static void free_ctx(data_context *ctx) {
 // PORT IT PROPERLY
 static void free_classifier(record_classifier *cf) {
 
-	free(cf->classd_hash);
+	ld__free(cf->classd_hash);
 	memstore_free(&cf->table_mem);
 }
 
@@ -75,9 +75,9 @@ static void free_classifier(record_classifier *cf) {
 // TODO: WE NEED TO BE ABSOLUTELY CERTAIN THAT THIS IS CORRECT
 void free_env(diff_environment *diff_env) {
 
-	free_ctx(&diff_env->data_ctx1);
-	free_ctx(&diff_env->data_ctx2);
-	free_classifier(&diff_env->classifier);
+	ld__free_ctx(&diff_env->data_ctx1);
+	ld__free_ctx(&diff_env->data_ctx2);
+	ld__free_classifier(&diff_env->classifier);
 }
 
 
@@ -166,7 +166,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	if(!(records_hash = (diff_record **) ld__malloc(table_size *
 			sizeof(diff_record *)))) {
 
-		free(records);
+		ld__free(records);
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
@@ -207,8 +207,8 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 				if(!(reallocd_records = (diff_record **) realloc(records,
 						guessed_len * sizeof(diff_record *)))) {
 
-					free(records_hash);
-					free(records);
+					ld__free(records_hash);
+					ld__free(records);
 					memstore_free(&data_ctx->table_mem);
 					return -1;
 				}
@@ -218,8 +218,8 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 			// append a record to the hashtable
 			if(!(curr_record = memstore_alloc(&data_ctx->table_mem))) {
 
-				free(records_hash);
-				free(records);
+				ld__free(records_hash);
+				ld__free(records);
 				memstore_free(&data_ctx->table_mem);
 				return -1;
 			}
@@ -232,8 +232,8 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 			if (classify_record(classifier, records_hash, hbits,
 					curr_record) < 0) {
 
-				free(records_hash);
-				free(records);
+				ld__free(records_hash);
+				ld__free(records);
 				memstore_free(&data_ctx->table_mem);
 				return -1;
 			}
@@ -243,8 +243,8 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	// alloc space for weights array
 	if (!(weights = (char *) ld__malloc((num_recs + 2) * sizeof(char)))) {
 
-		free(records_hash);
-		free(records);
+		ld__free(records_hash);
+		ld__free(records);
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
@@ -253,9 +253,9 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	// alloc space for keys array
 	if (!(keys = (long *) ld__malloc((num_recs + 1) * sizeof(long)))) {
 
-		free(weights);
-		free(records_hash);
-		free(records);
+		ld__free(weights);
+		ld__free(records_hash);
+		ld__free(records);
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
@@ -263,10 +263,10 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	// alloc space for array that will hold the hashes of every record
 	if (!(hshd_recs = (unsigned long *) ld__malloc((num_recs + 1) * sizeof(unsigned long)))) {
 
-		free(keys);
-		free(weights);
-		free(records_hash);
-		free(records);
+		ld__free(keys);
+		ld__free(weights);
+		ld__free(records_hash);
+		ld__free(records);
 		memstore_free(&data_ctx->table_mem);
 		return -1;
 	}
@@ -853,12 +853,12 @@ int prepare_and_myers(diff_environment *diff_env)
 
 	if(recursive_compare(&data1, 0, data1.num_recs, &data2, 0,
 			data2.num_recs, k_fwd, k_bwd, 0, &conf) < 0) {
-		free(k_diags);
+		ld__free(k_diags);
 		free_env(diff_env);
 		return -1;
 	}
 
-	free(k_diags);
+	ld__free(k_diags);
 
 	return 0;
 }
