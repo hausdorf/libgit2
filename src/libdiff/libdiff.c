@@ -28,11 +28,16 @@
 
 
 
+// TODO: These are MACROS; they should probably go elsewhere
+#define XDL_MIN(a, b) ((a) < (b) ? (a): (b))
+#define XDL_MAX(a, b) ((a) > (b) ? (a): (b))
+
 // Default values for Myers algorithm parameters
 #define XDL_MAX_COST_MIN 256
 #define XDL_HEUR_MIN_COST 256
 #define XDL_SNAKE_CNT 20
 #define XDL_K_HEUR 4
+#define XDL_LINE_MAX (long)((1UL << (CHAR_BIT * sizeof(long) - 1)) - 1)
 
 
 
