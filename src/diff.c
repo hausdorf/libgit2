@@ -121,7 +121,7 @@ static int get_filepath(char** results, git_repository *repo, char *subdir,
 
 /* Gets the changes between the git_tree_entry and the local filesystem, and
  * saves them into **results_conf. Returns 0 on success, error otherwise */
-int get_file_changes(const git_tree_entry *entry, git_repository *repo,
+int diff_entry_to_filesystem(const git_tree_entry *entry, git_repository *repo,
 		char *subdir, git_diffresults_conf **results_conf)
 {
 	char *filepath;				/* Path to a file in the working directory*/
@@ -219,7 +219,7 @@ int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
 			free(new_subdir);
 		}
 		else {
-			error = get_file_changes(entry, repo, subdir, results_conf);
+			error = diff_entry_to_filesystem(entry, repo, subdir, results_conf);
 			if(error < GIT_SUCCESS)
 				return error;
 		}
