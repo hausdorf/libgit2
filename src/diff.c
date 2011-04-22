@@ -21,8 +21,8 @@ static int get_filepath(char** results, git_repository *repo,
 
 
 
-/* 0 on success, error on failure. The char* file_path must be free'd by
- * the caller or a memory leak will occur. The file contesnts are loaded
+/* 0 on success, error on failure. The char* file_path must be freed by
+ * the caller or a memory leak will occur. The file contents are loaded
  * into the buffer, and the size of the buffer is loaded into size */
 static int load_file(const char *file_path, char **buffer, int *size)
 {
@@ -180,12 +180,12 @@ static int get_filepath(char** results, git_repository *repo,
 int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 		git_diffresults_conf **results_conf)
 {
-	char *filepath;		/* Filepath to a file in the working directory*/
+	char *filepath;		/* Path to a file in the working directory*/
 	char *file_buffer;	/* Buffer for contents of a file */
 	int file_size;		/* The size of the file in the file_buffer */
 	int error;			/* Holds error results of function calls */
 
-	/* Get the filepath from the entry */
+	/* Get the file path from the entry */
 	error = get_filepath(&filepath, repo, entry);
 	if(error < GIT_SUCCESS)
 		return error;
@@ -217,7 +217,7 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		git_repository *repo)
 {
 	git_tree *tree;				/* The tree that we will be diffing */
-	const git_tree_entry *entry;/* Enteries in the tree that we are diffing */
+	const git_tree_entry *entry;/* Entries in the tree that we are diffing */
 	int error;					/* Return results of helper functions */
 	unsigned int i;				/* Loop counter */
 
@@ -261,7 +261,7 @@ int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
 }
 
 /* Assumes commit1 is newer then commit 2. If this is not the case then the
- * diff will be reveresed, ie the added stuff will show up as deleted and
+ * diff will be reversed, i.e. the added stuff will show up as deleted and
  * vice versa */
 int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		git_commit *commit2)
@@ -286,7 +286,7 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		entry1 = git_tree_entry_byindex(tree1, i);
 		filename = git_tree_entry_name(entry1);
 
-		/* Entry1 is guarenteed to exist, Entry2 may or may not exist */
+		/* Entry1 is guaranteed to exist, Entry2 may or may not exist */
 		entry2 = git_tree_entry_byname(tree2, filename);
 
 		if(!entry2) {
@@ -305,7 +305,7 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		entry2 = git_tree_entry_byindex(tree2, i);
 		filename = git_tree_entry_name(entry2);
 
-		/* Entry2 is guarenteed to exist, Entry1 may or may not exist */
+		/* Entry2 is guaranteed to exist, Entry1 may or may not exist */
 		entry1 = git_tree_entry_byname(tree2, filename);
 
 		if(!entry1) {
