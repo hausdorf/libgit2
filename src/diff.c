@@ -10,15 +10,6 @@
 #include <assert.h>
 
 
-
-static int compare_hashes(char *file_buffer, const git_oid *blob_id,
-		int file_size);
-static int get_git_tree(git_tree **results, git_repository *repo,
-		git_commit *commit);
-static int get_filepath(char** results, git_repository *repo,
-		const git_tree_entry *entry);
-
-
 int git_diff_no_index(git_diffresults_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {
@@ -153,8 +144,8 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 	char *filepath;				/* Path to a file in the working directory*/
 	char *file_buffer;			/* Buffer for contents of a file */
 	size_t file_size;			/* The size of the file in the file_buffer */
-	int error = GIT_SUCCESS;	/* Holds error results of function calls */
-    git_file file				/* Tracks the file */
+	int error;					/* Holds error results of function calls */
+    git_file file;				/* Tracks the file */
 
 	/* Get the file path from the entry */
 	error = get_filepath(&filepath, repo, entry);
@@ -169,9 +160,9 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 
 	/* If the file is no longer present, it has been deleted since this entries
 	 * commit */
-    if(!gitfo_exists(filepath))
+    if(!gitfo_exists(filepath)) {
 		/* TODO - Mark this file as deleted in the diff */
-        free(filepath)
+        free(filepath);
         return GIT_SUCCESS;
     }
 
@@ -194,7 +185,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 		diff(NULL, NULL, NULL);
 
 	free(file_buffer);
-	free(file_path);
+	free(filepath);
 
 	return GIT_SUCCESS;
 }
