@@ -61,6 +61,12 @@ typedef struct myers_conf myers_conf;
 int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf);
 
+
+/*********************
+ * Patience diff lives here
+ * Thar be dragons!
+ ********************/
+
 /*
  * This is a hash mapping from line hash to line numbers in the first
  * and second file/blob
@@ -92,24 +98,101 @@ struct hashmap {
 	git_diffresults_conf const *results_conf;
 };
 
-/* Declare functions */
+/**
+ * Insert record entries
+ * @param line The line number
+ * @param map The hashmap to store the entries
+ * @param pass Which diff file/blob: 1 for first, 2 for second
+ */
 static void insert_record(int line, struct hashmap *map, int which);
+
+/*
+ * PORTED xdiff/xpatience.c from git
+ * This function has to be called for each recursion into the inter-hunk
+ * parts, as previously non-unique lines can become unique when being
+ * restricted to a smaller part of the files.
+ *
+ * It is assumed that env has been prepared using xdl_prepare().
+ *
+ * @param data1 First blob of data, from a file or elsewhere (may not be needed)
+ * @param data2 First blob of data, from a file or elsewhere (may not be needed)
+ * @param results_conf We'll use the flags from this
+ * @param env Already contains data[12]
+ * @param result Hashmap to fill
+ * @param line1 The starting line from data1
+ * @param count1 The number of lines in data1
+ * @param line2 The starting line from data2
+ * @param count2 The number of lines in data2
+ *
+ * @return 0 if successful, -1 if fail
+ */
 static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf,
 		diff_environment *env, struct hashmap *result,
 		int line1, int count1, int line2, int count2);
+
+/*
+ * PORTED DIRECTLY FROM xdiff with only modifications to the types
+ * Find the longest sequence with a smaller last element (meaning a smaller
+ * line2, as we construct the sequence with entries ordered by line1).
+ */
 static int binary_search(struct entry **sequence, int longest,
 		struct entry *entry);
+
+/*
+ * PORTED DIRECTLY FROM xdiff with only modifications to the types
+ * The idea is to start with the list of common unique lines sorted by
+ * the order in file1.  For each of these pairs, the longest (partial)
+ * sequence whose last element's line2 is smaller is determined.
+ *
+ * For efficiency, the sequences are kept in a list containing exactly one
+ * item per sequence length: the sequence with the smallest last
+ * element (in terms of line2).
+ */
 static struct entry *find_longest_common_sequence(struct hashmap *map);
+
+/*
+ * PORTED DIRECTLY FROM xdiff with only modifications to the types
+ */
 static int match(struct hashmap *map, int line1, int line2);
+
+/*
+	static int patience_diff(mmfile_t *file1, mmfile_t *file2,
+	xpparam_t const *xpp, xdfenv_t *env,
+	int line1, int count1, int line2, int count2);
+*/
+/*
+ * PORTED DIRECTLY FROM xdiff with only modifications to the types
+ * Recursively find the longest common sequence of unique lines,
+ * and if none was found, ask xdl_do_diff() to do the job.
+ *
+ * This function assumes that env was prepared with xdl_prepare_env().
+ */
 static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		git_diffresults_conf const *results_conf,
 		diff_environment *env,
 		int line1, int count1, int line2, int count2);
+
+/*
+ * PORTED DIRECTLY FROM xdiff with only modifications to the types
+ */
 static int walk_common_sequence(struct hashmap *map, struct entry *first,
 		int line1, int count1, int line2, int count2);
+
+/*
+ * PORTED DIRECTLY FROM xdiff with only modifications to the types
+ */
 static int fall_back_to_classic_diff(struct hashmap *map,
 		int line1, int count1, int line2, int count2);
+
+/*
+ * PORTED DIRECTLY FROM xdiff with only modifications to the types
+ * Entry point to patience diff
+ */
+/*
+	int xdl_do_patience_diff(mmfile_t *file1, mmfile_t *file2,
+	xpparam_t const *xpp, xdfenv_t *env)
+	*/
 int do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		git_diffresults_conf const *results_conf, diff_environment *env);
 

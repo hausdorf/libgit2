@@ -922,17 +922,10 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 /*********************
  * Patience diff lives here
  * Thar be dragons!
- *    -- and unfinished stuff, too.
  ********************/
 
 #define NON_UNIQUE ULONG_MAX
 
-/**
- * Insert record entries
- * @param line The line number
- * @param map The hashmap to store the entries
- * @param pass Which diff file/blob: 1 for first, 2 for second
- */
 static void insert_record(int line, struct hashmap *map, int pass)
 {
 	/* Assign the records from the appropriate pass */
