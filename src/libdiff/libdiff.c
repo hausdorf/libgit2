@@ -338,7 +338,7 @@ void xdl_free_script(git_changeset *xscr) {
 static git_changeset *xdl_add_change(git_changeset *xscr, long i1, long i2, long chg1, long chg2) {
 	git_changeset *xch;
 
-	if (!(xch = (git_changeset *) ld_malloc(sizeof(git_changeset))))
+	if (!(xch = (git_changeset *) ld__malloc(sizeof(git_changeset))))
 		return NULL;
 
 	xch->next = xscr;
