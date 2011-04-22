@@ -21,4 +21,5 @@ msvc/Release/
 *.opensdf
 .DS_Store
 *.swp
+*.swo
 tags
