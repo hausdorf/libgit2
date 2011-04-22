@@ -72,12 +72,12 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 
     /* Check if files exist at given paths */
     if(!gitfo_exists(filepath1) || !gitfo_exists(filepath2)) {
-        result = -1;
+        result = GIT_EINVALIDPATH;
         goto cleanup;
     }
     /* Check if either given path is a directory */
     if(gitfo_isdir(filepath1) || gitfo_isdir(filepath2)) {
-        result = -1;
+        result = GIT_EINVALIDPATH;
         goto cleanup;
     }
 
