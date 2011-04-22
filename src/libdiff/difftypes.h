@@ -207,7 +207,7 @@ struct diff_environment {
 
 	// Flags points to the flags member of git_diffresults_conf,
 	// and is usually set in diff()
-	unsigned long *flags;
+	unsigned long flags;
 /*
 	chastore_t rcha;
 	// Number of records, which is DEFINITLY
