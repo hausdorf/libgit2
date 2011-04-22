@@ -28,6 +28,19 @@
 
 
 
+// TODO: These are MACROS; they should probably go elsewhere
+#define XDL_MIN(a, b) ((a) < (b) ? (a): (b))
+#define XDL_MAX(a, b) ((a) > (b) ? (a): (b))
+
+// Default values for Myers algorithm parameters
+#define XDL_MAX_COST_MIN 256
+#define XDL_HEUR_MIN_COST 256
+#define XDL_SNAKE_CNT 20
+#define XDL_K_HEUR 4
+#define XDL_LINE_MAX (long)((1UL << (CHAR_BIT * sizeof(long) - 1)) - 1)
+
+
+
 static void free_classifier(record_classifier *cf);
 static int init_record_classifier(record_classifier *classifier, long size);
 static int prepare_data_ctx(diff_mem_data *data1, data_context *data_ctx,
@@ -361,32 +374,327 @@ int algo_environment(diff_environment *diff_env)
 }
 
 
+/*
+ * See "An O(ND) Difference Algorithm and its Variations", by Eugene Myers.
+ * Basically considers a "box" (left1, left2, right1, right2) and scan from both
+ * the forward diagonal starting from (left1, left2) and the backward diagonal
+ * starting from (right1, right2). If the K values on the same diagonal crosses
+ * returns the furthest point of reach. We might end up having to expensive
+ * cases using this algorithm is full, so a little bit of heuristic is needed
+ * to cut the search and to return a suboptimal point.
+ */
+static long myers(unsigned long const *hshd_recs1, long left1, long right1,
+		      unsigned long const *hshd_recs2, long left2, long right2,
+		      long *k_fwd, long *k_bwd, int need_min, split *spl,
+		      myers_conf *conf) {
+	long dmin = left1 - right2, dmax = right1 - left2;
+	long fmid = left1 - left2, bmid = right1 - right2;
+	long odd = (fmid - bmid) & 1;
+	long fmin = fmid, fmax = fmid;
+	long bmin = bmid, bmax = bmid;
+	// IMPORTANT: ec is the EDIT COST. THIS IS WHAT WE ARE RETURNING.
+	// d is the D-path
+	long ec, d, i1, i2, prev1, best, dd, v, k;
+
+	// Set initial diagonal values for both forward and backward path.
+	k_fwd[fmid] = left1;
+	k_bwd[bmid] = right1;
+
+// BEGIN REQUIRED COMPONENTS TO IMPLEMENT ALGORITHM
+
+	for (ec = 1;; ec++) {
+		int got_snake = 0;
+
+		// We need to extent the diagonal "domain" by one. If the next
+		// values exits the box boundaries we need to change it in the
+		// opposite direction because (max - min) must be a power of two.
+		// Also we initialize the external K value to -1 so that we can
+		// avoid extra conditions check inside the core loop.
+		if (fmin > dmin)
+			k_fwd[--fmin - 1] = -1;
+		else
+			++fmin;
+		if (fmax < dmax)
+			k_fwd[++fmax + 1] = -1;
+		else
+			--fmax;
+
+		// Greedy LCS/SES algorithm: see Myers, page 6, it's almost 1-1
+		// mapping for the Myers algorithm
+		//
+		// INITIALIZE D-PATH: we start at M+N and work backwards, rather
+		// than starting at the beginning. In this way we avoid having
+		// to lookahead.
+		for (d = fmax; d >= fmin; d -= 2) {
+			if (k_fwd[d - 1] >= k_fwd[d + 1])
+				i1 = k_fwd[d - 1] + 1;
+			else
+				i1 = k_fwd[d + 1];
+			prev1 = i1;
+			i2 = i1 - d;
+			for (; i1 < right1 && i2 < right2 && hshd_recs1[i1] == hshd_recs2[i2]; i1++, i2++);
+			if (i1 - prev1 > conf->snake_cnt)
+				got_snake = 1;
+			k_fwd[d] = i1;
+			if (odd && bmin <= d && d <= bmax && k_bwd[d] <= i1) {
+				spl->i1 = i1;
+				spl->i2 = i2;
+				spl->min_lo = spl->min_hi = 1;
+				return ec;
+			}
+		}
+
+		// We need to extent the diagonal "domain" by one. If the next
+		// values exits the box boundaries we need to change it in the
+		// opposite direction because (max - min) must be a power of two.
+		// Also we initialize the external K value to -1 so that we can
+		// avoid extra conditions check inside the core loop.
+		if (bmin > dmin)
+			k_bwd[--bmin - 1] = XDL_LINE_MAX;
+		else
+			++bmin;
+		if (bmax < dmax)
+			k_bwd[++bmax + 1] = XDL_LINE_MAX;
+		else
+			--bmax;
+
+		for (d = bmax; d >= bmin; d -= 2) {
+			if (k_bwd[d - 1] < k_bwd[d + 1])
+				i1 = k_bwd[d - 1];
+			else
+				i1 = k_bwd[d + 1] - 1;
+			prev1 = i1;
+			i2 = i1 - d;
+			for (; i1 > left1 && i2 > left2 && hshd_recs1[i1 - 1] == hshd_recs2[i2 - 1]; i1--, i2--);
+			if (prev1 - i1 > conf->snake_cnt)
+				got_snake = 1;
+			k_bwd[d] = i1;
+			if (!odd && fmin <= d && d <= fmax && i1 <= k_fwd[d]) {
+				spl->i1 = i1;
+				spl->i2 = i2;
+				spl->min_lo = spl->min_hi = 1;
+				return ec;
+			}
+		}
+
+// END REQUIRED COMPONENTS TO IMPLEMENT ALGORITHM
+
+		if (need_min)
+			continue;
+
+		// If the edit cost is above the heuristic trigger and if
+		// we got a good snake, we sample current diagonals to see
+		// if some of the, have reached an "interesting" path. Our
+		// measure is a function of the distance from the diagonal
+		// corner (i1 + i2) penalized with the distance from the
+		// mid diagonal itself. If this value is above the current
+		// edit cost times a magic factor (XDL_K_HEUR) we consider
+		// it interesting.
+		if (got_snake && ec > conf->heur_min) {
+			for (best = 0, d = fmax; d >= fmin; d -= 2) {
+				dd = d > fmid ? d - fmid: fmid - d;
+				i1 = k_fwd[d];
+				i2 = i1 - d;
+				v = (i1 - left1) + (i2 - left2) - dd;
+
+				if (v > XDL_K_HEUR * ec && v > best &&
+				    left1 + conf->snake_cnt <= i1 && i1 < right1 &&
+				    left2 + conf->snake_cnt <= i2 && i2 < right2) {
+					for (k = 1; hshd_recs1[i1 - k] == hshd_recs2[i2 - k]; k++)
+						if (k == conf->snake_cnt) {
+							best = v;
+							spl->i1 = i1;
+							spl->i2 = i2;
+							break;
+						}
+				}
+			}
+			if (best > 0) {
+				spl->min_lo = 1;
+				spl->min_hi = 0;
+				return ec;
+			}
+
+			for (best = 0, d = bmax; d >= bmin; d -= 2) {
+				dd = d > bmid ? d - bmid: bmid - d;
+				i1 = k_bwd[d];
+				i2 = i1 - d;
+				v = (right1 - i1) + (right2 - i2) - dd;
+
+				if (v > XDL_K_HEUR * ec && v > best &&
+				    left1 < i1 && i1 <= right1 - conf->snake_cnt &&
+				    left2 < i2 && i2 <= right2 - conf->snake_cnt) {
+					for (k = 0; hshd_recs1[i1 + k] == hshd_recs2[i2 + k]; k++)
+						if (k == conf->snake_cnt - 1) {
+							best = v;
+							spl->i1 = i1;
+							spl->i2 = i2;
+							break;
+						}
+				}
+			}
+			if (best > 0) {
+				spl->min_lo = 0;
+				spl->min_hi = 1;
+				return ec;
+			}
+		}
+
+		// Enough is enough. We spent too much time here and now we collect
+		// the furthest reaching path using the (i1 + i2) measure.
+		if (ec >= conf->maxcost) {
+			long fbest, fbest1, bbest, bbest1;
+
+			fbest = fbest1 = -1;
+			for (d = fmax; d >= fmin; d -= 2) {
+				i1 = XDL_MIN(k_fwd[d], right1);
+				i2 = i1 - d;
+				if (right2 < i2)
+					i1 = right2 + d, i2 = right2;
+				if (fbest < i1 + i2) {
+					fbest = i1 + i2;
+					fbest1 = i1;
+				}
+			}
+
+			bbest = bbest1 = XDL_LINE_MAX;
+			for (d = bmax; d >= bmin; d -= 2) {
+				i1 = XDL_MAX(left1, k_bwd[d]);
+				i2 = i1 - d;
+				if (i2 < left2)
+					i1 = left2 + d, i2 = left2;
+				if (i1 + i2 < bbest) {
+					bbest = i1 + i2;
+					bbest1 = i1;
+				}
+			}
+
+			if ((right1 + right2) - bbest < fbest - (left1 + left2)) {
+				spl->i1 = fbest1;
+				spl->i2 = fbest - fbest1;
+				spl->min_lo = 1;
+				spl->min_hi = 0;
+			} else {
+				spl->i1 = bbest1;
+				spl->i2 = bbest - bbest1;
+				spl->min_lo = 0;
+				spl->min_hi = 1;
+			}
+			return ec;
+		}
+	}
+}
+
+
+// TODO: PUT COMMENT HERE
+int recursive_compare(parsed_data *data1, long left1, long right1,
+		parsed_data *data2, long left2, long right2, long *k_fwd,
+		long *k_bwd, int need_min, myers_conf *conf)
+{
+	unsigned long const *hshd_recs1 = data1->hshd_recs,
+			*hshd_recs2 = data2->hshd_recs;
+
+	// Compare data1 and data2 from the BEGINNING; break on inequality
+	for(; left1 < right1 && left2 < right2 &&
+			hshd_recs1[left1] == hshd_recs2[left2]; left1++, left2++);
+	// Compare data1 and data2 from the END; break on inequality
+	for(; left1 < right1 && left2 < right2 &&
+			hshd_recs1[right1-1] == hshd_recs2[right2-1]; right1--, right2--);
+
+	if(left1 == right1) {
+		char *weights2 = data2->weights;
+		long *keys2 = data2->keys;
+
+		// these edges are non-diagonal, so set their weight to 1
+		for (; left2 < right2; left2++)
+			weights2[keys2[left2]] = 1;
+	} else if(left2 == right2) {
+		char *weights1 = data1->weights;
+		long *keys1 = data1->keys;
+
+		// these edges are non-diagonal, so set their weight to 1
+		for(; left1 < right1; left1++)
+			weights1[keys1[left1]] = 1;
+	} else {
+		split spl;
+		spl.i1 = spl.i2 = 0;
+
+		if(myers(hshd_recs1, left1, right1, hshd_recs2, left2, right2, k_fwd, k_bwd,
+				need_min, &spl, conf) < 0) {
+
+			return -1;
+		}
+
+		if(recursive_compare(data1, left1, spl.i1, data2, left2, spl.i2,
+				k_fwd, k_bwd, spl.min_lo, conf) < 0 ||
+		   recursive_compare(data1, spl.i1, right1, data2, spl.i2, right2,
+				k_fwd, k_bwd, spl.min_hi, conf) < 0) {
+
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+
 // TODO: COMMENT THIS FUNCTION
 int prepare_and_myers(diff_environment *diff_env)
 {
-	// TODO: COMMENT THESE VARS
-	long ndiags;
+	long ndiags;    // Equivalent to Myers' "L" parameter; total
+	                // combined len of both things we're diffing
 
-	long *k_diags;
-	long *k_diags_fwd;
-	long *k_diags_bkwd;
+	long *k_diags;  // mem for both fwd and bwd K-diagonals allocd here
+	long *k_fwd;    // points to the fwd K-diag inside k_diags
+	long *k_bwd;    // points to the bwd K-diag inside k_diags
+
+	parsed_data data1, data2;
 
 	myers_conf conf;
 
-	// TODO: FIND OUT HOW TO CONSOLIDATE diffdata, implement these.
-	// Not needed particularly until the end of the function.
-	//diffdata dd1, dd2;
-
+	// Setup and acquire information we need to perform diff
 	if(algo_environment(diff_env) < 0) {
 		return -1;
 	}
 
+	// Allocate memory for the forward and backward K diagonals
 	ndiags = diff_env->data_ctx1.nreff + diff_env->data_ctx2.nreff + 3;
 	if(!(k_diags = (long *) malloc((2 * ndiags + 2) * sizeof(long)))) {
 		free_env(diff_env);
 	}
 
-	// TODO: THIS FUNCTION IS NOT DONE YET
+	// point k_fwd and k_bwd to the appropriate location in memory allocd
+	// at *k_diags
+	k_fwd = k_diags;
+	k_bwd = k_diags + ndiags;
+	k_fwd += diff_env->data_ctx2.nreff + 1;
+	k_bwd += diff_env->data_ctx2.nreff + 1;
+
+	// set up parameters for Myers
+	conf.maxcost = bogosqrt(ndiags);
+	if(conf.maxcost < XDL_MAX_COST_MIN)
+		conf.maxcost = XDL_MAX_COST_MIN;
+	conf.snake_cnt = XDL_SNAKE_CNT;
+	conf.heur_min = XDL_HEUR_MIN_COST;
+
+	// Put data we got from algo_environment into parsed_data instances
+	data1.num_recs = diff_env->data_ctx1.nreff;
+	data1.hshd_recs = diff_env->data_ctx1.hshd_recs;
+	data1.weights = diff_env->data_ctx1.weights;
+	data1.keys = diff_env->data_ctx1.keys;
+	data2.num_recs = diff_env->data_ctx2.nreff;
+	data2.hshd_recs = diff_env->data_ctx2.hshd_recs;
+	data2.weights = diff_env->data_ctx2.weights;
+	data2.keys = diff_env->data_ctx2.keys;
+
+	if(recursive_compare(&data1, 0, data1.num_recs, &data2, 0,
+			data2.num_recs, k_fwd, k_bwd, 0, &conf) < 0) {
+		free(k_diags);
+		free_env(diff_env);
+		return -1;
+	}
+
+	free(k_diags);
 
 	return 0;
 }

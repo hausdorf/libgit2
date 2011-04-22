@@ -4,6 +4,60 @@
 #include "../common.h"
 #include "difftypes.h"
 
+
+// TODO: COMMENT HERE
+// TODO: IS THIS STRUCT EVEN NECESSARY?
+struct parsed_data {
+	long num_recs;
+	// This is DEFINITELY an array of hashes; in
+	// xdl_recs_cmp we access it as such
+	unsigned long const *hshd_recs;
+	// Points to diff_context.keys: Array of longs that represent hashes,
+	// used to access weights[]
+	long *keys;
+	// Points to diff_context.weights: In xdl_recs_cmp, each of these
+	// chars is set to a "weight" -- usually 0 or 1 depending on whether
+	// that particular record has changed. So it's basically a bit vector
+	// made of chars
+	char *weights;
+};
+typedef struct parsed_data parsed_data;
+
+// TODO: COMMENT HERE
+// TODO: This may be a silly struct
+struct split {
+	// i1 and i2 are x and y per the Myers O(ND) paper
+	long i1, i2;
+	// DEPRECATED: git does not use the flag XDF_NEEDS_MINIMAL anymore, so these
+	// do not get used
+	int min_lo, min_hi;
+};
+typedef struct split split;
+
+
+/*
+ * Represents the inner variables required to run Myers O(ND)
+ * diffing algorithm. This includes guiding information like
+ * the maximum cost we're willing to incur before we switch
+ * to a slightly different version of O(ND).
+ */
+struct myers_conf {
+	// We use this to determine when our LCS traversal has
+	// become too expensive, at which point we switch to
+	// something else
+	long maxcost;
+	long snake_cnt;
+	long heur_min;
+};
+typedef struct myers_conf myers_conf;
+
+
+// libdiff memory allocation by default is handled through libgit's
+#define ld__malloc(x) git__malloc(x)
+#define ld__free(ptr) free(ptr)
+#define ld__realloc(ptr,x) git__realloc(ptr,x)
+
+
 int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf);
 
