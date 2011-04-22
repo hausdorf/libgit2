@@ -8,6 +8,19 @@
 #include <string.h>
 #include <assert.h>
 
+
+
+static int load_file(const char *file_path, char **buffer, int *size);
+static int compare_hashes(char *file_buffer, const git_oid *blob_id,
+		int file_size);
+static int file_exists(char *filename);
+static int get_git_tree(git_tree **results, git_repository *repo,
+		git_commit *commit);
+static int get_filepath(char** results, git_repository *repo,
+		const git_tree_entry *entry);
+
+
+
 /* 0 on success, error on failure. The char* file_path must be free'd by
  * the caller or a memory leak will occur. The file contesnts are loaded
  * into the buffer, and the size of the buffer is loaded into size */
@@ -45,6 +58,7 @@ static int load_file(const char *file_path, char **buffer, int *size)
 int git_diff_no_index(git_diffresults_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {
+	diff_mem_data data1, data2;
 	char *buffer1, *buffer2;
 	int buffer1_size, buffer2_size;
 	int result;
@@ -54,6 +68,8 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	buffer1 = NULL;
 	buffer2 = NULL;
 
+	// FIXME: These calls fail and cause #15.
+	/*
 	result = load_file(filepath1, &buffer1, &buffer1_size);
 	if(result < GIT_SUCCESS)
 		goto cleanup;
@@ -61,16 +77,34 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	result = load_file(filepath2, &buffer2, &buffer2_size);
 	if(result < GIT_SUCCESS)
 		goto cleanup;
-
-	/*
-	diff(NULL, NULL, NULL);
 	*/
 
+	// FIXME: The above commented-out code should populate
+	// these vars. They don't, and this is part of the
+	// workaround.
+	buffer1 = "SOME TEXT\nGOES HERE\n";
+	buffer1_size = 22;
+	buffer2 = "SOME OTHER TEXT\nGOES HERE\n";
+	buffer2_size = 28;
+
+	// TODO: IMPLEMENT THIS FOR REAL. THIS IS TEST CODE.
+	/* TEST CODE */
+	data1.data = buffer1;
+	data1.size = buffer1_size;
+	data2.data = buffer2;
+	data2.size = buffer2_size;
+
+	diff(&data1, &data2, *results_conf);
+
 cleanup:
+	// FIXME: This is where #15 is happening. COMMENTING IT OUT
+	// IS A (BAD) WORKAROUND.
+	/*
 	if(buffer1)
 		free(buffer1);
 	if(buffer2)
 		free(buffer2);
+	*/
 
 	return result;
 }
