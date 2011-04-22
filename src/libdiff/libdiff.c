@@ -369,6 +369,7 @@ int algo_environment(diff_environment *diff_env)
 }
 
 
+// TODO: PUT COMMENT HERE
 int recursive_compare(parsed_data *data1, long left1, long right1,
 		parsed_data *data2, long left2, long right2, long *k_fwd,
 		long *k_bwd, int need_min, myers_conf *conf)
@@ -401,13 +402,11 @@ int recursive_compare(parsed_data *data1, long left1, long right1,
 		split spl;
 		spl.i1 = spl.i2 = 0;
 
-		/*
-		if(xdl_split(hshd_recs1, left1, right1, hshd_recs2, left2, right2, k_fwd, k_bwd,
+		if(myers(hshd_recs1, left1, right1, hshd_recs2, left2, right2, k_fwd, k_bwd,
 				need_min, &spl, conf) < 0) {
 
 			return -1;
 		}
-		*/
 
 		if(recursive_compare(data1, left1, spl.i1, data2, left2, spl.i2,
 				k_fwd, k_bwd, spl.min_lo, conf) < 0 ||
