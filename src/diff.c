@@ -121,18 +121,23 @@ static int get_git_tree(git_tree **results, git_repository *repo,
 static int get_filepath(char** results, git_repository *repo,
 		const git_tree_entry *entry)
 {
-	*results = git__malloc(sizeof(char) *
-		   (strlen(git_repository_workdir(repo))
-		   + strlen(git_tree_entry_name(entry))));
+	size_t dir_length;
+	size_t file_length;
+
+	dir_length = strlen(git_repository_workdir(repo));
+	file_length = strlen(git_tree_entry_name(entry));
+
+	*results = git__malloc(dir_length + file_length + 1);
 
 	if(results == NULL)
 		return GIT_ENOMEM;
 
-	strcat(*results, git_repository_workdir(repo));
+	strcpy(*results, git_repository_workdir(repo));
 	strcat(*results, git_tree_entry_name(entry));
 
-	printf(*results);
+	printf("%s", *results);
 	printf("\n");
+
 	return GIT_SUCCESS;
 }
 
@@ -153,6 +158,8 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 		return error;
 
 	/* Error if a directory is passed to this, shouldn't' happen */
+	/* TODO - this is returning true even when the file is valid, can be
+	 * read, and is vey much so not a directory */
 	if(gitfo_isdir(filepath)) {
 		free(filepath);
 		return GIT_EINVALIDPATH;
@@ -160,6 +167,8 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 
 	/* If the file is no longer present, it has been deleted since this entries
 	 * commit */
+	/* TODO - this is returning true even when the file is valid, can be
+	 * read, and is vey much so not a directory */
     if(!gitfo_exists(filepath)) {
 		/* TODO - Mark this file as deleted in the diff */
         free(filepath);
@@ -169,6 +178,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
     /* Open file and read contents */
 	file = gitfo_open(filepath, 0);
 	if(file == GIT_EOSERR) {
+		free(filepath);
 		return file;
     }
     file_size = (size_t)(gitfo_size(file));
@@ -195,6 +205,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
 	 	git_repository *repo, git_tree *tree)
 {
+	git_tree *sub_tree; /* Holder for a sub tree that this tree points to */
 	const git_tree_entry *entry;
 	git_object *object;
 	unsigned int i;
@@ -206,15 +217,15 @@ int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
 	for(i=0; i<git_tree_entrycount(tree); i++) {
 		entry = git_tree_entry_byindex(tree, i);
 		git_tree_entry_2object(&object, repo, entry);
-		/*
-		if(git_object_type(*obj) == GIT_OBJ_TREE)
-			TODO call this method again with this new tree object
+		if(git_object_type(object) == GIT_OBJ_TREE) {
+			git_tree_lookup(&sub_tree, repo, git_object_id(object));
+			diff_tree_to_filesystem(results_conf, repo, sub_tree);
+		}
 		else {
 			error = get_file_changes(entry, repo, results_conf);
 			if(error < GIT_SUCCESS)
 				return error;
 		}
-		*/
 	}
 
 	return GIT_SUCCESS;
