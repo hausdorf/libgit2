@@ -11,7 +11,6 @@
 
 
 
-static int load_file(const char *file_path, char **buffer, int *size);
 static int compare_hashes(char *file_buffer, const git_oid *blob_id,
 		int file_size);
 static int get_git_tree(git_tree **results, git_repository *repo,
@@ -19,41 +18,6 @@ static int get_git_tree(git_tree **results, git_repository *repo,
 static int get_filepath(char** results, git_repository *repo,
 		const git_tree_entry *entry);
 
-
-
-/* 0 on success, error on failure. The char* file_path must be freed by
- * the caller or a memory leak will occur. The file contents are loaded
- * into the buffer, and the size of the buffer is loaded into size */
-static int load_file(const char *file_path, char **buffer, int *size)
-{
-	FILE *file;
-	int read_result;
-
-	file = fopen(file_path, "rb");
-	if(!file)
-		return GIT_EINVALIDPATH;
-
-	/* Get the size of this file */
-	fseek(file, 0, SEEK_END);
-	*size=ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	*buffer = git__malloc(*size+1);
-	if (*buffer == NULL) {
-		fclose(file);
-		return GIT_ENOMEM;
-	}
-
-	read_result = fread(*buffer, 1, *size, file);
-	if(read_result != *size) {
-		free(*buffer);
-		*buffer = NULL;
-		fclose(file);
-		return GIT_ERROR;
-	}
-
-	return GIT_SUCCESS;
-}
 
 int git_diff_no_index(git_diffresults_conf **results_conf,
 		const char *filepath1, const char *filepath2)
