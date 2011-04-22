@@ -25,7 +25,7 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	buffer2 = NULL;
 
     /* Check if files exist at given paths */
-    if(!gitfo_exists(filepath1) || !gitfo_exists(filepath2)) {
+    if(gitfo_exists(filepath1) || gitfo_exists(filepath2)) {
         result = GIT_EINVALIDPATH;
         goto cleanup;
     }
@@ -135,6 +135,9 @@ static int get_filepath(char** results, git_repository *repo,
 	strcpy(*results, git_repository_workdir(repo));
 	strcat(*results, git_tree_entry_name(entry));
 
+	/* Explicitally null terminate this string */
+	*results[dir_length + file_length - 1] = '\0';
+
 	printf("%s", *results);
 	printf("\n");
 
@@ -169,7 +172,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 	 * commit */
 	/* TODO - this is returning true even when the file is valid, can be
 	 * read, and is vey much so not a directory */
-    if(!gitfo_exists(filepath)) {
+    if(gitfo_exists(filepath)) {
 		/* TODO - Mark this file as deleted in the diff */
         free(filepath);
         return GIT_SUCCESS;
