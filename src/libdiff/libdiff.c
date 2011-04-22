@@ -705,16 +705,12 @@ int prepare_and_myers(diff_environment *diff_env)
 int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf)
 {
-	// TODO COMMENT THESE VARS
-	git_changeset *diff;
 	diff_environment diff_env;
-
-	// Put the data we're diffing into the diff_environment
 	diff_env.data1 = data1;
 	diff_env.data2 = data2;
+	diff_env.flags = results_conf->flags;
 
-	// Put the flags into the diff_environment
-	diff_env.flags = &results_conf->flags;
+	git_changeset *diff;
 
 	// TODO: ERROR CHECK THIS ASSIGNMENT???
 	diff_results_hndlr process_results = results_conf->results_hndlr ?
