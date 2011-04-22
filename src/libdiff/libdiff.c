@@ -930,7 +930,7 @@ static void insert_record(int line, struct hashmap *map, int pass)
 {
 	/* Assign the records from the appropriate pass */
 	diff_record **records = pass == 1 ? map->env->data_ctx1.recs
-										: map->env->data_ctx2.recs;
+									  : map->env->data_ctx2.recs;
 	/* Grab the record corresponding to the line we are looking at */
 	diff_record *record = records[line - 1], *other;
 
