@@ -886,7 +886,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 
 	// TODO: IMPLEMENT PATIENCE DIFF
 //	if(results_conf->flags & DO_PATIENCE_DIFF)
-//		if(prepare_and_patience(data1, data2, &diff_env) < 0)
+//		if(prepare_and_patience(&diff_env) < 0)
 //			return -1;
 
 	// Prepare algorithm environment and then run Myers
@@ -1170,9 +1170,14 @@ static int fall_back_to_classic_diff(struct hashmap *map,
     return 0;
 }
 
-int xdl_do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
-		git_diffresults_conf const *results_conf, diff_environment *env)
+int prepare_and_patience(diff_environment *env,
+		git_diffresults_conf const *results_conf)
 {
-	return 0;
+	if (algo_environment(env) < 0)
+		return -1;
+
+	/* environment is cleaned up in diff() */
+	return patience_diff(env->data1, env->data2, results_conf, env,
+			1, env->data_ctx1.num_recs, 1, env->data_ctx2.num_recs);
 }
 

@@ -193,7 +193,7 @@ static int fall_back_to_classic_diff(struct hashmap *map,
 	int xdl_do_patience_diff(mmfile_t *file1, mmfile_t *file2,
 	xpparam_t const *xpp, xdfenv_t *env)
 	*/
-int do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
-		git_diffresults_conf const *results_conf, diff_environment *env);
+int prepare_and_patience(diff_environment *env,
+		git_diffresults_conf const *results_conf);
 
 #endif
