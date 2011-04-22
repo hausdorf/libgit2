@@ -895,14 +895,14 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 	}
 
 	// Build edit script
-	/*
-	if (xdl_change_compact(&xe.xdf1, &xe.xdf2, xpp->flags) < 0 ||
-	    xdl_change_compact(&xe.xdf2, &xe.xdf1, xpp->flags) < 0 ||
-	    xdl_build_script(&xe, &xscr) < 0) {
+	if (xdl_change_compact(&diff_env.data_ctx1, &diff_env.data_ctx2, diff_env.flags) < 0 ||
+	    xdl_change_compact(&diff_env.data_ctx2, &diff_env.data_ctx1, diff_env.flags) < 0 ||
+	    xdl_build_script(&diff_env, &diff) < 0) {
 
-		free_env(&xe);
+		free_env(&diff_env);
 		return -1;
 	}
+	/*
 	if (xscr) {
 		if (ef(&xe, xscr, ecb, xecfg) < 0) {
 
