@@ -396,7 +396,6 @@ static long myers(unsigned long const *hshd_recs1, long left1, long right1,
 	// d is the D-path
 	long ec, d, i1, i2, prev1, best, dd, v, k;
 
-	/*
 	// Set initial diagonal values for both forward and backward path.
 	k_fwd[fmid] = left1;
 	k_bwd[bmid] = right1;
@@ -584,7 +583,6 @@ static long myers(unsigned long const *hshd_recs1, long left1, long right1,
 			return ec;
 		}
 	}
-	*/
 }
 
 
