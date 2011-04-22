@@ -371,19 +371,19 @@ int algo_environment(diff_environment *diff_env)
 
 /*
  * See "An O(ND) Difference Algorithm and its Variations", by Eugene Myers.
- * Basically considers a "box" (off1, off2, lim1, lim2) and scan from both
- * the forward diagonal starting from (off1, off2) and the backward diagonal
- * starting from (lim1, lim2). If the K values on the same diagonal crosses
+ * Basically considers a "box" (left1, left2, right1, right2) and scan from both
+ * the forward diagonal starting from (left1, left2) and the backward diagonal
+ * starting from (right1, right2). If the K values on the same diagonal crosses
  * returns the furthest point of reach. We might end up having to expensive
  * cases using this algorithm is full, so a little bit of heuristic is needed
  * to cut the search and to return a suboptimal point.
  */
-static long myers(unsigned long const *ha1, long off1, long lim1,
-		      unsigned long const *ha2, long off2, long lim2,
-		      long *kvdf, long *kvdb, int need_min, split *spl,
-		      myers_conf *xenv) {
-	long dmin = off1 - lim2, dmax = lim1 - off2;
-	long fmid = off1 - off2, bmid = lim1 - lim2;
+static long myers(unsigned long const *hshd_recs1, long left1, long right1,
+		      unsigned long const *hshd_recs2, long left2, long right2,
+		      long *k_fwd, long *k_bwd, int need_min, split *spl,
+		      myers_conf *conf) {
+	long dmin = left1 - right2, dmax = right1 - left2;
+	long fmid = left1 - left2, bmid = right1 - right2;
 	long odd = (fmid - bmid) & 1;
 	long fmin = fmid, fmax = fmid;
 	long bmin = bmid, bmax = bmid;
@@ -393,8 +393,8 @@ static long myers(unsigned long const *ha1, long off1, long lim1,
 
 	/*
 	// Set initial diagonal values for both forward and backward path.
-	kvdf[fmid] = off1;
-	kvdb[bmid] = lim1;
+	k_fwd[fmid] = left1;
+	k_bwd[bmid] = right1;
 
 // BEGIN REQUIRED COMPONENTS TO IMPLEMENT ALGORITHM
 
@@ -407,11 +407,11 @@ static long myers(unsigned long const *ha1, long off1, long lim1,
 		// Also we initialize the external K value to -1 so that we can
 		// avoid extra conditions check inside the core loop.
 		if (fmin > dmin)
-			kvdf[--fmin - 1] = -1;
+			k_fwd[--fmin - 1] = -1;
 		else
 			++fmin;
 		if (fmax < dmax)
-			kvdf[++fmax + 1] = -1;
+			k_fwd[++fmax + 1] = -1;
 		else
 			--fmax;
 
@@ -422,17 +422,17 @@ static long myers(unsigned long const *ha1, long off1, long lim1,
 		// than starting at the beginning. In this way we avoid having
 		// to lookahead.
 		for (d = fmax; d >= fmin; d -= 2) {
-			if (kvdf[d - 1] >= kvdf[d + 1])
-				i1 = kvdf[d - 1] + 1;
+			if (k_fwd[d - 1] >= k_fwd[d + 1])
+				i1 = k_fwd[d - 1] + 1;
 			else
-				i1 = kvdf[d + 1];
+				i1 = k_fwd[d + 1];
 			prev1 = i1;
 			i2 = i1 - d;
-			for (; i1 < lim1 && i2 < lim2 && ha1[i1] == ha2[i2]; i1++, i2++);
-			if (i1 - prev1 > xenv->snake_cnt)
+			for (; i1 < right1 && i2 < right2 && hshd_recs1[i1] == hshd_recs2[i2]; i1++, i2++);
+			if (i1 - prev1 > conf->snake_cnt)
 				got_snake = 1;
-			kvdf[d] = i1;
-			if (odd && bmin <= d && d <= bmax && kvdb[d] <= i1) {
+			k_fwd[d] = i1;
+			if (odd && bmin <= d && d <= bmax && k_bwd[d] <= i1) {
 				spl->i1 = i1;
 				spl->i2 = i2;
 				spl->min_lo = spl->min_hi = 1;
@@ -446,26 +446,26 @@ static long myers(unsigned long const *ha1, long off1, long lim1,
 		// Also we initialize the external K value to -1 so that we can
 		// avoid extra conditions check inside the core loop.
 		if (bmin > dmin)
-			kvdb[--bmin - 1] = XDL_LINE_MAX;
+			k_bwd[--bmin - 1] = XDL_LINE_MAX;
 		else
 			++bmin;
 		if (bmax < dmax)
-			kvdb[++bmax + 1] = XDL_LINE_MAX;
+			k_bwd[++bmax + 1] = XDL_LINE_MAX;
 		else
 			--bmax;
 
 		for (d = bmax; d >= bmin; d -= 2) {
-			if (kvdb[d - 1] < kvdb[d + 1])
-				i1 = kvdb[d - 1];
+			if (k_bwd[d - 1] < k_bwd[d + 1])
+				i1 = k_bwd[d - 1];
 			else
-				i1 = kvdb[d + 1] - 1;
+				i1 = k_bwd[d + 1] - 1;
 			prev1 = i1;
 			i2 = i1 - d;
-			for (; i1 > off1 && i2 > off2 && ha1[i1 - 1] == ha2[i2 - 1]; i1--, i2--);
-			if (prev1 - i1 > xenv->snake_cnt)
+			for (; i1 > left1 && i2 > left2 && hshd_recs1[i1 - 1] == hshd_recs2[i2 - 1]; i1--, i2--);
+			if (prev1 - i1 > conf->snake_cnt)
 				got_snake = 1;
-			kvdb[d] = i1;
-			if (!odd && fmin <= d && d <= fmax && i1 <= kvdf[d]) {
+			k_bwd[d] = i1;
+			if (!odd && fmin <= d && d <= fmax && i1 <= k_fwd[d]) {
 				spl->i1 = i1;
 				spl->i2 = i2;
 				spl->min_lo = spl->min_hi = 1;
@@ -486,18 +486,18 @@ static long myers(unsigned long const *ha1, long off1, long lim1,
 		// mid diagonal itself. If this value is above the current
 		// edit cost times a magic factor (XDL_K_HEUR) we consider
 		// it interesting.
-		if (got_snake && ec > xenv->heur_min) {
+		if (got_snake && ec > conf->heur_min) {
 			for (best = 0, d = fmax; d >= fmin; d -= 2) {
 				dd = d > fmid ? d - fmid: fmid - d;
-				i1 = kvdf[d];
+				i1 = k_fwd[d];
 				i2 = i1 - d;
-				v = (i1 - off1) + (i2 - off2) - dd;
+				v = (i1 - left1) + (i2 - left2) - dd;
 
 				if (v > XDL_K_HEUR * ec && v > best &&
-				    off1 + xenv->snake_cnt <= i1 && i1 < lim1 &&
-				    off2 + xenv->snake_cnt <= i2 && i2 < lim2) {
-					for (k = 1; ha1[i1 - k] == ha2[i2 - k]; k++)
-						if (k == xenv->snake_cnt) {
+				    left1 + conf->snake_cnt <= i1 && i1 < right1 &&
+				    left2 + conf->snake_cnt <= i2 && i2 < right2) {
+					for (k = 1; hshd_recs1[i1 - k] == hshd_recs2[i2 - k]; k++)
+						if (k == conf->snake_cnt) {
 							best = v;
 							spl->i1 = i1;
 							spl->i2 = i2;
@@ -513,15 +513,15 @@ static long myers(unsigned long const *ha1, long off1, long lim1,
 
 			for (best = 0, d = bmax; d >= bmin; d -= 2) {
 				dd = d > bmid ? d - bmid: bmid - d;
-				i1 = kvdb[d];
+				i1 = k_bwd[d];
 				i2 = i1 - d;
-				v = (lim1 - i1) + (lim2 - i2) - dd;
+				v = (right1 - i1) + (right2 - i2) - dd;
 
 				if (v > XDL_K_HEUR * ec && v > best &&
-				    off1 < i1 && i1 <= lim1 - xenv->snake_cnt &&
-				    off2 < i2 && i2 <= lim2 - xenv->snake_cnt) {
-					for (k = 0; ha1[i1 + k] == ha2[i2 + k]; k++)
-						if (k == xenv->snake_cnt - 1) {
+				    left1 < i1 && i1 <= right1 - conf->snake_cnt &&
+				    left2 < i2 && i2 <= right2 - conf->snake_cnt) {
+					for (k = 0; hshd_recs1[i1 + k] == hshd_recs2[i2 + k]; k++)
+						if (k == conf->snake_cnt - 1) {
 							best = v;
 							spl->i1 = i1;
 							spl->i2 = i2;
@@ -538,15 +538,15 @@ static long myers(unsigned long const *ha1, long off1, long lim1,
 
 		// Enough is enough. We spent too much time here and now we collect
 		// the furthest reaching path using the (i1 + i2) measure.
-		if (ec >= xenv->mxcost) {
+		if (ec >= conf->mxcost) {
 			long fbest, fbest1, bbest, bbest1;
 
 			fbest = fbest1 = -1;
 			for (d = fmax; d >= fmin; d -= 2) {
-				i1 = XDL_MIN(kvdf[d], lim1);
+				i1 = XDL_MIN(k_fwd[d], right1);
 				i2 = i1 - d;
-				if (lim2 < i2)
-					i1 = lim2 + d, i2 = lim2;
+				if (right2 < i2)
+					i1 = right2 + d, i2 = right2;
 				if (fbest < i1 + i2) {
 					fbest = i1 + i2;
 					fbest1 = i1;
@@ -555,17 +555,17 @@ static long myers(unsigned long const *ha1, long off1, long lim1,
 
 			bbest = bbest1 = XDL_LINE_MAX;
 			for (d = bmax; d >= bmin; d -= 2) {
-				i1 = XDL_MAX(off1, kvdb[d]);
+				i1 = XDL_MAX(left1, k_bwd[d]);
 				i2 = i1 - d;
-				if (i2 < off2)
-					i1 = off2 + d, i2 = off2;
+				if (i2 < left2)
+					i1 = left2 + d, i2 = left2;
 				if (i1 + i2 < bbest) {
 					bbest = i1 + i2;
 					bbest1 = i1;
 				}
 			}
 
-			if ((lim1 + lim2) - bbest < fbest - (off1 + off2)) {
+			if ((right1 + right2) - bbest < fbest - (left1 + left2)) {
 				spl->i1 = fbest1;
 				spl->i2 = fbest - fbest1;
 				spl->min_lo = 1;
