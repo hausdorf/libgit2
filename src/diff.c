@@ -161,18 +161,18 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 	if(error < GIT_SUCCESS)
 		return error;
 
-	/*
-	 * If the local file exists load it into memory and compare it with the
-	 * blob. If it doesn't exist, the file has been deleted from the filesystem
-	 * since this entry's commit
-	 */
+	/* Error if a directory is passed to this, shouldn't' happen */
+	if(gitfo_isdir(filepath)) {
+		free(filepath);
+		return GIT_EINVALIDPATH;
+	}
 
-    /* Check if file exists at given path (and is not directory) */
-	/* TODO:  Handle file deleted case? (right now will only return error) */
-    if(!gitfo_exists(filepath) || gitfo_isdir(filepath)) {
-        error = GIT_EINVALIDPATH;
+	/* If the file is no longer present, it has been deleted since this entries
+	 * commit */
+    if(!gitfo_exists(filepath))
+		/* TODO - Mark this file as deleted in the diff */
         free(filepath)
-        return error;
+        return GIT_SUCCESS;
     }
 
     /* Open file and read contents */
@@ -189,7 +189,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 		return error;
 	}
 
-	/* Check if the local file matches the git blob */
+	/* Check if the local file matches the git blob, and diff it if not */
 	if(!compare_hashes(file_buffer, git_tree_entry_id(entry), file_size))
 		diff(NULL, NULL, NULL);
 
