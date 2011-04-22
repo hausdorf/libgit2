@@ -51,13 +51,14 @@ cleanup:
 }
 
 /* A git_oid is the SHA1 hash of a blob, so we will just create a git_oid from
- * the file_buffer and compare it to the blob. Returns 1 if they are the same,
- * 0 otherwise */
-static int compare_hashes(char *file_buffer, const git_oid *blob_id,
+ * the file_buffer and compare it to the blob. Returns 0 if they are the same */
+static int compare_hashes(void *file_buffer, const git_oid *blob_id,
 		int file_size)
 {
+	/* TODO  This is saying that every file has changed. Fix this */
+
 	git_oid file_id; 	/* The resulting SHA1 hash of the file */
-	git_hash_buf(&file_id, (void *) file_buffer, file_size);
+	git_hash_buf(&file_id, file_buffer, file_size);
 
 	return git_oid_cmp(&file_id, blob_id);
 }
@@ -113,9 +114,6 @@ static int get_filepath(char** results, git_repository *repo, char *subdir,
 	strcat(*results, subdir);
 	strcat(*results, git_tree_entry_name(entry));
 
-	printf("%s", *results);
-	printf("\n");
-
 	return GIT_SUCCESS;
 }
 
@@ -151,8 +149,12 @@ int diff_entry_to_filesystem(const git_tree_entry *entry, git_repository *repo,
 		goto cleanup;
 
 	/* Check if the local file matches the git blob, and diff it if not */
-	if(!compare_hashes(buffer.data, git_tree_entry_id(entry), buffer.len))
-		diff(NULL, NULL, NULL); /* TODO */
+	if(compare_hashes(buffer.data, git_tree_entry_id(entry), buffer.len) != 0) {
+		printf("%s \n", "compare hashes not the same");
+		/*
+		diff();
+		*/
+	}
 
 cleanup:
 	if(buffer.data)
