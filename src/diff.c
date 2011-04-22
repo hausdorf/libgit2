@@ -246,41 +246,20 @@ int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
 	return GIT_SUCCESS;
 }
 
-/* Recursivly goes through this tree to all other trees this points to,
- * checing all of the blobs */
 int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 		git_repository *repo)
 {
-	git_tree *tree;				/* The tree that we will be diffing */
-	int error;					/* Return results of helper functions */
-	unsigned int i;				/* Loop counter */
+	git_tree *tree;
+	int result;
 
 	/* Get the tree we will be diffing */
-	error = get_git_tree(&tree, repo, commit);
-	if(error < GIT_SUCCESS)
-		return error;
+	result = get_git_tree(&tree, repo, commit);
+	if(result < GIT_SUCCESS)
+		return result;
 
 	/* Preform the diff of everything in the tree */
-	error = diff_tree_to_filesystem(results_conf, repo, tree, "");
-	if(error < GIT_SUCCESS) {
-		git_tree_close(tree);
-		return error;
-	}
-
-	/* Check every file on the local filesystem, to catch any new files that
-	 * may have been created since the commit */
-	/*
-	for(each file in filesystem) {
-		entry = git_tree_entry_byname(tree, filename);
-
-		if(entry == NULL) {
-			This is a newly created file since the commit we are diffing
-		}
-	}
-	*/
-
-	git_tree_close(tree);
-	return GIT_SUCCESS;
+	result = diff_tree_to_filesystem(results_conf, repo, tree, "");
+	return result;
 }
 
 int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
@@ -331,6 +310,7 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 	}
 
 	/* Check tree2 for files that were added between these two commits */
+	/* TODO git diff doesn't do this, so check if git diff commits does */
 	for(i=0; i<git_tree_entrycount(tree2); i++) {
 		entry2 = git_tree_entry_byindex(tree2, i);
 		filename = git_tree_entry_name(entry2);
