@@ -701,6 +701,7 @@ static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		diff_environment *env,
 		int line1, int count1, int line2, int count2)
 {
+	struct hashmap map;
 	return 0;
 }
 
@@ -771,6 +772,7 @@ static int walk_common_sequence(struct hashmap *map, struct entry *first,
 static int fall_back_to_classic_diff(struct hashmap *map,
 		int line1, int count1, int line2, int count2)
 {
+	/* TODO: Implement this when core algo is done */
     return 0;
 }
 
