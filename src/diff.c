@@ -60,15 +60,12 @@ static int is_file_different(void *file_buffer, int file_size,
 
 	/* Quick check, see if the number of bytes are the same in the two files */
 	git_blob_lookup(&blob, repo, blob_id);
-	if(file_size != git_blob_rawsize(blob));
+	if(file_size != git_blob_rawsize(blob))
 			return 0;
 
 	/* Deep lookup. Compare the SHA1 of the file to the blob to see if any
 	 * changes have occurred. TODO make this work */
 	git_hash_buf(&file_id, file_buffer, file_size);
-
-	printf("%u \n", strlen(blob_id->id));
-	printf("%u \n", strlen(file_id.id));
 
 	return git_oid_cmp(&file_id, blob_id);
 }
@@ -124,6 +121,8 @@ static int get_filepath(char** results, git_repository *repo, char *subdir,
 	strcat(*results, subdir);
 	strcat(*results, git_tree_entry_name(entry));
 
+	printf("%s \n", *results);
+
 	return GIT_SUCCESS;
 }
 
@@ -159,8 +158,8 @@ int diff_entry_to_filesystem(const git_tree_entry *entry, git_repository *repo,
 		goto cleanup;
 
 	/* Check if the file has changed, and diff it if it has */
-	if(is_file_different(buffer.data, buffer.len, git_tree_entry_id(entry),
-				repo)) {
+	if(is_file_different(buffer.data, buffer.len, repo,
+			   	git_tree_entry_id(entry))) {
 		/*
 		diff();
 		*/
