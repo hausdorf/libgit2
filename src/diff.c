@@ -194,36 +194,52 @@ static int get_filepath(char** results, git_repository *repo,
 int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 		git_diffresults_conf **results_conf)
 {
-	char *filepath;		/* Path to a file in the working directory*/
-	char *file_buffer;	/* Buffer for contents of a file */
-	int file_size;		/* The size of the file in the file_buffer */
-	int error;			/* Holds error results of function calls */
+	char *filepath;				/* Path to a file in the working directory*/
+	char *file_buffer;			/* Buffer for contents of a file */
+	size_t file_size;			/* The size of the file in the file_buffer */
+	int error = GIT_SUCCESS;	/* Holds error results of function calls */
+    git_file file				/* Tracks the file */
 
 	/* Get the file path from the entry */
 	error = get_filepath(&filepath, repo, entry);
 	if(error < GIT_SUCCESS)
 		return error;
 
-	/* If the local file exists load it into memory and compare it with the
+	/*
+	 * If the local file exists load it into memory and compare it with the
 	 * blob. If it doesn't exist, the file has been deleted from the filesystem
-	 * since this entry's commit */
-	if(file_exists(filepath)) {
-		error = load_file(filepath, &file_buffer, &file_size);
-		if(error < GIT_SUCCESS) {
-			free(filepath);
-			return error;
-		}
+	 * since this entry's commit
+	 */
 
-		/* Check if the local file matches the git blob */
-		if(!compare_hashes(file_buffer, git_tree_entry_id(entry), file_size))
-			diff(NULL, NULL, NULL);
+    /* Check if file exists at given path (and is not directory) */
+	/* TODO:  Handle file deleted case? (right now will only return error) */
+    if(!gitfo_exists(filepath) || gitfo_isdir(filepath)) {
+        error = GIT_EINVALIDPATH;
+        free(filepath)
+        return error;
+    }
 
+    /* Open file and read contents */
+	file = gitfo_open(filepath, 0);
+	if(file == GIT_EOSERR) {
+		return file;
+    }
+    file_size = (size_t)(gitfo_size(file));
+    error = gitfo_read(file, file_buffer, file_size);
+    gitfo_close(file);
+    if(error < GIT_SUCCESS) {
+		free(filepath);
 		free(file_buffer);
-	}
-	else {
+		return error;
 	}
 
-	free(filepath);
+	/* Check if the local file matches the git blob */
+	if(!compare_hashes(file_buffer, git_tree_entry_id(entry), file_size))
+		diff(NULL, NULL, NULL);
+
+	free(file_buffer);
+	free(file_path);
+
 	return GIT_SUCCESS;
 }
 
