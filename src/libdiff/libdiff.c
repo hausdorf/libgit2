@@ -75,9 +75,9 @@ static void free_classifier(record_classifier *cf) {
 // TODO: WE NEED TO BE ABSOLUTELY CERTAIN THAT THIS IS CORRECT
 void free_env(diff_environment *diff_env) {
 
-	ld__free_ctx(&diff_env->data_ctx1);
-	ld__free_ctx(&diff_env->data_ctx2);
-	ld__free_classifier(&diff_env->classifier);
+	free_ctx(&diff_env->data_ctx1);
+	free_ctx(&diff_env->data_ctx2);
+	free_classifier(&diff_env->classifier);
 }
 
 
