@@ -2,6 +2,7 @@
 #include "hash.h"
 #include "refs.h"
 #include "tree.h"
+#include "blob.h"
 #include "commit.h"
 #include "fileops.h"
 #include "libdiff/libdiff.h"
