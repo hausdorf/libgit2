@@ -17,47 +17,47 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	char *buffer1, *buffer2;
 	size_t buffer1_size, buffer2_size;
 	int result = GIT_SUCCESS;
-    git_file file1, file2;
+	git_file file1, file2;
 
 	/* Verify and initialize variables */
 	assert(filepath1 && filepath2);
 	buffer1 = NULL;
 	buffer2 = NULL;
 
-    /* Check if files exist at given paths */
-    if(gitfo_exists(filepath1) || gitfo_exists(filepath2)) {
-        result = GIT_EINVALIDPATH;
-        goto cleanup;
-    }
-    /* Check if either given path is a directory */
-    if(gitfo_isdir(filepath1) || gitfo_isdir(filepath2)) {
-        result = GIT_EINVALIDPATH;
-        goto cleanup;
-    }
+	/* Check if files exist at given paths */
+	if(gitfo_exists(filepath1) || gitfo_exists(filepath2)) {
+		result = GIT_EINVALIDPATH;
+		goto cleanup;
+	}
+	/* Check if either given path is a directory */
+	if(gitfo_isdir(filepath1) || gitfo_isdir(filepath2)) {
+		result = GIT_EINVALIDPATH;
+		goto cleanup;
+	}
 
-    /* Open file1 and read contents */
+	/* Open file1 and read contents */
 	file1 = gitfo_open(filepath1, 0);
 	if(file1 == GIT_EOSERR) {
-        result = file1;
+		result = file1;
 		goto cleanup;
-    }
-    buffer1_size = (size_t)(gitfo_size(file1));
-    result = gitfo_read(file1, buffer1, buffer1_size);
-    gitfo_close(file1);
-    if(result < GIT_SUCCESS)
-        goto cleanup;
+	}
+	buffer1_size = (size_t)(gitfo_size(file1));
+	result = gitfo_read(file1, buffer1, buffer1_size);
+	gitfo_close(file1);
+	if(result < GIT_SUCCESS)
+		goto cleanup;
 
-    /* Open file2 and read contents */
+	/* Open file2 and read contents */
 	file2 = gitfo_open(filepath2, 0);
 	if(file2 == GIT_EOSERR) {
-        result = file2;
+		result = file2;
 		goto cleanup;
-    }
-    buffer2_size = (size_t)(gitfo_size(file2));
-    result = gitfo_read(file2, buffer2, buffer2_size);
-    gitfo_close(file2);
-    if(result < GIT_SUCCESS)
-        goto cleanup;
+	}
+	buffer2_size = (size_t)(gitfo_size(file2));
+	result = gitfo_read(file2, buffer2, buffer2_size);
+	gitfo_close(file2);
+	if(result < GIT_SUCCESS)
+		goto cleanup;
 
 	data1.data = buffer1;
 	data1.size = buffer1_size;
@@ -153,7 +153,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 	char *file_buffer;			/* Buffer for contents of a file */
 	size_t file_size;			/* The size of the file in the file_buffer */
 	int error;					/* Holds error results of function calls */
-    git_file file;				/* Tracks the file */
+	git_file file;				/* Tracks the file */
 
 	/* Get the file path from the entry */
 	error = get_filepath(&filepath, repo, entry);
@@ -172,22 +172,22 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 	 * commit */
 	/* TODO - this is returning true even when the file is valid, can be
 	 * read, and is vey much so not a directory */
-    if(gitfo_exists(filepath)) {
+	if(gitfo_exists(filepath)) {
 		/* TODO - Mark this file as deleted in the diff */
-        free(filepath);
-        return GIT_SUCCESS;
-    }
+		free(filepath);
+		return GIT_SUCCESS;
+	}
 
-    /* Open file and read contents */
+	/* Open file and read contents */
 	file = gitfo_open(filepath, 0);
 	if(file == GIT_EOSERR) {
 		free(filepath);
 		return file;
-    }
-    file_size = (size_t)(gitfo_size(file));
-    error = gitfo_read(file, file_buffer, file_size);
-    gitfo_close(file);
-    if(error < GIT_SUCCESS) {
+	}
+	file_size = (size_t)(gitfo_size(file));
+	error = gitfo_read(file, file_buffer, file_size);
+	gitfo_close(file);
+	if(error < GIT_SUCCESS) {
 		free(filepath);
 		free(file_buffer);
 		return error;
@@ -206,7 +206,7 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 /* Recursivly diffs a git_tree, navigating down every tree in this
  * entry and diffing all the blobs to the local filesystem */
 int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
-	 	git_repository *repo, git_tree *tree)
+		git_repository *repo, git_tree *tree)
 {
 	git_tree *sub_tree; /* Holder for a sub tree that this tree points to */
 	const git_tree_entry *entry;
@@ -275,7 +275,7 @@ int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
 		git_index *index)
 {
 	/* TODO */
-    return 0;
+	return 0;
 }
 
 /* Assumes commit1 is newer then commit 2. If this is not the case then the
