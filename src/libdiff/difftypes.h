@@ -19,6 +19,8 @@ struct diff_record {
 	struct diff_record *next;
 	char const *data;
 	long size;
+	// "Linearized" hash -- first record's is 0, second record's
+	// is 0 or 1, and so on.
 	unsigned long hash;
 };
 typedef struct diff_record diff_record;
@@ -131,27 +133,6 @@ struct data_context {
 typedef struct data_context data_context;
 
 /*
- * Represents the inner variables required to run Myers O(ND)
- * diffing algorithm. This includes guiding information like
- * the maximum cost we're willing to incur before we switch
- * to a slightly different version of O(ND).
- */
-struct myers_conf {
-	// TODO: FIX THESE VAR NAMES
-	// mAxcost, thanks for the var name asshole
-	// maxcost is the square root of L (which
-	// xdiffi.c calls "ndiags"), unless L < 256,
-	// in which case, it becomes 256. We use this
-	// to determine when our LCS traversal has
-	// become too expensive, at which point we
-	// switch to ... uh... something else
-	long mxcost;
-	long snake_cnt;
-	long heur_min;
-};
-typedef struct myers_conf myers_conf;
-
-/*
  * Represents file data (binary or text) in memory. Often
  * instances of these structs are the direct objects that
  * diffing is performed on.
@@ -226,7 +207,7 @@ struct diff_environment {
 
 	// Flags points to the flags member of git_diffresults_conf,
 	// and is usually set in diff()
-	unsigned long *flags;
+	unsigned long flags;
 /*
 	chastore_t rcha;
 	// Number of records, which is DEFINITLY
