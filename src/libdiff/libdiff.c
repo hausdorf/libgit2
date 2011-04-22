@@ -900,7 +900,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 	    xdl_change_compact(&xe.xdf2, &xe.xdf1, xpp->flags) < 0 ||
 	    xdl_build_script(&xe, &xscr) < 0) {
 
-		xdl_free_env(&xe);
+		free_env(&xe);
 		return -1;
 	}
 	if (xscr) {
