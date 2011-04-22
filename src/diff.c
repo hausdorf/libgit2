@@ -234,6 +234,8 @@ int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
 {
 	const git_tree_entry *entry;
 	git_object *object;
+	unsigned int i;
+	int error;
 
 	/* Check every tree entry. If one points to another tree go through all
 	 * of the entries in that tree. If one points to a blob diff that blob
@@ -241,13 +243,15 @@ int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
 	for(i=0; i<git_tree_entrycount(tree); i++) {
 		entry = git_tree_entry_byindex(tree, i);
 		git_tree_entry_2object(&object, repo, entry);
+		/*
 		if(git_object_type(*obj) == GIT_OBJ_TREE)
-			/* TODO call this method again with this new tree object */
+			TODO call this method again with this new tree object
 		else {
 			error = get_file_changes(entry, repo, results_conf);
 			if(error < GIT_SUCCESS)
 				return error;
 		}
+		*/
 	}
 
 	return GIT_SUCCESS;
