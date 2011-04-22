@@ -152,7 +152,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 
 		return -1;
 	}
-	if(!(records = (diff_record **) malloc(guessed_len * sizeof(diff_record *)))) {
+	if(!(records = (diff_record **) ld__malloc(guessed_len * sizeof(diff_record *)))) {
 
 		memstore_free(&data_ctx->table_mem);
 		return -1;
@@ -163,7 +163,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	hbits = hashbits((unsigned int) guessed_len);
 	table_size = 1 << hbits;
 	// Allocate memory required to store this table
-	if(!(records_hash = (diff_record **) malloc(table_size *
+	if(!(records_hash = (diff_record **) ld__malloc(table_size *
 			sizeof(diff_record *)))) {
 
 		free(records);
@@ -241,7 +241,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	}
 
 	// alloc space for weights array
-	if (!(weights = (char *) malloc((num_recs + 2) * sizeof(char)))) {
+	if (!(weights = (char *) ld__malloc((num_recs + 2) * sizeof(char)))) {
 
 		free(records_hash);
 		free(records);
@@ -251,7 +251,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	memset(weights, 0, (num_recs + 2) * sizeof(char));
 
 	// alloc space for keys array
-	if (!(keys = (long *) malloc((num_recs + 1) * sizeof(long)))) {
+	if (!(keys = (long *) ld__malloc((num_recs + 1) * sizeof(long)))) {
 
 		free(weights);
 		free(records_hash);
@@ -261,7 +261,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	}
 
 	// alloc space for array that will hold the hashes of every record
-	if (!(hshd_recs = (unsigned long *) malloc((num_recs + 1) * sizeof(unsigned long)))) {
+	if (!(hshd_recs = (unsigned long *) ld__malloc((num_recs + 1) * sizeof(unsigned long)))) {
 
 		free(keys);
 		free(weights);
@@ -304,7 +304,7 @@ static int init_record_classifier(record_classifier *classifier, long size)
 	// Build hashtable of classd_record pointers
 	classifier->hbits = hashbits((unsigned int) size);
 	classifier->table_size = 1 << classifier->hbits;
-	if(!(classifier->classd_hash = (classd_record **) malloc(
+	if(!(classifier->classd_hash = (classd_record **) ld__malloc(
 			classifier->table_size * sizeof(classd_record *)))) {
 		memstore_free(&classifier->table_mem);
 		return -1;
@@ -823,7 +823,7 @@ int prepare_and_myers(diff_environment *diff_env)
 
 	// Allocate memory for the forward and backward K diagonals
 	ndiags = diff_env->data_ctx1.nreff + diff_env->data_ctx2.nreff + 3;
-	if(!(k_diags = (long *) malloc((2 * ndiags + 2) * sizeof(long)))) {
+	if(!(k_diags = (long *) ld__malloc((2 * ndiags + 2) * sizeof(long)))) {
 		free_env(diff_env);
 	}
 
