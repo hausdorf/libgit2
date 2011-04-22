@@ -920,75 +920,16 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 /*********************
  * Patience diff lives here
  * Thar be dragons!
- *    -- and unfinished stuff, too.
  ********************/
 
 #define NON_UNIQUE ULONG_MAX
 
-/*
- * This is a hash mapping from line hash to line numbers in the first
- * and second file/blob
- */
-struct hashmap {
-	// TODO: Figure out what nr and alloc do
-	int nr, alloc;
-	struct entry {
-		size_t hash;
-
-		/*
-		 * 0 = unused entry, 1 = first line, 2 = second, etc.
-		 * line2 is NON_UNIQUE if the line is not unique
-		 * in either the first or the second file.
-		 */
-		size_t line1, line2;
-
-		/*
-		 * "next" & "previous" are used for the longest common
-		 * sequence;
-		 * initially, "next" reflects only the order in file1.
-		 */
-		struct entry *next, *previous;
-	} *entries, *first, *last;
-
-	/* were common records found? */
-	size_t has_matches;
-	diff_mem_data *file1, *file2;
-	diff_environment *env;
-	git_diffresults_conf const *results_conf;
-};
-
-/* Declare functions */
-static void insert_record(int line, struct hashmap *map, int which);
-static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
-		git_diffresults_conf const *results_conf,
-		diff_environment *env, struct hashmap *result,
-		int line1, int count1, int line2, int count2);
-static int binary_search(struct entry **sequence, int longest,
-		struct entry *entry);
-static struct entry *find_longest_common_sequence(struct hashmap *map);
-static int match(struct hashmap *map, int line1, int line2);
-static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
-		git_diffresults_conf const *results_conf,
-		diff_environment *env,
-		int line1, int count1, int line2, int count2);
-static int walk_common_sequence(struct hashmap *map, struct entry *first,
-		int line1, int count1, int line2, int count2);
-static int fall_back_to_classic_diff(struct hashmap *map,
-		int line1, int count1, int line2, int count2);
-int do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
-		git_diffresults_conf const *results_conf, diff_environment *env);
-/**
- * Insert record entries
- * @param line The line number
- * @param map The hashmap to store the entries
- * @param pass Which diff file/blob: 1 for first, 2 for second
- */
 static void insert_record(int line, struct hashmap *map, int pass)
 {
-	// Assign the records from the appropriate pass
+	/* Assign the records from the appropriate pass */
 	diff_record **records = pass == 1 ? map->env->data_ctx1.recs
-										: map->env->data_ctx2.recs;
-	// Grab the record corresponding to the line we are looking at
+									  : map->env->data_ctx2.recs;
+	/* Grab the record corresponding to the line we are looking at */
 	diff_record *record = records[line - 1], *other;
 
 	/*
@@ -1031,111 +972,204 @@ static void insert_record(int line, struct hashmap *map, int pass)
 		return;
 	}
 
+	/* No need to store entries if we are on the second pass */
+	if (pass == 2)
+		return;
+
+	/* Map line and hash */
+	map->entries[index].line1 = line;
+	map->entries[index].hash = record->hash;
+
+	/* Set first entry, if not set */
+	if (!map->first)
+		map->first = map->entries + index;
+
+	/* Update linked list, setting last and next to last */
+	if (map->last) {
+		map->last->next = map->entries + index;
+		map->entries[index].previous = map->last;
+	}
+
+	map->last = map->entries + index;
+	map->record_count++;
 }
 
-/*
- * PORTED DIRECTLY FROM xdiff with only modifications to the types
- * This function has to be called for each recursion into the inter-hunk
- * parts, as previously non-unique lines can become unique when being
- * restricted to a smaller part of the files.
- *
- * It is assumed that env has been prepared using xdl_prepare().
- */
-/*
-	static int fill_hashmap(mmfile_t *file1, mmfile_t *file2,
-	xpparam_t const *xpp, xdfenv_t *env,
-	struct hashmap *result,
-	int line1, int count1, int line2, int count2)
-*/
 static int fill_hashmap(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf,
 		diff_environment *env, struct hashmap *result,
 		int line1, int count1, int line2, int count2)
 {
+	/*
+	 * If env already has data1/2, then there is no reason to pass
+	 * in two data structs
+	 */
+	result->file1 = data1; /* maybe? result->file1 = env->data1 */
+	result->file2 = data2; /* "" */
+	result->results_conf = results_conf;
+	result->env = env;
+
+	/* We know exactly how large we want the hash map */
+	result->alloc = count1 * 2;
+	result->entries = (struct entry *)
+		ld__malloc(result->alloc * sizeof(struct entry));
+
+	if (!result->entries)
+		return -1;
+	
+	memset(result->entries, 0, result->alloc * sizeof(struct entry));
+
+	/* First, fill with entries from the first file */
+	while (count1--)
+		insert_record(line1++, result, 1);
+
+	/* Then search for matches in the second file */
+	while (count2--)
+		insert_record(line2++, result, 2);
+
 	return 0;
 }
 
-/*
- * PORTED DIRECTLY FROM xdiff with only modifications to the types
- * Find the longest sequence with a smaller last element (meaning a smaller
- * line2, as we construct the sequence with entries ordered by line1).
- */
 static int binary_search(struct entry **sequence, int longest,
 		struct entry *entry)
 {
-	return 0;
+	int left = -1, right = longest;
+
+	while (left + 1 < right) {
+		int middle = (left + right) / 2;
+		/* by construction, no two entries can be equal */
+		if (sequence[middle]->line2 > entry->line2)
+			right = middle;
+		else
+			left = middle;
+	}
+	/* return the index in "sequence", not the sequence length */
+	return left;
 }
 
-/*
- * PORTED DIRECTLY FROM xdiff with only modifications to the types
- * The idea is to start with the list of common unique lines sorted by
- * the order in file1.  For each of these pairs, the longest (partial)
- * sequence whose last element's line2 is smaller is determined.
- *
- * For efficiency, the sequences are kept in a list containing exactly one
- * item per sequence length: the sequence with the smallest last
- * element (in terms of line2).
- */
 static struct entry *find_longest_common_sequence(struct hashmap *map)
 {
-	return NULL;
+	struct entry **sequence =
+		ld__malloc(map->record_count * sizeof(struct entry *));
+	size_t longest = 0, i;
+	struct entry *entry;
+
+	/*
+	 * Could we use fewer comparisons by making this a while loop?
+	 * entry = map->first
+	 * while (entry->next) {...
+	 * ?
+	 */
+	for (entry = map->first; entry; entry = entry->next) {
+		if (!entry->line2 || entry->line2 == NON_UNIQUE)
+			continue;
+		i = binary_search(sequence, longest, entry);
+		entry->previous = i < 0 ? NULL : sequence[i];
+		sequence[++i] = entry;
+		if (i == longest)
+			longest++;
+	}
+
+	/* No common unique lines were found */
+	if (!longest) {
+		ld__free(sequence);
+		return NULL;
+	}
+
+	/* Adjust the 'next' members by iterating backwards */
+	entry = sequence[longest - 1];
+	entry->next = NULL;
+	while (entry->previous) {
+		entry->previous->next = entry;
+		entry = entry->previous;
+	}
+	ld__free(sequence);
+
+	return entry;
 }
 
-/*
- * PORTED DIRECTLY FROM xdiff with only modifications to the types
- * calls xdl_recmatch
- */
 static int match(struct hashmap *map, int line1, int line2)
 {
-	return 0;
+	diff_record *record1 = map->env->data_ctx1.recs[line1 - 1];
+	diff_record *record2 = map->env->data_ctx2.recs[line2 - 1];
+
+	return record_match(record1->data, record1->size,
+			record2->data, record2->size, map->results_conf->flags);
 }
 
-/*
-	static int patience_diff(mmfile_t *file1, mmfile_t *file2,
-	xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2);
-*/
-/*
- * PORTED DIRECTLY FROM xdiff with only modifications to the types
- * Recursively find the longest common sequence of unique lines,
- * and if none was found, ask xdl_do_diff() to do the job.
- *
- * This function assumes that env was prepared with xdl_prepare_env().
- */
 static int patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		git_diffresults_conf const *results_conf,
 		diff_environment *env,
 		int line1, int count1, int line2, int count2)
 {
+	struct hashmap map;
 	return 0;
 }
 
-/*
- * PORTED DIRECTLY FROM xdiff with only modifications to the types
- */
 static int walk_common_sequence(struct hashmap *map, struct entry *first,
 		int line1, int count1, int line2, int count2)
 {
-	return 0;
+	int end1 = line1 + count1, end2 = line2 + count2;
+	int next1, next2;
+
+	for (;;) {
+		/* Try to grow the line ranges of common lines */
+		if (first) {
+			next1 = first->line1;
+			next2 = first->line2;
+			while (next1 > line1 && next2 > line2 &&
+					match(map, next1 - 1, next2 - 1)) {
+				next1--;
+				next2--;
+			}
+		} else {
+			next1 = end1;
+			next2 = end2;
+		}
+		while (line1 < next1 && line2 < next2 &&
+				match(map, line1, line2)) {
+			line1++;
+			line2++;
+		}
+
+		/* Recurse */
+		if (next1 > line1 || next2 > line2) {
+			struct hashmap submap;
+
+			memset(&submap, 0, sizeof(submap));
+			if (patience_diff(map->file1, map->file2,
+						map->results_conf, map->env,
+						line1, next1 - line1,
+						line2, next2 - line2)) {
+				return -1;
+			}
+		}
+
+		if (!first)
+			return 0;
+
+		/* Get next non-matching lines */
+		while (first->next &&
+				first->next->line1 == first->line1 + 1 &&
+				first->next->line2 == first->line2 + 1)
+			first = first->next;
+
+		line1 = first->line1 + 1;
+		line2 = first->line2 + 1;
+
+		/* Reposition next */
+		first = first->next;
+	}
+
+	/* Should be returning 0 here, I think */
 }
 
-/*
- * PORTED DIRECTLY FROM xdiff with only modifications to the types
- */
 static int fall_back_to_classic_diff(struct hashmap *map,
 		int line1, int count1, int line2, int count2)
 {
-	return 0;
+	/* TODO: Implement this when core algo is done */
+    return 0;
 }
 
-/*
- * PORTED DIRECTLY FROM xdiff with only modifications to the types
- * Entry point to patience diff
- */
-/*
-	int xdl_do_patience_diff(mmfile_t *file1, mmfile_t *file2,
-	xpparam_t const *xpp, xdfenv_t *env)
-	*/
 int xdl_do_patience_diff(diff_mem_data *file1, diff_mem_data *file2,
 		git_diffresults_conf const *results_conf, diff_environment *env)
 {
