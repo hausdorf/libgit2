@@ -110,9 +110,6 @@ static int get_filepath(char** results, git_repository *repo,
 	strcpy(*results, git_repository_workdir(repo));
 	strcat(*results, git_tree_entry_name(entry));
 
-	/* Explicitally null terminate this string */
-	*results[dir_length + file_length - 1] = '\0';
-
 	printf("%s", *results);
 	printf("\n");
 
@@ -125,55 +122,40 @@ int get_file_changes(const git_tree_entry *entry, git_repository *repo,
 		git_diffresults_conf **results_conf)
 {
 	char *filepath;				/* Path to a file in the working directory*/
-	char *file_buffer;			/* Buffer for contents of a file */
-	size_t file_size;			/* The size of the file in the file_buffer */
+	gitfo_buf buffer;		/* Buffer to hold the contects of a file */
 	int error;					/* Holds error results of function calls */
-    git_file file;				/* Tracks the file */
+
+	/* Verify and initialize data */
+	assert(entry && repo);
+	filepath = NULL;
+	buffer.data = NULL;
 
 	/* Get the file path from the entry */
 	error = get_filepath(&filepath, repo, entry);
 	if(error < GIT_SUCCESS)
 		return error;
 
-	/* Error if a directory is passed to this, shouldn't' happen */
-	/* TODO - this is returning true even when the file is valid, can be
-	 * read, and is vey much so not a directory */
-	if(gitfo_isdir(filepath)) {
-		free(filepath);
-		return GIT_EINVALIDPATH;
-	}
-
 	/* If the file is no longer present, it has been deleted since this entries
-	 * commit */
-	/* TODO - this is returning true even when the file is valid, can be
-	 * read, and is vey much so not a directory */
-    if(gitfo_exists(filepath)) {
+	 * commit (NOTE this method is wierd and returns 0 if the file exists) */
+    if(gitfo_exists(filepath) != 0) {
 		/* TODO - Mark this file as deleted in the diff */
-        free(filepath);
-        return GIT_SUCCESS;
+		goto cleanup;
     }
 
-    /* Open file and read contents */
-	file = gitfo_open(filepath, 0);
-	if(file == GIT_EOSERR) {
-		free(filepath);
-		return file;
-    }
-    file_size = (size_t)(gitfo_size(file));
-    error = gitfo_read(file, file_buffer, file_size);
-    gitfo_close(file);
-    if(error < GIT_SUCCESS) {
-		free(filepath);
-		free(file_buffer);
-		return error;
-	}
+	/* Attempt to open the file and read its contents */
+	error = gitfo_read_file(&buffer, filepath);
+	if(error < GIT_SUCCESS)
+		goto cleanup;
 
 	/* Check if the local file matches the git blob, and diff it if not */
-	if(!compare_hashes(file_buffer, git_tree_entry_id(entry), file_size))
-		diff(NULL, NULL, NULL);
+	if(!compare_hashes(buffer.data, git_tree_entry_id(entry), buffer.len))
+		diff(NULL, NULL, NULL); /* TODO */
 
-	free(file_buffer);
-	free(filepath);
+cleanup:
+	if(buffer.data)
+		gitfo_free_buf(&buffer);
+	if(filepath)
+		free(filepath);
 
 	return GIT_SUCCESS;
 }
