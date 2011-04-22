@@ -3,6 +3,7 @@
 #include "refs.h"
 #include "tree.h"
 #include "commit.h"
+#include "fileops.h"
 #include "libdiff/libdiff.h"
 #include <stdio.h>
 #include <string.h>
@@ -60,35 +61,51 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 {
 	diff_mem_data data1, data2;
 	char *buffer1, *buffer2;
-	int buffer1_size, buffer2_size;
-	int result;
+	size_t buffer1_size, buffer2_size;
+	int result = GIT_SUCCESS;
+    git_file file1, file2;
 
-	/* verify and initialize variables */
+	/* Verify and initialize variables */
 	assert(filepath1 && filepath2);
 	buffer1 = NULL;
 	buffer2 = NULL;
 
-	// FIXME: These calls fail and cause #15.
-	/*
-	result = load_file(filepath1, &buffer1, &buffer1_size);
-	if(result < GIT_SUCCESS)
+    /* Check if files exist at given paths */
+    if(!gitfo_exists(filepath1) || !gitfo_exists(filepath2)) {
+        result = -1;
+        goto cleanup;
+    }
+    /* Check if either given path is a directory */
+    if(gitfo_isdir(filepath1) || gitfo_isdir(filepath2)) {
+        result = -1;
+        goto cleanup;
+    }
+
+
+    /* Open file1 and read contents */
+	file1 = gitfo_open(filepath1, 0);
+	if(file1 == GIT_EOSERR) {
+        result = file1;
 		goto cleanup;
+    }
+    buffer1_size = (size_t)(gitfo_size(file1));
+    result = gitfo_read(file1, buffer1, buffer1_size);
+    gitfo_close(file1);
+    if(result < GIT_SUCCESS)
+        goto cleanup;
 
-	result = load_file(filepath2, &buffer2, &buffer2_size);
-	if(result < GIT_SUCCESS)
+    /* Open file2 and read contents */
+	file2 = gitfo_open(filepath2, 0);
+	if(file2 == GIT_EOSERR) {
+        result = file2;
 		goto cleanup;
-	*/
+    }
+    buffer2_size = (size_t)(gitfo_size(file2));
+    result = gitfo_read(file2, buffer2, buffer2_size);
+    gitfo_close(file2);
+    if(result < GIT_SUCCESS)
+        goto cleanup;
 
-	// FIXME: The above commented-out code should populate
-	// these vars. They don't, and this is part of the
-	// workaround.
-	buffer1 = "SOME TEXT\nGOES HERE\n";
-	buffer1_size = 22;
-	buffer2 = "SOME OTHER TEXT\nGOES HERE\n";
-	buffer2_size = 28;
-
-	// TODO: IMPLEMENT THIS FOR REAL. THIS IS TEST CODE.
-	/* TEST CODE */
 	data1.data = buffer1;
 	data1.size = buffer1_size;
 	data2.data = buffer2;
@@ -97,14 +114,10 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	diff(&data1, &data2, *results_conf);
 
 cleanup:
-	// FIXME: This is where #15 is happening. COMMENTING IT OUT
-	// IS A (BAD) WORKAROUND.
-	/*
 	if(buffer1)
 		free(buffer1);
 	if(buffer2)
 		free(buffer2);
-	*/
 
 	return result;
 }
