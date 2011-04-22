@@ -321,6 +321,34 @@ static int init_record_classifier(record_classifier *classifier, long size)
 }
 
 
+int xdl_build_script(diff_environment *xe, git_changeset **xscr) {
+	git_changeset *cscr = NULL, *xch;
+	char *rchg1 = xe->data_ctx1.weights, *rchg2 = xe->data_ctx2.weights;
+	long i1, i2, l1, l2;
+
+	/*
+	 * Trivial. Collects "groups" of changes and creates an edit script.
+	 */
+	for (i1 = xe->data_ctx1.num_recs, i2 = xe->data_ctx2.num_recs; i1 >= 0 || i2 >= 0; i1--, i2--)
+		if (rchg1[i1 - 1] || rchg2[i2 - 1]) {
+			for (l1 = i1; rchg1[i1 - 1]; i1--);
+			for (l2 = i2; rchg2[i2 - 1]; i2--);
+
+			/*
+			if (!(xch = xdl_add_change(cscr, i1, i2, l1 - i1, l2 - i2))) {
+				xdl_free_script(cscr);
+				return -1;
+			}
+			cscr = xch;
+			*/
+		}
+
+	*xscr = cscr;
+
+	return 0;
+}
+
+
 // TODO: COMMENT HERE
 // TODO: This is currently a direct port from xdiff/xdiffi.c
 int xdl_change_compact(data_context *xdf, data_context *xdfo, long flags) {
