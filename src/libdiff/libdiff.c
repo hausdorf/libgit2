@@ -204,7 +204,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 			// realloc the amount of memory needed
 			if(num_recs >= guessed_len) {
 				guessed_len *= 2;
-				if(!(reallocd_records = (diff_record **) realloc(records,
+				if(!(reallocd_records = (diff_record **) ld__realloc(records,
 						guessed_len * sizeof(diff_record *)))) {
 
 					ld__free(records_hash);
