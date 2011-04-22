@@ -725,13 +725,32 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 //		if(prepare_and_patience(data1, data2, &diff_env) < 0)
 //			return -1;
 
+	// Prepare algorithm environment and then run Myers
 	if(prepare_and_myers(&diff_env) < 0) {
 		return -1;
 	}
 
-	// TODO: IMPLEMENT THESE
-	// STEP 2: COMPACT AND BUILD SCRIPT
-	// STEP 3: CALL THE SPECIFIED CALLBACK FUNCTION
+	// Build edit script
+	/*
+	if (xdl_change_compact(&xe.xdf1, &xe.xdf2, xpp->flags) < 0 ||
+	    xdl_change_compact(&xe.xdf2, &xe.xdf1, xpp->flags) < 0 ||
+	    xdl_build_script(&xe, &xscr) < 0) {
+
+		xdl_free_env(&xe);
+		return -1;
+	}
+	if (xscr) {
+		if (ef(&xe, xscr, ecb, xecfg) < 0) {
+
+			xdl_free_script(xscr);
+			xdl_free_env(&xe);
+			return -1;
+		}
+		xdl_free_script(xscr);
+	}
+	xdl_free_env(&xe);
+	*/
+
 	return 0;
 }
 
