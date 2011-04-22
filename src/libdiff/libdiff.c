@@ -902,18 +902,16 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 		free_env(&diff_env);
 		return -1;
 	}
-	/*
-	if (xscr) {
-		if (ef(&xe, xscr, ecb, xecfg) < 0) {
+	if (diff) {
+		if (process_results(&diff_env, diff, results_conf->callback->out_func, results_conf) < 0) {
 
-			xdl_free_script(xscr);
-			xdl_free_env(&xe);
+			xdl_free_script(diff);
+			free_env(&diff_env);
 			return -1;
 		}
-		xdl_free_script(xscr);
+		xdl_free_script(diff);
 	}
-	xdl_free_env(&xe);
-	*/
+	free_env(&diff_env);
 
 	return 0;
 }
