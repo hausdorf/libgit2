@@ -1142,10 +1142,7 @@ int diff(diff_mem_data *data1, diff_mem_data *data2,
 	// TODO: ERROR CHECK THIS ASSIGNMENT???
 	diff_results_hndlr process_results = results_conf->results_hndlr ?
 		(diff_results_hndlr)results_conf->results_hndlr :
-		// TODO: IMPLEMENT the default_results_hndlr; it's in
-		// xdiff/xemit.c
-		//default_results_hndlr;
-		NULL;
+		default_results_hndlr;
 
 	// TODO: IMPLEMENT PATIENCE DIFF
 //	if(results_conf->flags & DO_PATIENCE_DIFF)
