@@ -164,6 +164,14 @@ int xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
 }
 
 
+static long xdl_get_rec(data_context *xdf, long ri, char const **rec) {
+
+	*rec = xdf->recs[ri]->data;
+
+	return xdf->recs[ri]->size;
+}
+
+
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
 static void free_ctx(data_context *ctx) {
