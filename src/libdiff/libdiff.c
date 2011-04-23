@@ -39,6 +39,8 @@
 #define XDL_K_HEUR 4
 #define XDL_LINE_MAX (long)((1UL << (CHAR_BIT * sizeof(long) - 1)) - 1)
 
+#define XDL_EMIT_COMMON (1 << 1)
+#define XDL_EMIT_FUNCNAMES (1 << 0)
 
 
 static void free_classifier(record_classifier *cf);
