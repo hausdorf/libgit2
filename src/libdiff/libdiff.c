@@ -68,6 +68,28 @@ static long def_ff(const char *rec, long len, char *buf, long sz, void *priv)
 	return -1;
 }
 
+int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
+		git_diff_callback *ecb) {
+	int i = 2;
+	diff_mem_data mb[3];
+
+	mb[0].data = (char *) pre;
+	mb[0].size = psize;
+	mb[1].data = (char *) rec;
+	mb[1].size = size;
+	if (size > 0 && rec[size - 1] != '\n') {
+		mb[2].data = (char *) "\n\\ No newline at end of file\n";
+		mb[2].size = strlen(mb[2].data);
+		i++;
+	}
+	if (ecb->out_func(ecb->payload, mb, i) < 0) {
+
+		return -1;
+	}
+
+	return 0;
+}
+
 
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
