@@ -23,12 +23,12 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	buffer1.data = NULL;
 	buffer2.data = NULL;
 
-    /* Attempt to open file1 and read contents */
+	/* Attempt to open file1 and read contents */
 	result = gitfo_read_file(&buffer1, filepath1);
 	if(result < GIT_SUCCESS)
 		goto cleanup;
 
-    /* Attempt to open file2 and read contents */
+	/* Attempt to open file2 and read contents */
 	result = gitfo_read_file(&buffer2, filepath2);
 	if(result < GIT_SUCCESS)
 		goto cleanup;
@@ -153,10 +153,10 @@ int diff_entry_to_filesystem(const git_tree_entry *entry, git_repository *repo,
 
 	/* If the file is no longer present, it has been deleted since this entries
 	 * commit (NOTE this method is wierd and returns 0 if the file exists) */
-    if(gitfo_exists(filepath) != 0) {
+	if(gitfo_exists(filepath) != 0) {
 		/* TODO - Mark this file as deleted in the diff */
 		goto cleanup;
-    }
+	}
 
 	/* Attempt to open the file and read its contents */
 	error = gitfo_read_file(&buffer, filepath);
