@@ -202,6 +202,22 @@ static int xdl_emit_common(diff_environment *xe, git_changeset *xscr, git_diff_c
 }
 
 
+/*
+ * Starting at the passed change atom, find the latest change atom to be included
+ * inside the differential hunk according to the specified configuration.
+ */
+git_changeset *xdl_get_hunk(git_changeset *xscr, callback_conf const *xecfg) {
+	git_changeset *xch, *xchp;
+	long max_common = 2 * xecfg->ctxlen + xecfg->interhunkctxlen;
+
+	for (xchp = xscr, xch = xscr->next; xch; xchp = xch, xch = xch->next)
+		if (xch->i1 - (xchp->i1 + xchp->chg1) > max_common)
+			break;
+
+	return xchp;
+}
+
+
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
 static void free_ctx(data_context *ctx) {
