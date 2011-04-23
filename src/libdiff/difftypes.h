@@ -159,6 +159,18 @@ struct git_diff_callback {
 };
 typedef struct git_diff_callback git_diff_callback;
 
+typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
+
+struct callback_conf {
+	long ctxlen;
+	long interhunkctxlen;
+	unsigned long flags;
+	find_func_t find_func;
+	void *find_func_priv;
+	void (*emit_func)();
+};
+typedef struct callback_conf callback_conf;
+
 /*
  * Fully configures not just how we generate diff's results,
  * but also *where* they go, and what form they take.
