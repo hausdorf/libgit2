@@ -91,6 +91,29 @@ int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
 }
 
 
+int xdl_num_out(char *out, long val) {
+	char *ptr, *str = out;
+	char buf[32];
+
+	ptr = buf + sizeof(buf) - 1;
+	*ptr = '\0';
+	if (val < 0) {
+		*--ptr = '-';
+		val = -val;
+	}
+	for (; val && ptr > buf; val /= 10)
+		*--ptr = "0123456789"[val % 10];
+	if (*ptr)
+		for (; *ptr; ptr++, str++)
+			*str = *ptr;
+	else
+		*str++ = '0';
+	*str = '\0';
+
+	return str - out;
+}
+
+
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
 static void free_ctx(data_context *ctx) {
