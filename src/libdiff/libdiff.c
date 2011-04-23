@@ -186,6 +186,22 @@ static int xdl_emit_record(data_context *xdf, long ri, char const *pre, git_diff
 }
 
 
+static int xdl_emit_common(diff_environment *xe, git_changeset *xscr, git_diff_callback *ecb,
+		callback_conf const *xecfg) {
+	data_context *xdf = &xe->data_ctx1;
+	const char *rchg = xdf->weights;
+	long ix;
+
+	for (ix = 0; ix < xdf->num_recs; ix++) {
+		if (rchg[ix])
+			continue;
+		if (xdl_emit_record(xdf, ix, "", ecb))
+			return -1;
+	}
+	return 0;
+}
+
+
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
 static void free_ctx(data_context *ctx) {
