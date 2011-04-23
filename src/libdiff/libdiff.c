@@ -172,6 +172,20 @@ static long xdl_get_rec(data_context *xdf, long ri, char const **rec) {
 }
 
 
+static int xdl_emit_record(data_context *xdf, long ri, char const *pre, git_diff_callback *ecb) {
+	long size, psize = strlen(pre);
+	char const *rec;
+
+	size = xdl_get_rec(xdf, ri, &rec);
+	if (xdl_emit_diffrec(rec, size, pre, psize, ecb) < 0) {
+
+		return -1;
+	}
+
+	return 0;
+}
+
+
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
 static void free_ctx(data_context *ctx) {
