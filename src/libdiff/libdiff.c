@@ -218,6 +218,101 @@ git_changeset *xdl_get_hunk(git_changeset *xscr, callback_conf const *xecfg) {
 }
 
 
+int default_results_hndlr(diff_environment *xe, git_changeset *xscr, git_diff_callback *ecb,
+		callback_conf const *xecfg) {
+	long s1, s2, e1, e2, lctx;
+	git_changeset *xch, *xche;
+	char funcbuf[80];
+	long funclen = 0;
+	long funclineprev = -1;
+	find_func_t ff = xecfg->find_func ?  xecfg->find_func : def_ff;
+
+	if (xecfg->flags & XDL_EMIT_COMMON)
+		return xdl_emit_common(xe, xscr, ecb, xecfg);
+
+	for (xch = xscr; xch; xch = xche->next) {
+		xche = xdl_get_hunk(xch, xecfg);
+
+		s1 = XDL_MAX(xch->i1 - xecfg->ctxlen, 0);
+		s2 = XDL_MAX(xch->i2 - xecfg->ctxlen, 0);
+
+		lctx = xecfg->ctxlen;
+		lctx = XDL_MIN(lctx, xe->data_ctx1.num_recs - (xche->i1 + xche->chg1));
+		lctx = XDL_MIN(lctx, xe->data_ctx2.num_recs - (xche->i2 + xche->chg2));
+
+		e1 = xche->i1 + xche->chg1 + lctx;
+		e2 = xche->i2 + xche->chg2 + lctx;
+
+		/*
+		 * Emit current hunk header.
+		 */
+
+		if (xecfg->flags & XDL_EMIT_FUNCNAMES) {
+			long l;
+			for (l = s1 - 1; l >= 0 && l > funclineprev; l--) {
+				const char *rec;
+				long reclen = xdl_get_rec(&xe->data_ctx1, l, &rec);
+				long newfunclen = ff(rec, reclen, funcbuf,
+						sizeof(funcbuf),
+						xecfg->find_func_priv);
+				if (newfunclen >= 0) {
+					funclen = newfunclen;
+					break;
+				}
+			}
+			funclineprev = s1 - 1;
+		}
+		if (xdl_emit_hunk_hdr(s1 + 1, e1 - s1, s2 + 1, e2 - s2,
+				      funcbuf, funclen, ecb) < 0)
+			return -1;
+
+		/*
+		 * Emit pre-context.
+		 */
+		for (; s1 < xch->i1; s1++)
+			if (xdl_emit_record(&xe->data_ctx1, s1, " ", ecb) < 0)
+				return -1;
+
+		for (s1 = xch->i1, s2 = xch->i2;; xch = xch->next) {
+			/*
+			 * Merge previous with current change atom.
+			 */
+			for (; s1 < xch->i1 && s2 < xch->i2; s1++, s2++)
+				if (xdl_emit_record(&xe->data_ctx1, s1, " ", ecb) < 0)
+					return -1;
+
+			/*
+			 * Removes lines from the first file.
+			 */
+			for (s1 = xch->i1; s1 < xch->i1 + xch->chg1; s1++)
+				if (xdl_emit_record(&xe->data_ctx1, s1, "-", ecb) < 0)
+					return -1;
+
+			/*
+			 * Adds lines from the second file.
+			 */
+			for (s2 = xch->i2; s2 < xch->i2 + xch->chg2; s2++)
+				if (xdl_emit_record(&xe->data_ctx2, s2, "+", ecb) < 0)
+					return -1;
+
+			if (xch == xche)
+				break;
+			s1 = xch->i1 + xch->chg1;
+			s2 = xch->i2 + xch->chg2;
+		}
+
+		/*
+		 * Emit post-context.
+		 */
+		for (s1 = xche->i1 + xche->chg1; s1 < e1; s1++)
+			if (xdl_emit_record(&xe->data_ctx1, s1, " ", ecb) < 0)
+				return -1;
+	}
+
+	return 0;
+}
+
+
 // TODO: THIS IS A DIRECT PORT FROM xdiff/xprepare.c
 // PORT IT PROPERLY
 static void free_ctx(data_context *ctx) {
