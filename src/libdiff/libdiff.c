@@ -160,6 +160,78 @@ static int xdl_trim_ends(data_context *xdf1, data_context *xdf2) {
 }
 
 
+/*
+ * Try to reduce the problem complexity, discard records that have no
+ * matches on the other file. Also, lines that have multiple matches
+ * might be potentially discarded if they happear in a run of discardable.
+ */
+static int xdl_cleanup_records(data_context *xdf1, data_context *xdf2) {
+	long i, nm, rhi, nreff, mlim;
+	unsigned long hav;
+	diff_record **recs;
+	diff_record *rec;
+	char *dis, *dis1, *dis2;
+
+	if (!(dis = (char *) ld__malloc(xdf1->num_recs + xdf2->num_recs + 2))) {
+
+		return -1;
+	}
+	memset(dis, 0, xdf1->num_recs + xdf2->num_recs + 2);
+	dis1 = dis;
+	dis2 = dis1 + xdf1->num_recs + 1;
+
+	if ((mlim = bogosqrt(xdf1->num_recs)) > XDL_MAX_EQLIMIT)
+		mlim = XDL_MAX_EQLIMIT;
+	for (i = xdf1->dstart, recs = &xdf1->recs[xdf1->dstart]; i <= xdf1->dend; i++, recs++) {
+		hav = (*recs)->hash;
+		rhi = (long) XDL_HASHLONG(hav, xdf2->hbits);
+		for (nm = 0, rec = xdf2->rhash[rhi]; rec; rec = rec->next)
+			if (rec->hash == hav && ++nm == mlim)
+				break;
+		dis1[i] = (nm == 0) ? 0: (nm >= mlim) ? 2: 1;
+	}
+
+	if ((mlim = bogosqrt(xdf2->num_recs)) > XDL_MAX_EQLIMIT)
+		mlim = XDL_MAX_EQLIMIT;
+	for (i = xdf2->dstart, recs = &xdf2->recs[xdf2->dstart]; i <= xdf2->dend; i++, recs++) {
+		hav = (*recs)->hash;
+		rhi = (long) XDL_HASHLONG(hav, xdf1->hbits);
+		for (nm = 0, rec = xdf1->rhash[rhi]; rec; rec = rec->next)
+			if (rec->hash == hav && ++nm == mlim)
+				break;
+		dis2[i] = (nm == 0) ? 0: (nm >= mlim) ? 2: 1;
+	}
+
+	for (nreff = 0, i = xdf1->dstart, recs = &xdf1->recs[xdf1->dstart];
+	     i <= xdf1->dend; i++, recs++) {
+		if (dis1[i] == 1 ||
+		    (dis1[i] == 2 && !xdl_clean_mmatch(dis1, i, xdf1->dstart, xdf1->dend))) {
+			xdf1->keys[nreff] = i;
+			xdf1->hshd_recs[nreff] = (*recs)->hash;
+			nreff++;
+		} else
+			xdf1->weights[i] = 1;
+	}
+	xdf1->nreff = nreff;
+
+	for (nreff = 0, i = xdf2->dstart, recs = &xdf2->recs[xdf2->dstart];
+	     i <= xdf2->dend; i++, recs++) {
+		if (dis2[i] == 1 ||
+		    (dis2[i] == 2 && !xdl_clean_mmatch(dis2, i, xdf2->dstart, xdf2->dend))) {
+			xdf2->keys[nreff] = i;
+			xdf2->hshd_recs[nreff] = (*recs)->hash;
+			nreff++;
+		} else
+			xdf2->weights[i] = 1;
+	}
+	xdf2->nreff = nreff;
+
+	ld__free(dis);
+
+	return 0;
+}
+
+
 int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
 		git_diff_callback *ecb) {
 	int i = 2;
