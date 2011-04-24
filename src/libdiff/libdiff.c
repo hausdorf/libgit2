@@ -965,13 +965,13 @@ int algo_environment(diff_environment *diff_env)
 	// TODO TODO TODO: Patience diff will require that we optimize
 	// these contexts for it. The following is the code for this
 	// optimization from xdl_prepare_env
-	//if (!(xpp->flags & XDF_PATIENCE_DIFF) &&
-	//		xdl_optimize_ctxs(&xe->xdf1, &xe->xdf2) < 0) {
+	if (!(diff_env->flags & XDF_PATIENCE_DIFF) &&
+			xdl_optimize_ctxs(&diff_env->data_ctx1, &diff_env->data_ctx2) < 0) {
 
-	//	xdl_free_ctx(&xe->xdf2);
-	//	xdl_free_ctx(&xe->xdf1);
-	//	return -1;
-	//}
+		free_ctx(&diff_env->data_ctx2);
+		free_ctx(&diff_env->data_ctx1);
+		return -1;
+	}
 
 	return 0;
 }
