@@ -14,6 +14,7 @@
 int git_diff_no_index(git_diffresults_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {
+	git_diffresults_conf conf;
 	diff_mem_data data1, data2;
 	gitfo_buf buffer1, buffer2;
 	int result;
@@ -33,14 +34,17 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 	if(result < GIT_SUCCESS)
 		goto cleanup;
 
+	// TODO TODO TODO: REMOVE THIS TEMPORARY TEST CODE, REPLACE
+	// WITH AWESOME GENERATOR FUNCTIONS
+	git_diffresults_conf res;
+	git_diffresults_conf *resu = &res;
+
 	/* Preform the diff, curently not implemented */
-	/*
 	data1.data = buffer1.data;
 	data1.size = buffer1.len;
 	data2.data = buffer2.data;
 	data2.size = buffer2.len;
-	diff(&data1, &data2, *results_conf);
-	*/
+	diff(&data1, &data2, &resu);
 
 cleanup:
 	if(buffer1.data)
