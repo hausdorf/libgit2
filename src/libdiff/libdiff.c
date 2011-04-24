@@ -39,6 +39,10 @@
 #define XDL_K_HEUR 4
 #define XDL_LINE_MAX (long)((1UL << (CHAR_BIT * sizeof(long) - 1)) - 1)
 
+#define XDL_KPDIS_RUN 4
+#define XDL_MAX_EQLIMIT 1024
+#define XDL_SIMSCAN_WINDOW 100
+
 #define XDL_EMIT_COMMON (1 << 1)
 #define XDL_EMIT_FUNCNAMES (1 << 0)
 
