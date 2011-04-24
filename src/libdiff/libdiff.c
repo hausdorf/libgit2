@@ -232,6 +232,18 @@ static int xdl_cleanup_records(data_context *xdf1, data_context *xdf2) {
 }
 
 
+static int xdl_optimize_ctxs(data_context *xdf1, data_context *xdf2) {
+
+	if (xdl_trim_ends(xdf1, xdf2) < 0 ||
+	    xdl_cleanup_records(xdf1, xdf2) < 0) {
+
+		return -1;
+	}
+
+	return 0;
+}
+
+
 int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
 		git_diff_callback *ecb) {
 	int i = 2;
