@@ -131,6 +131,35 @@ static int xdl_clean_mmatch(char const *dis, long i, long s, long e) {
 }
 
 
+/*
+ * Early trim initial and terminal matching records.
+ */
+static int xdl_trim_ends(data_context *xdf1, data_context *xdf2) {
+	long i, lim;
+	diff_record **recs1, **recs2;
+
+	recs1 = xdf1->recs;
+	recs2 = xdf2->recs;
+	for (i = 0, lim = XDL_MIN(xdf1->num_recs, xdf2->num_recs); i < lim;
+	     i++, recs1++, recs2++)
+		if ((*recs1)->hash != (*recs2)->hash)
+			break;
+
+	xdf1->dstart = xdf2->dstart = i;
+
+	recs1 = xdf1->recs + xdf1->num_recs - 1;
+	recs2 = xdf2->recs + xdf2->num_recs - 1;
+	for (lim -= i, i = 0; i < lim; i++, recs1--, recs2--)
+		if ((*recs1)->hash != (*recs2)->hash)
+			break;
+
+	xdf1->dend = xdf1->num_recs - i - 1;
+	xdf2->dend = xdf2->num_recs - i - 1;
+
+	return 0;
+}
+
+
 int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
 		git_diff_callback *ecb) {
 	int i = 2;
