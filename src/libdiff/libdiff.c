@@ -570,8 +570,11 @@ static int classify_record(record_classifier *classifier, diff_record **rhash,
 static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		diff_environment *diff_env)
 {
+	printf("\nPREPARE_DATA_CTX\n");
 	record_classifier *classifier = &diff_env->classifier;
 	long guessed_len = data_ctx->guessed_size;
+
+	printf("guessed_len %lu\n", guessed_len);
 
 	long i;
 	unsigned int hbits;
@@ -587,7 +590,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 
 	// Allocate memory for the array of records
 	if(memstore_init(&data_ctx->table_mem, sizeof(diff_record),
-			(guessed_len >> 2) + 1) < 0) {
+			(guessed_len / 4) + 1) < 0) {
 
 		return -1;
 	}
@@ -597,10 +600,21 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 		return -1;
 	}
 
+	int idx;
+	printf("RECS: ");
+	for (i = 0; i < guessed_len; i++)
+		//if(records[i] > 0)
+			printf("recs %u ", records[i]);
+	printf("\n");
+
 	// Find hashtable size -- the smallest power of 2 greater than guessed_len,
 	// the guessed number of records
 	hbits = hashbits((unsigned int) guessed_len);
 	table_size = 1 << hbits;
+
+	printf("hbits %lu\n", hbits);
+	printf("table_size %lu\n", table_size);
+
 	// Allocate memory required to store this table
 	if(!(records_hash = (diff_record **) ld__malloc(table_size *
 			sizeof(diff_record *)))) {
@@ -639,6 +653,8 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 			// A SEGFAULT. THIS NEEDS TO BE IMPLEMENTED.
 			hash_val = hash_record(&cur, top, 0 /**diff_env->flags*/);
 
+			printf("hash %lu ", hash_val);
+
 			// if number of records is greater than guessed length of records,
 			// realloc the amount of memory needed
 			if(num_recs >= guessed_len) {
@@ -667,6 +683,8 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 			curr_record->hash = hash_val;
 			records[num_recs++] = curr_record;
 
+			printf("RECORD: %lu %lu ", records[num_recs-1], records[num_recs]);
+
 			// FIXME: CLASSIFY RECORD AND THE LIKE DO NOT APPEAR TO DO ANYTHING
 			if (classify_record(classifier, records_hash, hbits,
 					curr_record) < 0) {
@@ -678,6 +696,8 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 			}
 		}
 	}
+
+	printf("\n");
 
 	// alloc space for weights array
 	if (!(weights = (char *) ld__malloc((num_recs + 2) * sizeof(char)))) {
@@ -731,7 +751,11 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 // TODO: COMPACT THIS METHOD -- WHAT CAN WE CUT OUT?
 static int init_record_classifier(record_classifier *classifier, long size)
 {
+	printf("INIT_CLASSIFIER\n");
 	long i;
+
+	printf("flags: %lu\n", classifier->flags);
+	printf("size: %lu\n", size);
 
 	/// TODO: FIND OUT WHY IT'S size/4+1
 	// Allocate memory for the hash table
@@ -743,6 +767,10 @@ static int init_record_classifier(record_classifier *classifier, long size)
 	// Build hashtable of classd_record pointers
 	classifier->hbits = hashbits((unsigned int) size);
 	classifier->table_size = 1 << classifier->hbits;
+
+	printf("classifier hbits %lu\n", classifier->hbits);
+	printf("classifier table_size %lu\n", classifier->table_size);
+
 	if(!(classifier->classd_hash = (classd_record **) ld__malloc(
 			classifier->table_size * sizeof(classd_record *)))) {
 		memstore_free(&classifier->table_mem);
@@ -755,6 +783,8 @@ static int init_record_classifier(record_classifier *classifier, long size)
 	}
 
 	classifier->count = 0;
+
+	printf("classifier count %lu\n", classifier->count);
 
 	return 0;
 }
@@ -946,6 +976,8 @@ int algo_environment(diff_environment *diff_env)
 	// the record_classifier
 	long total_size_guess = (data_ctx1->guessed_size = guess_lines(data1) + 1) +
 		(data_ctx2->guessed_size = guess_lines(data2) + 1) + 1;
+
+	printf("guesses: %lu %lu\n", data_ctx1->guessed_size, data_ctx2->guessed_size);
 
 	if(init_record_classifier(classifier, total_size_guess) < 0) {
 		return -1;
@@ -1244,6 +1276,7 @@ int recursive_compare(parsed_data *data1, long left1, long right1,
 // TODO: COMMENT THIS FUNCTION
 int prepare_and_myers(diff_environment *diff_env)
 {
+	printf("PREPARE_AND_MYERS\n");
 	long ndiags;    // Equivalent to Myers' "L" parameter; total
 	                // combined len of both things we're diffing
 
@@ -1308,6 +1341,7 @@ int prepare_and_myers(diff_environment *diff_env)
 int diff(diff_mem_data *data1, diff_mem_data *data2,
 		git_diffresults_conf const *results_conf)
 {
+	printf("DIFF\n");
 	diff_environment diff_env;
 	diff_env.data1 = data1;
 	diff_env.data2 = data2;
