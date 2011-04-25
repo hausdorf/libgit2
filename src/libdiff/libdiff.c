@@ -585,7 +585,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 	char *weights;
 	long *keys;
 
-	// Allocate memory for the hash table of records
+	// Allocate memory for the array of records
 	if(memstore_init(&data_ctx->table_mem, sizeof(diff_record),
 			(guessed_len >> 2) + 1) < 0) {
 
@@ -654,7 +654,7 @@ static int prepare_data_ctx(diff_mem_data *data, data_context *data_ctx,
 				records = reallocd_records;
 			}
 
-			// append a record to the hashtable
+			// append a record to the list
 			if(!(curr_record = memstore_alloc(&data_ctx->table_mem))) {
 
 				ld__free(records_hash);
