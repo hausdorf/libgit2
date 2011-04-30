@@ -22,12 +22,24 @@
  * the Free Software Foundation, 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+#include "include.h"
 #include "libdiff.h"
 
 
 
 int diff(struct diff_mem *diffme1, struct diff_mem *diffme2)
 {
+	struct diff_env env;
+
+	// Init diff's environment
+	if (init_diff_env(&env) < 0)
+		return -1;
+
+	env.diffme1 = diffme1;
+	env.diffme2 = diffme2;
+
+
+
 	return 0;
 }
 
