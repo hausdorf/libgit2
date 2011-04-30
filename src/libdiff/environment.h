@@ -13,4 +13,4 @@ int init_diff_env(struct diff_env *env);
 
 
 
-#endif /* INCLUDE_utils_h__ */
+#endif /* INCLUDE_environment_h__ */
