@@ -28,8 +28,58 @@
 
 
 
+int myers(struct diff_env *env)
+{
+	char *a = "this is a cow";
+	char *b = "this is not a cow";
+
+	int n = 13, m = 17, k, d;
+	int l = n+m;
+	int v[n+m+2];
+	char down;
+	int kprev, xstart, xmid, xend, ystart, ymid, yend;
+	int snake;
+
+	for (d = 0; d <= l; d++) {
+		for (k = -d; k <= d; k+= 2) {
+			down = (k == -d || (k != d && v[k-1] < v[k + 1]));
+
+			kprev = down ? k + 1 : k - 1;
+
+			xstart = v[kprev];
+			ystart = xstart - kprev;
+
+			xmid = down ? xstart : xstart + 1;
+			ymid = xmid - k;
+
+			xend = xmid;
+			yend = ymid;
+
+			snake = 0;
+			while (xend < n && yend < m && a[xend] == b[yend])
+				xend++; yend++; snake++;
+
+			v[k] = xend;
+
+			if (xend >= n && yend >= m) {
+				printf("Found solution\n\n");
+				goto solutionfound;
+			}
+		}
+	}
+
+solutionfound:
+
+	printf("Successfully exited loop\n");
+
+	return 0;
+}
+
+
 int prepare_and_myers(struct diff_env *env)
 {
+	myers(env);
+
 	return 0;
 }
 
