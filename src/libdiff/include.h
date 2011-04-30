@@ -8,6 +8,7 @@
 #define INCLUDE_include_h__
 
 #include "../common.h"
+#include "libdiff.h"
 
 
 
