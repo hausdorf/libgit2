@@ -26,10 +26,11 @@
 
 
 
-int init_diff_env(struct diff_env *env)
+int init_diff_env(struct diff_env *env, struct diff_mem *diffme1,
+		struct diff_mem *diffme2)
 {
-	// ZERO OUT ALL MEMORY
-	env->diffme1 = env->diffme2 = NULL;
+	env->diffme1 = diffme1;
+	env->diffme2 = diffme2;
 
 	return 0;
 }

@@ -9,7 +9,8 @@
 
 
 
-int init_diff_env(struct diff_env *env);
+int init_diff_env(struct diff_env *env, struct diff_mem *diffme1,
+		struct diff_mem *diffme2);
 
 
 
