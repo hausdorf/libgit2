@@ -28,16 +28,25 @@
 
 
 
+int prepare_and_myers(struct diff_env *env)
+{
+	return 0;
+}
+
+
 int diff(struct diff_mem *diffme1, struct diff_mem *diffme2)
 {
 	struct diff_env env;
 
-	// Init diff's environment
+	// Init environment, put files to diff inside
 	if (init_diff_env(&env) < 0)
 		return -1;
 
 	env.diffme1 = diffme1;
 	env.diffme2 = diffme2;
+
+	if (prepare_and_myers(&env) < 0)
+		return -1;
 
 	return 0;
 }
