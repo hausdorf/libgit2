@@ -1,17 +1,20 @@
 /*
- * include.h - Collection of miscellaneous types and things used
- * internally in libdiff: common header files, structures, and
- * so on.
+ * include.h - Collection of miscellaneous items (usually
+ * definitions) that we use a lot here in libdiff:
+ * #includes for common header files, declarations for
+ * common structs, and so on.
  */
 #ifndef INCLUDE_include_h__
 #define INCLUDE_include_h__
 
-#include "libdiff.h"
+#include "../common.h"
 
 
 
 struct diff_env {
+	struct diff_mem *diffme1, *diffme2;
 };
+
 
 
 #endif /* INCLUDE_include_h__ */

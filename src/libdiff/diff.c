@@ -24,6 +24,7 @@
  */
 #include "include.h"
 #include "libdiff.h"
+#include "environment.h"
 
 
 
@@ -37,8 +38,6 @@ int diff(struct diff_mem *diffme1, struct diff_mem *diffme2)
 
 	env.diffme1 = diffme1;
 	env.diffme2 = diffme2;
-
-
 
 	return 0;
 }
