@@ -14,8 +14,8 @@
 int git_diff_no_index(git_diffresults_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {
-	git_diffresults_conf conf;
-	diff_mem_data data1, data2;
+	//git_diffresults_conf conf;
+	struct diff_mem file1, file2;
 	gitfo_buf buffer1, buffer2;
 	int result;
 
@@ -36,15 +36,15 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 
 	// TODO TODO TODO: REMOVE THIS TEMPORARY TEST CODE, REPLACE
 	// WITH AWESOME GENERATOR FUNCTIONS
-	git_diffresults_conf res;
-	git_diffresults_conf *resu = &res;
+	//git_diffresults_conf res;
+	//git_diffresults_conf *resu = &res;
 
 	/* Preform the diff, curently not implemented */
-	data1.data = buffer1.data;
-	data1.size = buffer1.len;
-	data2.data = buffer2.data;
-	data2.size = buffer2.len;
-	diff(&data1, &data2, &resu);
+	file1.data = buffer1.data;
+	file1.size = buffer1.len;
+	file2.data = buffer2.data;
+	file2.size = buffer2.len;
+	diff(&file1, &file2);
 
 cleanup:
 	if(buffer1.data)
@@ -308,8 +308,10 @@ int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
 		else {
 			blob1 = git_tree_entry_id(entry1);
 			blob2 = git_tree_entry_id(entry1);
+			/*
 			if(git_oid_cmp(blob1, blob2))
 				diff(NULL, NULL, NULL);
+			*/
 		}
 	}
 
