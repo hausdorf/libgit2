@@ -30,23 +30,61 @@
 
 int myers(struct diff_env *env)
 {
-	char *a = "this is a cow";
-	char *b = "this is not a cow";
+	char *a = "abcabba";
+	char *b = "cbabac";
 
 	int n = 13, m = 17, k, d;
 	int l = n+m;
-	int v[n+m+2];
+	int v[n+m];
+	int v_arr[100];
 	char down;
 	int kprev, xstart, xmid, xend, ystart, ymid, yend;
 	int snake;
 
+	memset(v, 0, sizeof(int) * (n+m));
+	memset(v_arr, 0, sizeof(int) * 100);
+
+	/*
+	// list v_arr
+	// snakes
+	// point p
+
+	for (d = v_arr.count - 1; p.x > 0 || p.y > 0; d--) {
+		v = v_arr[d];
+		k = p.x - p.y;
+
+		// end point is in v
+		xend = v[k];
+		yend = x - k;
+
+		// down or right?
+		down = (k == -d || (k != d && v[k - 1] < v[k + 1]));
+
+		kprev = down ? k + 1 : k - 1;
+
+		// start point
+		xstart = v[kprev];
+		ystart = xstart - kprev;
+
+		// mid point
+		xmid = down ? xstart : xstart + 1;
+		ymid = xmid - k;
+
+		snakes.insert(0, new snake( start, mid, end points));
+
+		p.x = xstart;
+		p.y = ystart;
+	}
+	*/
+
 	for (d = 0; d <= l; d++) {
-		for (k = -d; k <= d; k+= 2) {
-			down = (k == -d || (k != d && v[k-1] < v[k + 1]));
+		for (k = -d; k <= d; k += 2) {
+			down = (k == -d || (k != d && v[k - 1] < v[k + 1]));
 
 			kprev = down ? k + 1 : k - 1;
 
 			xstart = v[kprev];
+			printf("%d %d ", v[kprev], kprev);
 			ystart = xstart - kprev;
 
 			xmid = down ? xstart : xstart + 1;
@@ -71,6 +109,9 @@ int myers(struct diff_env *env)
 solutionfound:
 
 	printf("Successfully exited loop\n");
+	int i;
+	for (i = 0; i < n+m+2; i++)
+		printf("%d ", v[i]);
 
 	return 0;
 }
