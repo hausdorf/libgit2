@@ -46,6 +46,7 @@ int myers(struct diff_env *env)
 	{
 		for (k = -d; k <= d; k += 2)
 		{
+			// Determine whether we're right or down in the edit graph
 			if (k == -d || (k != d && v[k - 1] < v[k + 1])) {
 				x = v[k + 1];
 			}
@@ -54,17 +55,21 @@ int myers(struct diff_env *env)
 			}
 			y = x - k;
 
+			// Make sure we're not stepping outside of the string bounds
 			if (x > m) { x = m; }
 			if (y > n) { y = n; }
 
+			// Skip over the diagonals, if any
 			while (x <= m && y <= n && s1[x] == s2[y]) {
 				x++; y++;
 			}
 
+			// Record current endpoint for current k line
 			v[k] = x;
 
+			// Greedily terminate if we've found a path that works
 			if (x >= m && y >= n) {
-				printf("RESULT: %d", d);
+				printf("RESULT: %d\n", d);
 				return 0;
 			}
 		}
