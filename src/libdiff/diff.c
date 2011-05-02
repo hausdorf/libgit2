@@ -36,10 +36,16 @@ int myers(struct diff_env *env)
 	int m = 7, n = 6;
 	int max = m + n;
 
-	int *mem = malloc(sizeof(int) * (max*2+1));
-	memset(mem, 0, sizeof(int) * (max*2+1));
-	int *v = mem+max;
+	int *v_mem = malloc(sizeof(int) * (max*2+1));
+	int *v = v_mem+max;
+
+	/*
+	int *d_path_mem = malloc(pow((sizeof(int) * (max*2+1)), 2));
+	memset(d_path_mem, 0, pow((sizeof(int) * (max*2+1)), 2));
+	*/
+
 	int x, y;
+	v[1] = 0;    // IMPORTANT
 
 	int d, k;
 	for (d = 0; d <= max; d++)
