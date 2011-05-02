@@ -30,88 +30,45 @@
 
 int myers(struct diff_env *env)
 {
-	char *a = "abcabba";
-	char *b = "cbabac";
+	char *s1 = "abcabba";
+	char *s2 = "cbabac";
 
-	int n = 13, m = 17, k, d;
-	int l = n+m;
-	int v[n+m];
-	int v_arr[100];
-	char down;
-	int kprev, xstart, xmid, xend, ystart, ymid, yend;
-	int snake;
+	int m = 7, n = 6;
+	int max = m + n;
 
-	memset(v, 0, sizeof(int) * (n+m));
-	memset(v_arr, 0, sizeof(int) * 100);
+	int *mem = malloc(sizeof(int) * (max*2+1));
+	memset(mem, 0, sizeof(int) * (max*2+1));
+	int *v = mem+max;
+	int x, y;
 
-	/*
-	// list v_arr
-	// snakes
-	// point p
+	int d, k;
+	for (d = 0; d <= max; d++)
+	{
+		for (k = -d; k <= d; k += 2)
+		{
+			if (k == -d || (k != d && v[k - 1] < v[k + 1])) {
+				x = v[k + 1];
+			}
+			else {
+				x = v[k - 1] + 1;
+			}
+			y = x - k;
 
-	for (d = v_arr.count - 1; p.x > 0 || p.y > 0; d--) {
-		v = v_arr[d];
-		k = p.x - p.y;
+			if (x > m) { x = m; }
+			if (y > n) { y = n; }
 
-		// end point is in v
-		xend = v[k];
-		yend = x - k;
+			while (x <= m && y <= n && s1[x] == s2[y]) {
+				x++; y++;
+			}
 
-		// down or right?
-		down = (k == -d || (k != d && v[k - 1] < v[k + 1]));
+			v[k] = x;
 
-		kprev = down ? k + 1 : k - 1;
-
-		// start point
-		xstart = v[kprev];
-		ystart = xstart - kprev;
-
-		// mid point
-		xmid = down ? xstart : xstart + 1;
-		ymid = xmid - k;
-
-		snakes.insert(0, new snake( start, mid, end points));
-
-		p.x = xstart;
-		p.y = ystart;
-	}
-	*/
-
-	for (d = 0; d <= l; d++) {
-		for (k = -d; k <= d; k += 2) {
-			down = (k == -d || (k != d && v[k - 1] < v[k + 1]));
-
-			kprev = down ? k + 1 : k - 1;
-
-			xstart = v[kprev];
-			printf("%d %d ", v[kprev], kprev);
-			ystart = xstart - kprev;
-
-			xmid = down ? xstart : xstart + 1;
-			ymid = xmid - k;
-
-			xend = xmid;
-			yend = ymid;
-
-			snake = 0;
-			while (xend < n && yend < m && a[xend] == b[yend])
-				xend++; yend++; snake++;
-
-			v[k] = xend;
-
-			if (xend >= n && yend >= m) {
-				printf("Found solution\n\n");
-				goto solutionfound;
+			if (x >= m && y >= n) {
+				printf("RESULT: %d", d);
+				return 0;
 			}
 		}
 	}
-
-solutionfound:
-
-	printf("Successfully exited loop\n");
-	int i;
-	for (i = 0; i < n+m+2; i++)
-		printf("%d ", v[i]);
 
 	return 0;
 }
