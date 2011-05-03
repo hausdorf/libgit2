@@ -31,6 +31,8 @@
 
 int myers(struct diff_env *env)
 {
+	// For the most part, we use the *exact same* variable names that
+	// Myers uses in his original paper.
 	char *s1 = "abcabba";
 	char *s2 = "cbabac";
 
@@ -43,17 +45,20 @@ int myers(struct diff_env *env)
 
 	int max = m + n;
 
+	// Set up Myers' "V" array
 	int v_size = (max*2+1);
 	int v_bytes = sizeof(int) * v_size;
 
 	int *v_mem = malloc(v_bytes);
 	int *v = v_mem+max;
 
+	// Alloc memory to save a copy of each version of Myers' "V" array
+	// (used for building the snake later)
 	int *v_set_mem = malloc(pow(v_bytes, 2));
 	int *v_set = v_set_mem;
 
 	int x, y;
-	v[1] = 0;    // IMPORTANT
+	v[1] = 0;  // IMPORTANT -- V's seed value
 
 	int d, k;
 	for (d = 0; d <= max; d++)
