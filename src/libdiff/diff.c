@@ -46,14 +46,15 @@ int myers(struct diff_env *env)
 	int max = m + n;
 
 	// Set up Myers' "V" array
-	int v_size = (max*2+1);
-	int v_bytes = sizeof(int) * v_size;
+	int v_size = (max*2+1);              // total elements in V
+	int v_bytes = sizeof(int) * v_size;  // size in bytes of V
 
 	int *v_mem = malloc(v_bytes);
 	int *v = v_mem+max;
 
-	// Alloc memory to save a copy of each version of Myers' "V" array
-	// (used for building the snake later)
+	// Alloc memory to save a copy of each version of Myers' "V" array;
+	// v_set goes in the middle of v_mem so that we can use negative
+	// indices exactly as the paper does
 	int *v_set_mem = malloc(pow(v_bytes, 2));
 	int *v_set = v_set_mem;
 
@@ -65,7 +66,7 @@ int myers(struct diff_env *env)
 	{
 		for (k = -d; k <= d; k += 2)
 		{
-			// Determine whether we're right or down in the edit graph
+			// Determine whether we're moving right or down in edit graph
 			if (k == -d || (k != d && v[k - 1] < v[k + 1])) {
 				x = v[k + 1];
 			}
