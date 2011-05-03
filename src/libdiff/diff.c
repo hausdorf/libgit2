@@ -45,16 +45,15 @@ int myers(struct diff_env *env)
 
 	int max = m + n;
 
-	// Set up Myers' "V" array
+	// Set up Myers' "V" array; v goes in the middle of v_mem so that
+	// we can use negative indices exactly as the paper does
 	int v_size = (max*2+1);              // total elements in V
 	int v_bytes = sizeof(int) * v_size;  // size in bytes of V
 
 	int *v_mem = malloc(v_bytes);
 	int *v = v_mem+max;
 
-	// Alloc memory to save a copy of each version of Myers' "V" array;
-	// v_hstry goes in the middle of v_mem so that we can use negative
-	// indices exactly as the paper does
+	// Alloc memory to save a copy of each version of Myers' "V" array
 	int *v_hstry_mem = malloc(pow(v_bytes, 2));
 	int *v_hstry = v_hstry_mem;
 
