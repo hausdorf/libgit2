@@ -53,10 +53,10 @@ int myers(struct diff_env *env)
 	int *v = v_mem+max;
 
 	// Alloc memory to save a copy of each version of Myers' "V" array;
-	// v_set goes in the middle of v_mem so that we can use negative
+	// v_hstry goes in the middle of v_mem so that we can use negative
 	// indices exactly as the paper does
-	int *v_set_mem = malloc(pow(v_bytes, 2));
-	int *v_set = v_set_mem;
+	int *v_hstry_mem = malloc(pow(v_bytes, 2));
+	int *v_hstry = v_hstry_mem;
 
 	int x, y;
 	v[1] = 0;  // IMPORTANT -- V's seed value
@@ -86,6 +86,9 @@ int myers(struct diff_env *env)
 
 			// Record current endpoint for current k line
 			v[k] = x;
+
+			memcpy(v_mem, v_hstry, v_size);
+			v_hstry += v_size;
 
 			// Greedily terminate if we've found a path that works
 			if (x >= m && y >= n) {
