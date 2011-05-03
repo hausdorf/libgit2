@@ -22,6 +22,7 @@
  * the Free Software Foundation, 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+#include <math.h>
 #include "include.h"
 #include "libdiff.h"
 #include "environment.h"
@@ -34,15 +35,22 @@ int myers(struct diff_env *env)
 	char *s2 = "cbabac";
 
 	int m = 7, n = 6;
+	/*
+	char *s1 = "cow";
+	char *s2 = "c";
+	int m = 3, n = 1;
+	*/
+
 	int max = m + n;
 
-	int *v_mem = malloc(sizeof(int) * (max*2+1));
+	int v_size = (max*2+1);
+	int v_bytes = sizeof(int) * v_size;
+
+	int *v_mem = malloc(v_bytes);
 	int *v = v_mem+max;
 
-	/*
-	int *d_path_mem = malloc(pow((sizeof(int) * (max*2+1)), 2));
-	memset(d_path_mem, 0, pow((sizeof(int) * (max*2+1)), 2));
-	*/
+	int *v_set_mem = malloc(pow(v_bytes, 2));
+	int *v_set = v_set_mem;
 
 	int x, y;
 	v[1] = 0;    // IMPORTANT
@@ -78,6 +86,7 @@ int myers(struct diff_env *env)
 				printf("RESULT: %d\n", d);
 				return 0;
 			}
+
 		}
 	}
 
