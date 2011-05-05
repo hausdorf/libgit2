@@ -29,18 +29,98 @@
 
 
 
+void find_snake(int *v, int v_size, char *s1, char *s2, int d, int m, int n, int k)
+{
+	// set x and y to be the last respective characters of s1 and s2
+	int x = v[k];
+	int y = x - k;
+	x -= 2; y -= 2;
+
+	// myers() terminates greedily when we find the first path from (0,0) to (N,M),
+	// so k, x, and y, may have been in the middle of myers() inner loop when this
+	// func was called. We need to normalize them:
+	while (x >= 0 && y >= 0 && s1[x] == s2[y]) {
+
+		printf("DIAGONAL %c %c\n", s1[x], s2[y]);
+		x--;
+		y--;
+	}
+
+	if (x < 0 && y < 0) {
+
+		printf("RETURNING\n");
+		return;
+	}
+
+	if (k == -d || (k != d && v[k-1] < v[k+1])) {
+
+		printf("INSERTION\t%c %c\t%c %c\n", s1[x], s2[y], s1[x], s2[y-1]);
+		k++;
+		y--;
+		d--;
+	}
+	else {
+
+		printf("DELETION\t%c %c\t%c %c\n", s1[x], s2[y], s1[x-1], s2[y]);
+		k--;
+		x--;
+		d--;
+	}
+
+	if (x < 0 && y < 0) { printf("RETURNING FIRST\n"); return; }
+
+	v -= v_size;
+
+	for (; d >= 0; d--, v -= v_size) {
+
+		while (x >= 0 && y >= 0 && s1[x] == s2[y] ) {
+
+			printf("dIAGONAL %c %c %c %c\n", s1[x], s2[y], s1[x-1], s2[y-1]);
+			x--;
+			y--;
+		}
+
+		if (x < 0 && y < 0) {
+
+			printf("RETURNING\n");
+			return;
+		}
+
+		if (k == -d || (k != d && v[k-1] < v[k+1])) {
+
+			printf("iNSERTION\t%c %c\t%c %c\n", s1[x], s2[y], s1[x], s2[y-1]);
+			k++;
+			y--;
+		}
+		else {
+
+			printf("dELETION\t%c %c\t%c %c\n", s1[x], s2[y], s1[x-1], s2[y]);
+			k--;
+			x--;
+		}
+	}
+	printf("ERROR\n");
+}
+
+
 int myers(struct diff_env *env)
 {
 	// For the most part, we use the *exact same* variable names that
 	// Myers uses in his original paper.
+	/*
 	char *s1 = "abcabba";
 	char *s2 = "cbabac";
-
 	int m = 7, n = 6;
+	*/
+
+	char *s1 = "cowby";
+	char *s2 = "cwboy";
+	int m = 5, n = 5;
+
 	/*
 	char *s1 = "cow";
-	char *s2 = "c";
-	int m = 3, n = 1;
+	char *s2 = "cow";
+	int m = 3, n = 3;
 	*/
 
 	int max = m + n;
@@ -86,12 +166,14 @@ int myers(struct diff_env *env)
 			// Record current endpoint for current k line
 			v[k] = x;
 
-			memcpy(v_mem, v_hstry, v_size);
+			memcpy(v_hstry, v_mem, v_bytes);
+
 			v_hstry += v_size;
 
 			// Greedily terminate if we've found a path that works
 			if (x >= m && y >= n) {
 				printf("RESULT: %d\n", d);
+				find_snake(v_hstry - v_size + max, v_size, s1, s2, d, m, n, k);
 				return 0;
 			}
 
