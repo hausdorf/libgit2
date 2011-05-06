@@ -29,8 +29,20 @@
 
 
 
-void find_snake(int *v, int v_size, char *s1, char *s2, int d, int m, int n, int k)
+int process_rcrds(env)
 {
+	int guess1 = guess_lines(env->diffme1);
+	int guess2 = guess_lines(env->diffme1);
+	return 0;
+}
+
+
+void build_script(int *v, int v_size, char *s1, char *s2, int d, int m, int n, int k)
+{
+	// TODO TODO TODO: See if we can consolidate the normalization to be with the
+	// regular loop??
+
+
 	// set x and y to be the last respective characters of s1 and s2
 	int x = v[k];
 	int y = x - k;
@@ -185,7 +197,7 @@ int myers(struct diff_env *env)
 			// Greedily terminate if we've found a path that works
 			if (x >= m && y >= n) {
 				printf("RESULT: %d\n", d);
-				find_snake(v_hstry - v_size + max, v_size, s1, s2, d, m, n, k);
+				build_script(v_hstry - v_size + max, v_size, s1, s2, d, m, n, k);
 				return 0;
 			}
 
@@ -198,6 +210,7 @@ int myers(struct diff_env *env)
 
 int prepare_and_myers(struct diff_env *env)
 {
+	process_rcrds(env);
 	myers(env);
 
 	return 0;
