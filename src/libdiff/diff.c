@@ -29,7 +29,13 @@
 
 
 
-int process_rcrds(env)
+int guess_lines(struct diff_mem *content)
+{
+	return 0;
+}
+
+
+int process_rcrds(struct diff_env *env)
 {
 	int guess1 = guess_lines(env->diffme1);
 	int guess2 = guess_lines(env->diffme1);
