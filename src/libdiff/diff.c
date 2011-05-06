@@ -46,12 +46,15 @@ void find_snake(int *v, int v_size, char *s1, char *s2, int d, int m, int n, int
 		y--;
 	}
 
+	// Return if documents are the same
+	// TODO: we probably should not even call this function, in this case
 	if (x < 0 && y < 0) {
 
 		printf("RETURNING\n");
 		return;
 	}
 
+	// Continue "normalization"
 	if (k == -d || (k != d && v[k-1] < v[k+1])) {
 
 		printf("INSERTION\t%c %c\t%c %c\n", s1[x], s2[y], s1[x], s2[y-1]);
@@ -67,10 +70,13 @@ void find_snake(int *v, int v_size, char *s1, char *s2, int d, int m, int n, int
 		d--;
 	}
 
+	// Return if there is one difference
 	if (x < 0 && y < 0) { printf("RETURNING FIRST\n"); return; }
 
+	// Move to previous version of V
 	v -= v_size;
 
+	// Do the above once for every version of V in v_hstry
 	for (; d >= 0; d--, v -= v_size) {
 
 		while (x >= 0 && y >= 0 && s1[x] == s2[y] ) {
@@ -113,15 +119,21 @@ int myers(struct diff_env *env)
 	int m = 7, n = 6;
 	*/
 
+	/*
 	char *s1 = "cowby";
 	char *s2 = "cwboy";
 	int m = 5, n = 5;
+	*/
 
 	/*
 	char *s1 = "cow";
 	char *s2 = "cow";
 	int m = 3, n = 3;
 	*/
+
+	char *s1 = "cow";
+	char *s2 = "ow";
+	int m = 3, n = 2;
 
 	int max = m + n;
 
