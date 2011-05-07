@@ -55,20 +55,20 @@ unsigned long hash_rcrd(struct record *rcrd, const char *source)
 }
 
 
-struct record * make_rcrds(struct diff_mem *mem, size_t *num_recs_guess)
+int make_rcrds(struct record **rtrn_val, struct diff_mem *mem, size_t *num_rcrds_guess)
 {
 	int i, tmp;
 	size_t num_rcrds = 0;
 	const int data_size = mem->size;
 	const char *data = mem->data;
-	size_t guess = *num_recs_guess;
+	size_t guess = *num_rcrds_guess;
 
 	// allocate space for the record list
 	struct record *rcrds;
 	if (!(rcrds = ld__malloc(sizeof(struct record) * guess))) {
 
 		// TODO: PUT FREE() HERE
-		return NULL;
+		return -1;
 	}
 	memset(rcrds, 0, sizeof(struct record) * guess);
 	struct record *curr_rcrd = rcrds;
@@ -87,16 +87,18 @@ struct record * make_rcrds(struct diff_mem *mem, size_t *num_recs_guess)
 		curr_rcrd++;
 		// realloc if number of records is bigger than guess
 		if (++num_rcrds >= guess) {
-			guess = *num_recs_guess = guess * 2;
+			guess = *num_rcrds_guess = guess * 2;
 			if (!(rcrds = ld__realloc(rcrds, sizeof(struct record) * guess))) {
 
 				// TODO: ADD FREE() HERE
-				return NULL;
+				return -1;
 			}
 		}
 	}
 
-	return rcrds;
+	*rtrn_val = rcrds;
+
+	return num_rcrds;
 }
 
 
@@ -138,16 +140,17 @@ long guess_num_rcrds(struct diff_mem *content)
 
 int prepare_data(struct diff_env *env)
 {
-	size_t guess1, guess2;
-
 	// Guess # of records in data; we malloc the space needed to build list of
 	// records and record hashes
-	guess1 = guess_num_rcrds(env->diffme1);
-	guess2 = guess_num_rcrds(env->diffme1);
+	env->rcrds_guess1 = guess_num_rcrds(env->diffme1);
+	env->rcrds_guess2 = guess_num_rcrds(env->diffme1);
 
 	// TODO: IMPLEMENT CHECKS FOR NULL POINTERS HERE
-	env->rcrds1 = make_rcrds(env->diffme1, &guess1);
-	env->rcrds2 = make_rcrds(env->diffme2, &guess2);
+	env->num_rcrds1 = make_rcrds(&env->rcrds1, env->diffme1, &env->rcrds_guess1);
+	// TODO TODO TODO: YOU ARE HERE, IMPLEMENTING CHECKS FOR THESE
+	// FUNCTION CALLS. YOU ALSO NEED TO MAKE PRINT LOOPS THAT VERIFY THAT WHAT
+	// WE'RE PUTTING IN IS WHAT WE'RE GETTING OUT.
+	env->num_rcrds2 = make_rcrds(&env->rcrds2, env->diffme2, &env->rcrds_guess2);
 
 	return 0;
 }
