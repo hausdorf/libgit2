@@ -38,17 +38,17 @@ struct record * make_rcrds(struct diff_mem *mem)
 	int i, tmp, num_rcrds;
 	const int size = mem->size;
 	const char *data = mem->data;
-	int guess = mem->num_recs_guess;
+	const int guess = mem->num_recs_guess;
 
 	// allocate space for the record list
 
-	for (;;) {
+	for (; i <= size;) {
 		tmp = i;
 		// find next newline
 		for (; i <= size, data[++i] != '\n';)
 			;
 		// create and hash this record
-		struct record
+		struct record;
 		//hash_rcrd();
 		if (++num_rcrds >= guess)
 			; // realloc
