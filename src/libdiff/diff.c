@@ -89,7 +89,11 @@ struct record * make_rcrds(struct diff_mem *mem)
 		// realloc if number of records is bigger than guess
 		if (++num_rcrds >= guess) {
 			guess = mem->num_recs_guess = guess * 2;
-			ld__realloc(rcrds, sizeof(struct record) * guess);
+			if (!(rcrds = ld__realloc(rcrds, sizeof(struct record) * guess))) {
+
+				// TODO: ADD FREE() HERE
+				return NULL;
+			}
 		}
 	}
 
