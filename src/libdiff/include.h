@@ -13,6 +13,7 @@
 
 
 struct record {
+	struct diff_mem *source;
 	unsigned long start;
 	unsigned long end;
 	unsigned long hash;
@@ -21,7 +22,7 @@ struct record {
 
 struct diff_env {
 	struct diff_mem *diffme1, *diffme2;
-	struct *rcrds1, *rcrds2;
+	struct record *rcrds1, *rcrds2;
 };
 
 
