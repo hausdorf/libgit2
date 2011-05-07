@@ -51,6 +51,7 @@ struct record * make_rcrds(struct diff_mem *mem)
 	memset(rcrds, 0, sizeof(struct record) * guess);
 	struct record *curr_rcrd = rcrds;
 
+	// beginning to end of given data
 	for (i = 0; i <= data_size;) {
 		tmp = i;
 		// find next newline
@@ -62,6 +63,7 @@ struct record * make_rcrds(struct diff_mem *mem)
 		hash_rcrd(curr_rcrd, data);
 
 		curr_rcrd++;
+		// realloc if number of records is bigger than guess
 		if (++num_rcrds >= guess)
 			; // realloc
 
