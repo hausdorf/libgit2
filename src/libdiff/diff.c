@@ -48,7 +48,7 @@ unsigned long hash_rcrd(struct record *rcrd, const char *source)
 		hash += (hash << 5);
 		hash ^= (unsigned long) source[i];
 	}
-	// Clever!
+	// Clever! TODO: find out if this is the better way?
 	//*data = ptr < top ? ptr + 1: ptr;
 
 	return hash;
@@ -64,6 +64,7 @@ struct record * make_rcrds(struct diff_mem *mem)
 	int guess = mem->num_recs_guess;
 
 	// allocate space for the record list
+	// TODO: BUILD CHECK INTO THIS.
 	struct record *rcrds = ld__malloc(sizeof(struct record) * guess);
 	memset(rcrds, 0, sizeof(struct record) * guess);
 	struct record *curr_rcrd = rcrds;
@@ -85,10 +86,9 @@ struct record * make_rcrds(struct diff_mem *mem)
 			guess = mem->num_recs_guess = guess * 2;
 			ld__realloc(rcrds, sizeof(struct record) * guess);
 		}
-
 	}
 
-	return NULL;
+	return rcrds;
 }
 
 
@@ -134,10 +134,11 @@ int prepare_data(struct diff_env *env)
 
 	// Guess # of records in data; we malloc the space needed to build list of
 	// records and record hashes
-	diffme1->num_recs_guess = guess_num_rcrds(env->diffme1);
-	diffme2->num_recs_guess = guess_num_rcrds(env->diffme1);
+	diffme1->num_recs_guess = guess_num_rcrds(diffme1);
+	diffme2->num_recs_guess = guess_num_rcrds(diffme1);
 
-	make_rcrds(env->diffme1);
+	env->rcrds1 = make_rcrds(diffme1);
+	env->rcrds2 = make_rcrds(diffme2);
 
 	return 0;
 }
