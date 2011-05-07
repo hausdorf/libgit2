@@ -19,7 +19,6 @@
 
 
 struct record {
-	struct diff_mem *source;
 	unsigned long start;
 	unsigned long end;
 	unsigned long hash;
