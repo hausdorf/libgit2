@@ -12,6 +12,12 @@
 
 
 
+#define ld__malloc(x) malloc(x)
+#define ld__realloc(x) realloc(x)
+#define ld__free(x) free(x)
+
+
+
 struct record {
 	struct diff_mem *source;
 	unsigned long start;

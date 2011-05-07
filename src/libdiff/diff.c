@@ -225,11 +225,11 @@ int myers(struct diff_env *env)
 	int v_size = (max*2+1);              // total elements in V
 	int v_bytes = sizeof(int) * v_size;  // size in bytes of V
 
-	int *v_mem = malloc(v_bytes);
+	int *v_mem = ld__malloc(v_bytes);
 	int *v = v_mem+max;
 
 	// Alloc memory to save a copy of each version of Myers' "V" array
-	int *v_hstry_mem = malloc(pow(v_bytes, 2));
+	int *v_hstry_mem = ld__malloc(pow(v_bytes, 2));
 	int *v_hstry = v_hstry_mem;
 
 	int x, y;
