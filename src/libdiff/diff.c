@@ -33,12 +33,14 @@
 
 
 
-void data_to_rcrds(struct diff_mem *mem)
+struct record * make_rcrds(struct diff_mem *mem)
 {
 	int i, tmp, num_rcrds;
 	const int size = mem->size;
 	const char *data = mem->data;
 	int guess = mem->num_recs_guess;
+
+	// allocate space for the record list
 
 	for (;;) {
 		tmp = i;
@@ -46,6 +48,7 @@ void data_to_rcrds(struct diff_mem *mem)
 		for (; i <= size, data[++i] != '\n';)
 			;
 		// create and hash this record
+		struct record
 		//hash_rcrd();
 		if (++num_rcrds >= guess)
 			; // realloc
@@ -54,7 +57,7 @@ void data_to_rcrds(struct diff_mem *mem)
 }
 
 
-long guess_lines(struct diff_mem *content)
+long guess_num_rcrds(struct diff_mem *content)
 {
 	// TODO TODO TODO: This function is pretty much from libxdiff, and just
 	// counts the new lines, more or less. Can we do better? I think so.
@@ -92,10 +95,14 @@ long guess_lines(struct diff_mem *content)
 
 int prepare_data(struct diff_env *env)
 {
-	const long guess1 = env->diffme1->num_recs_guess = guess_lines(env->diffme1);
-	const long guess2 = guess_lines(env->diffme1);
+	struct diff_mem *diffme1 = env->diffme1, *diffme2 = env->diffme2;
 
-	data_to_rcrds(env->diffme1);
+	// Guess # of records in data; we malloc the space needed to build list of
+	// records and record hashes
+	diffme1->num_recs_guess = guess_num_rcrds(env->diffme1);
+	diffme2->num_recs_guess = guess_num_rcrds(env->diffme1);
+
+	make_rcrds(env->diffme1);
 
 	return 0;
 }
