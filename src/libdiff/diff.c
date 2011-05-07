@@ -55,16 +55,15 @@ unsigned long hash_rcrd(struct record *rcrd, const char *source)
 }
 
 
-struct record * make_rcrds(struct diff_mem *mem)
+struct record * make_rcrds(struct diff_mem *mem, size_t *num_recs_guess)
 {
 	int i, tmp;
-	int num_rcrds = 0;
+	size_t num_rcrds = 0;
 	const int data_size = mem->size;
 	const char *data = mem->data;
-	int guess = mem->num_recs_guess;
+	size_t guess = *num_recs_guess;
 
 	// allocate space for the record list
-	// TODO: BUILD CHECK INTO THIS.
 	struct record *rcrds;
 	if (!(rcrds = ld__malloc(sizeof(struct record) * guess))) {
 
@@ -88,7 +87,7 @@ struct record * make_rcrds(struct diff_mem *mem)
 		curr_rcrd++;
 		// realloc if number of records is bigger than guess
 		if (++num_rcrds >= guess) {
-			guess = mem->num_recs_guess = guess * 2;
+			guess = *num_recs_guess = guess * 2;
 			if (!(rcrds = ld__realloc(rcrds, sizeof(struct record) * guess))) {
 
 				// TODO: ADD FREE() HERE
@@ -139,15 +138,16 @@ long guess_num_rcrds(struct diff_mem *content)
 
 int prepare_data(struct diff_env *env)
 {
-	struct diff_mem *diffme1 = env->diffme1, *diffme2 = env->diffme2;
+	size_t guess1, guess2;
 
 	// Guess # of records in data; we malloc the space needed to build list of
 	// records and record hashes
-	diffme1->num_recs_guess = guess_num_rcrds(diffme1);
-	diffme2->num_recs_guess = guess_num_rcrds(diffme1);
+	guess1 = guess_num_rcrds(env->diffme1);
+	guess2 = guess_num_rcrds(env->diffme1);
 
-	env->rcrds1 = make_rcrds(diffme1);
-	env->rcrds2 = make_rcrds(diffme2);
+	// TODO: IMPLEMENT CHECKS FOR NULL POINTERS HERE
+	env->rcrds1 = make_rcrds(env->diffme1, &guess1);
+	env->rcrds2 = make_rcrds(env->diffme2, &guess2);
 
 	return 0;
 }
@@ -274,7 +274,7 @@ int myers(struct diff_env *env)
 	if (!(v_mem = ld__malloc(v_bytes))) {
 
 		// TODO: PUT FREE() HERE
-		return NULL;
+		return -1;
 	}
 	int *v = v_mem+max;
 
@@ -283,7 +283,7 @@ int myers(struct diff_env *env)
 	if (!(v_hstry_mem = ld__malloc(pow(v_bytes, 2)))) {
 
 		// TODO: PUT FREE() HERE
-		return NULL;
+		return -1;
 	}
 	int *v_hstry = v_hstry_mem;
 

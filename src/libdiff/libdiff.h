@@ -14,7 +14,6 @@
 struct diff_mem {
 	char *data;
 	size_t size;
-	size_t num_recs_guess;
 };
 
 
