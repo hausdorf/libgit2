@@ -33,7 +33,7 @@
 
 
 
-long hash_rcrd(struct record *rcrd, char *source)
+long hash_rcrd(struct record *rcrd, const char *source)
 {
 	return 0;
 }
@@ -41,10 +41,11 @@ long hash_rcrd(struct record *rcrd, char *source)
 
 struct record * make_rcrds(struct diff_mem *mem)
 {
-	int i, tmp, num_rcrds;
+	int i, tmp;
+	int num_rcrds = 0;
 	const int data_size = mem->size;
 	const char *data = mem->data;
-	const int guess = mem->num_recs_guess;
+	int guess = mem->num_recs_guess;
 
 	// allocate space for the record list
 	struct record *rcrds = ld__malloc(sizeof(struct record) * guess);
@@ -64,8 +65,10 @@ struct record * make_rcrds(struct diff_mem *mem)
 
 		curr_rcrd++;
 		// realloc if number of records is bigger than guess
-		if (++num_rcrds >= guess)
-			; // realloc
+		if (++num_rcrds >= guess) {
+			guess = mem->num_recs_guess = guess * 2;
+			ld__realloc(rcrds, sizeof(struct record) * guess);
+		}
 
 	}
 

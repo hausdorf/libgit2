@@ -13,7 +13,7 @@
 
 
 #define ld__malloc(x) malloc(x)
-#define ld__realloc(x) realloc(x)
+#define ld__realloc(ptr, x) realloc(ptr, x)
 #define ld__free(x) free(x)
 
 
