@@ -33,9 +33,25 @@
 
 
 
-long hash_rcrd(struct record *rcrd, const char *source)
+unsigned long hash_rcrd(struct record *rcrd, const char *source)
 {
-	return 0;
+	unsigned long hash = 5381;
+	size_t i = rcrd->start;
+
+	// TODO: IMPLEMENT THIS
+	/*
+	if (flags & XDF_WHITESPACE_FLAGS)
+		return xdl_hash_record_with_whitespace(data, top, flags);
+	*/
+
+	for (; i < rcrd->end && source[i] != '\n'; i++) {
+		hash += (hash << 5);
+		hash ^= (unsigned long) source[i];
+	}
+	// Clever!
+	//*data = ptr < top ? ptr + 1: ptr;
+
+	return hash;
 }
 
 
@@ -56,12 +72,12 @@ struct record * make_rcrds(struct diff_mem *mem)
 	for (i = 0; i <= data_size;) {
 		tmp = i;
 		// find next newline
-		for (; i <= data_size && data[++i] != '\n';)
+		for (; i <= data_size && data[i++] != '\n';)
 			;
-		// create and hash this record
+		// create record and record hash
 		curr_rcrd->start = tmp;
 		curr_rcrd->end = i;
-		hash_rcrd(curr_rcrd, data);
+		curr_rcrd->hash = hash_rcrd(curr_rcrd, data);
 
 		curr_rcrd++;
 		// realloc if number of records is bigger than guess
