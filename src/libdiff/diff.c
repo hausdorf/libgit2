@@ -29,16 +29,50 @@
 
 
 
-int guess_lines(struct diff_mem *content)
+#define GUESS_NEWLINES 256
+
+
+
+long guess_lines(struct diff_mem *content)
 {
-	return 0;
+	// TODO TODO TODO: This function is pretty much from libxdiff, and just
+	// counts the new lines, more or less. Can we do better? I think so.
+
+	long nwlines = 0, size, tmpsz = 0;
+	char const *data, *curr, *end;
+
+	if ((curr = data = content->data) != NULL) {
+		size = content->size;
+
+		// Increment newlines for every '\n' we find; break
+		// when curr passes end
+		for (end = data + size; nwlines < GUESS_NEWLINES;) {
+			if (curr >= end) {
+				tmpsz += (long) (curr - data);
+				curr = data = NULL;
+				break;
+			}
+			nwlines++;
+
+			if (!(curr = memchr(curr, '\n', end - curr)))
+				curr = end;
+			else
+				curr++;
+		}
+		tmpsz += (long) (curr - data);
+	}
+
+	if(nwlines && tmpsz)
+		nwlines = content->size / (tmpsz / nwlines);
+
+	return nwlines + 1;
 }
 
 
 int process_rcrds(struct diff_env *env)
 {
-	int guess1 = guess_lines(env->diffme1);
-	int guess2 = guess_lines(env->diffme1);
+	long guess1 = guess_lines(env->diffme1);
+	long guess2 = guess_lines(env->diffme1);
 	return 0;
 }
 
