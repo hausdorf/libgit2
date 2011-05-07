@@ -33,6 +33,12 @@
 
 
 
+long hash_rcrd(struct record *rcrd, char *source)
+{
+	return 0;
+}
+
+
 struct record * make_rcrds(struct diff_mem *mem)
 {
 	int i, tmp, num_rcrds;
@@ -53,7 +59,8 @@ struct record * make_rcrds(struct diff_mem *mem)
 		// create and hash this record
 		curr_rcrd->start = tmp;
 		curr_rcrd->end = i;
-		//hash_rcrd();
+		hash_rcrd(curr_rcrd, data);
+
 		curr_rcrd++;
 		if (++num_rcrds >= guess)
 			; // realloc
