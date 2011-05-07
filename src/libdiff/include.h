@@ -28,6 +28,8 @@ struct record {
 struct diff_env {
 	struct diff_mem *diffme1, *diffme2;
 	struct record *rcrds1, *rcrds2;
+	size_t num_rcrds1, num_rcrds2;
+	size_t rcrds_guess1, rcrds_guess2;
 };
 
 
