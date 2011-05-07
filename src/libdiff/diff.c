@@ -69,7 +69,7 @@ long guess_lines(struct diff_mem *content)
 }
 
 
-int process_rcrds(struct diff_env *env)
+int prepare_data(struct diff_env *env)
 {
 	long guess1 = guess_lines(env->diffme1);
 	long guess2 = guess_lines(env->diffme1);
@@ -250,7 +250,7 @@ int myers(struct diff_env *env)
 
 int prepare_and_myers(struct diff_env *env)
 {
-	process_rcrds(env);
+	prepare_data(env);
 	myers(env);
 
 	return 0;
