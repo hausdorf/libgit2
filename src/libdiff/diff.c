@@ -33,6 +33,27 @@
 
 
 
+void data_to_rcrds(struct diff_mem *mem)
+{
+	int i, tmp, num_rcrds;
+	const int size = mem->size;
+	const char *data = mem->data;
+	int guess = mem->num_recs_guess;
+
+	for (;;) {
+		tmp = i;
+		// find next newline
+		for (; i <= size, data[++i] != '\n';)
+			;
+		// create and hash this record
+		//hash_rcrd();
+		if (++num_rcrds >= guess)
+			; // realloc
+
+	}
+}
+
+
 long guess_lines(struct diff_mem *content)
 {
 	// TODO TODO TODO: This function is pretty much from libxdiff, and just
@@ -71,8 +92,11 @@ long guess_lines(struct diff_mem *content)
 
 int prepare_data(struct diff_env *env)
 {
-	long guess1 = guess_lines(env->diffme1);
-	long guess2 = guess_lines(env->diffme1);
+	const long guess1 = env->diffme1->num_recs_guess = guess_lines(env->diffme1);
+	const long guess2 = guess_lines(env->diffme1);
+
+	data_to_rcrds(env->diffme1);
+
 	return 0;
 }
 
