@@ -41,6 +41,9 @@ struct record * make_rcrds(struct diff_mem *mem)
 	const int guess = mem->num_recs_guess;
 
 	// allocate space for the record list
+	struct record *rcrds = ld__malloc(sizeof(struct record) * guess);
+	memset(rcrds, 0, sizeof(struct record) * guess);
+	struct record *curr_rcrd = rcrds;
 
 	for (i = 0; i <= data_size;) {
 		tmp = i;
@@ -48,8 +51,10 @@ struct record * make_rcrds(struct diff_mem *mem)
 		for (; i <= data_size && data[++i] != '\n';)
 			;
 		// create and hash this record
-		struct record;
+		curr_rcrd->start = tmp;
+		curr_rcrd->end = i;
 		//hash_rcrd();
+		curr_rcrd++;
 		if (++num_rcrds >= guess)
 			; // realloc
 
