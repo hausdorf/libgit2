@@ -152,12 +152,41 @@ int prepare_data(struct diff_env *env)
 	// WE'RE PUTTING IN IS WHAT WE'RE GETTING OUT.
 	env->num_rcrds2 = make_rcrds(&env->rcrds2, env->diffme2, &env->rcrds_guess2);
 
+	// TODO: REMOVE. For debugging, verifies that the recorsd are copied
+	/*
+	size_t i;
+	for (i = 0; i < env->rcrds_guess1; i++) {
+		printf("%lu\t%lu\t%lu\n", env->rcrds1[i].start, env->rcrds1[i].end, env->rcrds1[i].hash);
+	}
+
+	printf("\n");
+
+	for (i = 0; i < env->rcrds_guess2; i++) {
+		printf("%lu\t%lu\t%lu\n", env->rcrds2[i].start, env->rcrds2[i].end, env->rcrds2[i].hash);
+	}
+	*/
+
 	return 0;
 }
 
 
-void build_script(int *v, int v_size, char *s1, char *s2, int d, int m, int n, int k)
+void p(struct record *r, struct diff_mem *d)
 {
+	char *data = d->data;
+	unsigned long i;
+	for (i = r->start; i < r->end; i++) {
+		printf("%c", data[i]);
+	}
+}
+
+
+void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n, int k)
+{
+	struct record *rcrds1 = env->rcrds1;
+	struct record *rcrds2 = env->rcrds2;
+	struct diff_mem *diffme1 = env->diffme1;
+	struct diff_mem *diffme2 = env->diffme2;
+
 	// TODO TODO TODO: See if we can consolidate the normalization to be with the
 	// regular loop??
 
@@ -170,9 +199,13 @@ void build_script(int *v, int v_size, char *s1, char *s2, int d, int m, int n, i
 	// myers() terminates greedily when we find the first path from (0,0) to (N,M),
 	// so k, x, and y, may have been in the middle of myers() inner loop when this
 	// func was called. We need to normalize them:
-	while (x >= 0 && y >= 0 && s1[x] == s2[y]) {
+	while (x >= 0 && y >= 0 && rcrds1[x].hash == rcrds2[y].hash) {
 
-		printf("DIAGONAL %c %c\n", s1[x], s2[y]);
+		printf("DIAGONAL\n");
+		p(&rcrds1[x], diffme1);
+		p(&rcrds2[y], diffme2);
+		p(&rcrds1[x-1], diffme1);
+		p(&rcrds2[y-1], diffme2);
 		x--;
 		y--;
 	}
@@ -188,14 +221,20 @@ void build_script(int *v, int v_size, char *s1, char *s2, int d, int m, int n, i
 	// Continue "normalization"
 	if (k == -d || (k != d && v[k-1] < v[k+1])) {
 
-		printf("INSERTION\t%c %c\t%c %c\n", s1[x], s2[y], s1[x], s2[y-1]);
+		printf("INSERTION\n");
+		p(&rcrds1[x], diffme1);
+		p(&rcrds2[y], diffme2);
+		p(&rcrds2[y-1], diffme2);
 		k++;
 		y--;
 		d--;
 	}
 	else {
 
-		printf("DELETION\t%c %c\t%c %c\n", s1[x], s2[y], s1[x-1], s2[y]);
+		printf("DELETION\n");
+		p(&rcrds1[x], diffme1);
+		p(&rcrds2[y], diffme2);
+		p(&rcrds1[x-1], diffme1);
 		k--;
 		x--;
 		d--;
@@ -210,9 +249,13 @@ void build_script(int *v, int v_size, char *s1, char *s2, int d, int m, int n, i
 	// Do the above once for every version of V in v_hstry
 	for (; d >= 0; d--, v -= v_size) {
 
-		while (x >= 0 && y >= 0 && s1[x] == s2[y] ) {
+		while (x >= 0 && y >= 0 && rcrds1[x].hash == rcrds2[y].hash ) {
 
-			printf("dIAGONAL %c %c %c %c\n", s1[x], s2[y], s1[x-1], s2[y-1]);
+			printf("dIAGONAL\n");
+			p(&rcrds1[x], diffme1);
+			p(&rcrds2[y], diffme2);
+			p(&rcrds1[x-1], diffme1);
+			p(&rcrds2[y-1], diffme2);
 			x--;
 			y--;
 		}
@@ -225,13 +268,19 @@ void build_script(int *v, int v_size, char *s1, char *s2, int d, int m, int n, i
 
 		if (k == -d || (k != d && v[k-1] < v[k+1])) {
 
-			printf("iNSERTION\t%c %c\t%c %c\n", s1[x], s2[y], s1[x], s2[y-1]);
+			printf("iNSERTION\n");
+			p(&rcrds1[x], diffme1);
+			p(&rcrds2[y], diffme2);
+			p(&rcrds2[y-1], diffme2);
 			k++;
 			y--;
 		}
 		else {
 
-			printf("dELETION\t%c %c\t%c %c\n", s1[x], s2[y], s1[x-1], s2[y]);
+			printf("dELETION\n");
+			p(&rcrds1[x], diffme1);
+			p(&rcrds2[y], diffme2);
+			p(&rcrds1[x-1], diffme1);
 			k--;
 			x--;
 		}
@@ -242,31 +291,13 @@ void build_script(int *v, int v_size, char *s1, char *s2, int d, int m, int n, i
 
 int myers(struct diff_env *env)
 {
-	// For the most part, we use the *exact same* variable names that
-	// Myers uses in his original paper.
-	/*
-	char *s1 = "abcabba";
-	char *s2 = "cbabac";
-	int m = 7, n = 6;
-	*/
-
-	/*
-	char *s1 = "cowby";
-	char *s2 = "cwboy";
-	int m = 5, n = 5;
-	*/
-
-	/*
-	char *s1 = "cow";
-	char *s2 = "cow";
-	int m = 3, n = 3;
-	*/
-
-	char *s1 = "cow";
-	char *s2 = "ow";
-	int m = 3, n = 2;
+	struct record *rcrds1 = env->rcrds1;
+	struct record *rcrds2 = env->rcrds2;
+	int m = env->num_rcrds1, n = env->num_rcrds2;
 
 	int max = m + n;
+
+	printf("m %d n %d\n", m, n);
 
 	// Set up Myers' "V" array; v goes in the middle of v_mem so that
 	// we can use negative indices exactly as the paper does
@@ -312,7 +343,7 @@ int myers(struct diff_env *env)
 			if (y > n) { y = n; }
 
 			// Skip over the diagonals, if any
-			while (x <= m && y <= n && s1[x] == s2[y]) {
+			while (x <= m && y <= n && rcrds1[x].hash == rcrds2[y].hash) {
 				x++; y++;
 			}
 
@@ -326,7 +357,7 @@ int myers(struct diff_env *env)
 			// Greedily terminate if we've found a path that works
 			if (x >= m && y >= n) {
 				printf("RESULT: %d\n", d);
-				build_script(v_hstry - v_size + max, v_size, s1, s2, d, m, n, k);
+				build_script(v_hstry - v_size + max, v_size, env, d, m, n, k);
 				return 0;
 			}
 
