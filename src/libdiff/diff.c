@@ -291,40 +291,43 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 
 int myers(struct diff_env *env)
 {
-	struct record *rcrds1 = env->rcrds1;
-	struct record *rcrds2 = env->rcrds2;
-	int m = env->num_rcrds1, n = env->num_rcrds2;
+	int m, n, max;
+	struct record *rcrds1, *rcrds2;
+	int v_size, v_bytes;
+	int *v_mem, *v, *v_hstry, *v_hstry_mem;
+	int x, y;
+	int d, k;
 
-	int max = m + n;
+	rcrds1 = env->rcrds1;
+	rcrds2 = env->rcrds2;
+	m = env->num_rcrds1, n = env->num_rcrds2;
+
+	max = m + n;
 
 	printf("m %d n %d\n", m, n);
 
 	// Set up Myers' "V" array; v goes in the middle of v_mem so that
 	// we can use negative indices exactly as the paper does
-	int v_size = (max*2+1);              // total elements in V
-	int v_bytes = sizeof(int) * v_size;  // size in bytes of V
+	v_size = (max*2+1);              // total elements in V
+	v_bytes = sizeof(int) * v_size;  // size in bytes of V
 
-	int *v_mem;
 	if (!(v_mem = ld__malloc(v_bytes))) {
 
 		// TODO: PUT FREE() HERE
 		return -1;
 	}
-	int *v = v_mem+max;
+	v = v_mem+max;
 
 	// Alloc memory to save a copy of each version of Myers' "V" array
-	int *v_hstry_mem;
 	if (!(v_hstry_mem = ld__malloc(pow(v_bytes, 2)))) {
 
 		// TODO: PUT FREE() HERE
 		return -1;
 	}
-	int *v_hstry = v_hstry_mem;
+	v_hstry = v_hstry_mem;
 
-	int x, y;
 	v[1] = 0;  // IMPORTANT -- V's seed value
 
-	int d, k;
 	for (d = 0; d <= max; d++)
 	{
 		for (k = -d; k <= d; k += 2)
