@@ -182,18 +182,21 @@ void p(struct record *r, struct diff_mem *d)
 
 void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n, int k)
 {
-	struct record *rcrds1 = env->rcrds1;
-	struct record *rcrds2 = env->rcrds2;
-	struct diff_mem *diffme1 = env->diffme1;
-	struct diff_mem *diffme2 = env->diffme2;
+	struct record *rcrds1, *rcrds2;
+	struct diff_mem *diffme1, *diffme2;
+	int x, y;
+
+	rcrds1 = env->rcrds1;
+	rcrds2 = env->rcrds2;
+	diffme1 = env->diffme1;
+	diffme2 = env->diffme2;
 
 	// TODO TODO TODO: See if we can consolidate the normalization to be with the
 	// regular loop??
 
-
 	// set x and y to be the last respective characters of s1 and s2
-	int x = v[k];
-	int y = x - k;
+	x = v[k];
+	y = x - k;
 	x -= 2; y -= 2;
 
 	// myers() terminates greedily when we find the first path from (0,0) to (N,M),
