@@ -380,6 +380,11 @@ int myers(struct diff_env *env)
 		}
 	}
 
+	// TODO: DECIDE WHETHER OR NOT WE WANT TO POSSIBLY SAVE THIS DATA
+	// FOR SEOMTHING ELSE???
+	ld__free(v_mem);
+	ld__free(v_hstry_mem);
+
 	// Shouldn't happen
 	return -1;
 }
