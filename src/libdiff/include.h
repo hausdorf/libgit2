@@ -16,6 +16,22 @@
 #define ld__realloc(ptr, x) git__realloc(ptr, x)
 #define ld__free(x) free(x)
 
+#define INSERTION 0
+#define DELETION 1
+
+
+
+struct edit {
+	struct record *rcrd;
+	struct edit *prev, *next;
+	unsigned char edit;
+	size_t x;
+};
+
+
+struct edt_scrpt {
+	struct edit *head;
+};
 
 
 struct record {
@@ -30,6 +46,7 @@ struct diff_env {
 	struct record *rcrds1, *rcrds2;
 	size_t num_rcrds1, num_rcrds2;
 	size_t rcrds_guess1, rcrds_guess2;
+	struct edt_scrpt *script;
 };
 
 
