@@ -29,11 +29,6 @@ struct edit {
 };
 
 
-struct edt_scrpt {
-	struct edit *head;
-};
-
-
 struct record {
 	unsigned long start;
 	unsigned long end;
@@ -46,7 +41,7 @@ struct diff_env {
 	struct record *rcrds1, *rcrds2;
 	size_t num_rcrds1, num_rcrds2;
 	size_t rcrds_guess1, rcrds_guess2;
-	struct edt_scrpt *script;
+	struct edit *edt_scrpt;
 };
 
 
