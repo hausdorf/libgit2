@@ -352,8 +352,13 @@ int myers(struct diff_env *env)
 			if (x > m) { x = m; }
 			if (y > n) { y = n; }
 
-			// Skip over the diagonals, if any
-			while (x <= m && y <= n && rcrds1[x].hash == rcrds2[y].hash) {
+			// Skip over the diagonals, if any; stay inside array bounds
+			// TODO: TEST BUG FIX. We added x >= 0 && y >= 0 and changed
+			// x <= m && y <= n to x < m && y < n. This is to eliminate
+			// access of uninitialized variables, but may compromise
+			// correctness, we need to test to be sure
+			while (x >= 0 && y >= 0 && x < m && y < n &&
+			       rcrds1[x].hash == rcrds2[y].hash) {
 				x++; y++;
 			}
 
