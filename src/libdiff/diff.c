@@ -368,6 +368,12 @@ int myers(struct diff_env *env)
 			if (x >= m && y >= n) {
 				printf("RESULT: %d\n", d);
 				build_script(v_hstry - v_size + max, v_size, env, d, m, n, k);
+
+				// TODO: DECIDE WHETHER OR NOT WE WANT TO POSSIBLY SAVE THIS DATA
+				// FOR SEOMTHING ELSE???
+				ld__free(v_mem);
+				ld__free(v_hstry_mem);
+
 				return 0;
 			}
 
