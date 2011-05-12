@@ -11,6 +11,8 @@
 
 int init_diff_env(struct diff_env *env, struct diff_mem *diffme1,
 		struct diff_mem *diffme2);
+void free_rcrds(struct record *r);
+void free_env(struct diff_env *env);
 
 
 
