@@ -405,6 +405,8 @@ int diff(struct diff_mem *diffme1, struct diff_mem *diffme2)
 	if (prepare_and_myers(&env) < 0)
 		return -1;
 
+	free_env(&env);
+
 	return 0;
 }
 
