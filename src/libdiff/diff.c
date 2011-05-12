@@ -74,7 +74,10 @@ int make_rcrds(struct record **rtrn_val, struct diff_mem *mem, size_t *num_rcrds
 	struct record *curr_rcrd = rcrds;
 
 	// beginning to end of given data
-	for (i = 0; i <= data_size;) {
+	// TODO: TEST BUG FIX: this used to be i <= data_size; making it i < data_size
+	// has eliminated a memory leak, but may or may not compromise code correctness.
+	// May also need to adjust the check on the inner for loop here also
+	for (i = 0; i < data_size;) {
 		tmp = i;
 		// find next newline
 		for (; i <= data_size && data[i++] != '\n';)
