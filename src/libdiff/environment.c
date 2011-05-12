@@ -36,6 +36,12 @@ int init_diff_env(struct diff_env *env, struct diff_mem *diffme1,
 }
 
 
+void free_edt_scrpt(struct edit *script)
+{
+	ld__free(script);
+}
+
+
 void free_rcrds(struct record *r)
 {
 	ld__free(r);
@@ -46,4 +52,5 @@ void free_env(struct diff_env *env)
 {
 	free_rcrds(env->rcrds1);
 	free_rcrds(env->rcrds2);
+	free_edt_scrpt(env->edt_scrpt);
 }
