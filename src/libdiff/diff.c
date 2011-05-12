@@ -224,7 +224,8 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	// Continue "normalization"
 	if (k == -d || (k != d && v[k-1] < v[k+1])) {
 
-		printf("INSERTION\n");
+		printf("INSERTION at x %d\n", x);
+		
 		p(&rcrds1[x], diffme1);
 		p(&rcrds2[y], diffme2);
 		p(&rcrds2[y-1], diffme2);
@@ -234,7 +235,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	}
 	else {
 
-		printf("DELETION\n");
+		printf("DELETION at x %d\n", x-1);
 		p(&rcrds1[x], diffme1);
 		p(&rcrds2[y], diffme2);
 		p(&rcrds1[x-1], diffme1);
@@ -255,10 +256,10 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		while (x >= 0 && y >= 0 && rcrds1[x].hash == rcrds2[y].hash ) {
 
 			printf("dIAGONAL\n");
-			p(&rcrds1[x], diffme1);
-			p(&rcrds2[y], diffme2);
-			p(&rcrds1[x-1], diffme1);
-			p(&rcrds2[y-1], diffme2);
+			p(x < 0 ? &rcrds1[0] : &rcrds1[x], diffme1);
+			p(y < 0 ? &rcrds2[0] : &rcrds2[y], diffme2);
+			p(x - 1 < 0 ? &rcrds1[0] : &rcrds1[x-1], diffme1);
+			p(y - 1 < 0 ? &rcrds2[0] : &rcrds2[y-1], diffme2);
 			x--;
 			y--;
 		}
@@ -271,19 +272,19 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 
 		if (k == -d || (k != d && v[k-1] < v[k+1])) {
 
-			printf("iNSERTION\n");
-			p(&rcrds1[x], diffme1);
-			p(&rcrds2[y], diffme2);
-			p(&rcrds2[y-1], diffme2);
+			printf("iNSERTION at x %d\n", x);
+			p(x < 0 ? &rcrds1[0] : &rcrds1[x], diffme1);
+			p(y < 0 ? &rcrds2[0] : &rcrds2[y], diffme2);
+			p(y - 1 < 0 ? &rcrds2[0] : &rcrds2[y-1], diffme2);
 			k++;
 			y--;
 		}
 		else {
 
-			printf("dELETION\n");
-			p(&rcrds1[x], diffme1);
-			p(&rcrds2[y], diffme2);
-			p(&rcrds1[x-1], diffme1);
+			printf("dELETION at x %x\n", x-1);
+			p(x < 0 ? &rcrds1[0] : &rcrds1[x], diffme1);
+			p(y < 0 ? &rcrds2[0] : &rcrds2[y], diffme2);
+			p(x - 1 < 0 ? &rcrds1[0] : &rcrds1[x-1], diffme1);
 			k--;
 			x--;
 		}
