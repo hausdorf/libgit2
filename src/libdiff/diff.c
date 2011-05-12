@@ -380,7 +380,8 @@ int myers(struct diff_env *env)
 		}
 	}
 
-	return 0;
+	// Shouldn't happen
+	return -1;
 }
 
 
