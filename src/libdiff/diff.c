@@ -200,7 +200,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	// set x and y to be the last respective characters of s1 and s2
 	x = v[k];
 	y = x - k;
-	x -= 2; y -= 2;
+	x -= 1; y -= 1;
 
 	// myers() terminates greedily when we find the first path from (0,0) to (N,M),
 	// so k, x, and y, may have been in the middle of myers() inner loop when this
@@ -238,7 +238,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	}
 	else {
 
-		printf("DELETION at x %d\n", x-1);
+		printf("DELETION at x %d\n", x);
 		p(&rcrds1[x], diffme1);
 		p(&rcrds2[y], diffme2);
 		p(&rcrds1[x-1], diffme1);
@@ -284,7 +284,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		}
 		else {
 
-			printf("dELETION at x %x\n", x-1);
+			printf("dELETION at x %x\n", x);
 			p(x < 0 ? &rcrds1[0] : &rcrds1[x], diffme1);
 			p(y < 0 ? &rcrds2[0] : &rcrds2[y], diffme2);
 			p(x - 1 < 0 ? &rcrds1[0] : &rcrds1[x-1], diffme1);
