@@ -173,12 +173,22 @@ int prepare_data(struct diff_env *env)
 }
 
 
+// TODO DEBUGGING FUNCTION TAKE OUT
 void p(struct record *r, struct diff_mem *d)
 {
 	char *data = d->data;
 	unsigned long i;
 	for (i = r->start; i < r->end; i++) {
 		printf("%c", data[i]);
+	}
+}
+
+
+// TODO DEBUGGING FUNCTION TAKE OUT
+void edits(struct edit *e)
+{
+	for(; e->edit != END_OF_SCRIPT; e = e->next) {
+		printf("EDIT: %d\n", e->edit);
 	}
 }
 
@@ -442,6 +452,8 @@ int myers(struct diff_env *env)
 			if (x >= m && y >= n) {
 				printf("RESULT: %d\n", d);
 				build_script(v_hstry - v_size + max, v_size, env, d, m, n, k);
+
+				edits(env->ses_head);
 
 				// TODO: DECIDE WHETHER OR NOT WE WANT TO POSSIBLY SAVE THIS DATA
 				// FOR SEOMTHING ELSE???
