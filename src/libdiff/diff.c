@@ -183,6 +183,27 @@ void p(struct record *r, struct diff_mem *d)
 }
 
 
+void insertion(struct edit **e, struct record *r, size_t y, size_t k)
+{
+	(*e)++;
+	(*e)->edit = INSERTION;
+	(*e)->y = y;
+	(*e)->k = k;
+	(*e)->rcrd = r;
+	(*e)->next = *e - 1;
+}
+
+
+void deletion(struct edit **e, size_t x, size_t k)
+{
+	(*e)++;
+	(*e)->edit = DELETION;
+	(*e)->x = x;
+	(*e)->k = k;
+	(*e)->next = *e - 1;
+}
+
+
 void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n, int k)
 {
 	struct record *rcrds1, *rcrds2;
