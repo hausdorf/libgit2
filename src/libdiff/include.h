@@ -16,16 +16,23 @@
 #define ld__realloc(ptr, x) git__realloc(ptr, x)
 #define ld__free(x) free(x)
 
-#define INSERTION 0
-#define DELETION 1
+// TODO: CONSIDER MOVING THIS TO THE GLOBAL COMMON FILE
+#ifndef max
+#define max(a, b) ( ((a) > (b)) ? (a) : (b) )
+#endif
+
+#define END_OF_SCRIPT 0
+#define INSERTION 1
+#define DELETION 2
 
 
 
 struct edit {
 	struct record *rcrd;
-	struct edit *prev, *next;
+	struct edit *next;
 	unsigned char edit;
 	size_t x;
+	size_t k;
 };
 
 
@@ -41,7 +48,7 @@ struct diff_env {
 	struct record *rcrds1, *rcrds2;
 	size_t num_rcrds1, num_rcrds2;
 	size_t rcrds_guess1, rcrds_guess2;
-	struct edit *edt_scrpt;
+	struct edit *ses_mem, *ses_head, *ses_tail;
 };
 
 
