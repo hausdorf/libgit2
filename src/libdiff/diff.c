@@ -188,11 +188,24 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	struct record *rcrds1, *rcrds2;
 	struct diff_mem *diffme1, *diffme2;
 	int x, y;
+	struct edit *curr_edt;
 
 	rcrds1 = env->rcrds1;
 	rcrds2 = env->rcrds2;
 	diffme1 = env->diffme1;
 	diffme2 = env->diffme2;
+
+	if(!(env->ses_mem = ld__malloc(sizeof(struct edit) * (max(m, n) + d + 1)))) {
+
+		// TODO: WE SHOUDL RETURN AN ERROR CODE
+		return;
+	}
+
+	// Seed values for edit script
+	curr_edt = env->ses_mem;
+	curr_edt->edit = END_OF_SCRIPT;
+	env->ses_tail = curr_edt;
+	env->ses_head = curr_edt;  // Updated again only just before return
 
 	// TODO TODO TODO: See if we can consolidate the normalization to be with the
 	// regular loop??
@@ -243,13 +256,23 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		p(&rcrds2[y], diffme2);
 		printf("\tAFTER DELETE: ");
 		p(&rcrds1[x-1], diffme1);
+
+		deletion(&curr_edt, x--, k--);
+
+		/*
 		k--;
 		x--;
+		*/
 		d--;
 	}
 
 	// Return if there is one difference
-	if (x < 0 && y < 0) { printf("RETURNING FIRST\n"); return; }
+	if (x < 0 && y < 0) {
+
+		printf("RETURNING FIRST\n");
+		env->ses_head = curr_edt;
+		return;
+	}
 
 	// Move to previous version of V
 	v -= v_size;
@@ -271,6 +294,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		if (x < 0 && y < 0) {
 
 			printf("RETURNING\n");
+			env->ses_head = curr_edt;
 			return;
 		}
 
@@ -291,8 +315,13 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 			p(y < 0 ? &rcrds2[0] : &rcrds2[y], diffme2);
 			printf("\tAFTER DELETE: ");
 			p(x - 1 < 0 ? &rcrds1[0] : &rcrds1[x-1], diffme1);
+
+			deletion(&curr_edt, x--, k--);
+
+			/*
 			k--;
 			x--;
+			*/
 		}
 	}
 	printf("ERROR\n");
