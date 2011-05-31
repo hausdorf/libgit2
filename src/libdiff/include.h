@@ -32,6 +32,7 @@ struct edit {
 	struct edit *next;
 	unsigned char edit;
 	size_t x;
+	size_t y;
 	size_t k;
 };
 
