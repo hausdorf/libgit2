@@ -65,7 +65,7 @@ int make_rcrds(struct record **rtrn_val, struct diff_mem *mem, size_t *num_rcrds
 
 	// allocate space for the record list
 	struct record *rcrds;
-	if (!(rcrds = (struct record *) ld__malloc(sizeof(struct record) * guess))) {
+	if (!(rcrds = ld__malloc(sizeof(struct record) * guess))) {
 
 		// TODO: PUT FREE() HERE
 		return -1;
@@ -321,7 +321,7 @@ int myers(struct diff_env *env)
 	v_size = (max*2+1);              // total elements in V
 	v_bytes = sizeof(int) * v_size;  // size in bytes of V
 
-	if (!(v_mem = (int *) ld__malloc(v_bytes))) {
+	if (!(v_mem = ld__malloc(v_bytes))) {
 
 		// TODO: PUT FREE() HERE
 		return -1;
@@ -329,7 +329,7 @@ int myers(struct diff_env *env)
 	v = v_mem+max;
 
 	// Alloc memory to save a copy of each version of Myers' "V" array
-	if (!(v_hstry_mem = (int *) ld__malloc(pow(v_bytes, 2)))) {
+	if (!(v_hstry_mem = ld__malloc(pow(v_bytes, 2)))) {
 
 		// TODO: PUT FREE() HERE
 		return -1;
