@@ -266,8 +266,16 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		p(&rcrds2[y], diffme2);
 		printf("\tAFTER INSERT: ");
 		p(&rcrds2[y-1], diffme2);
+
+		// Variable used to avoid undefined behavior with y--
+		// in following line
+		struct record *tmp = &rcrds2[y];
+		insertion(&curr_edt, tmp, y--, k++);
+
+		/*
 		k++;
 		y--;
+		*/
 		d--;
 	}
 	else {
@@ -326,8 +334,16 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 			p(y < 0 ? &rcrds2[0] : &rcrds2[y], diffme2);
 			printf("\tAFTER INSERT: ");
 			p(y - 1 < 0 ? &rcrds2[0] : &rcrds2[y-1], diffme2);
+
+			// Variable used to avoid undefined behavior with y--
+			// in following line
+			struct record *tmp = &rcrds2[y];
+			insertion(&curr_edt, tmp, y--, k++);
+
+			/*
 			k++;
 			y--;
+			*/
 		}
 		else {
 
