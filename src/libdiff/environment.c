@@ -52,5 +52,6 @@ void free_env(struct diff_env *env)
 {
 	free_rcrds(env->rcrds1);
 	free_rcrds(env->rcrds2);
-	free_edt_scrpt(env->edt_scrpt);
+	free_edt_scrpt(env->ses_mem);
 }
+
