@@ -193,10 +193,11 @@ void edits(struct edit *e)
 }
 
 
-void insertion(struct edit **e, struct record *r, size_t y, size_t k)
+void insertion(struct edit **e, struct record *r, size_t x, size_t y, size_t k)
 {
 	(*e)++;
 	(*e)->edit = INSERTION;
+	(*e)->x = x;
 	(*e)->y = y;
 	(*e)->k = k;
 	(*e)->rcrd = r;
@@ -204,11 +205,12 @@ void insertion(struct edit **e, struct record *r, size_t y, size_t k)
 }
 
 
-void deletion(struct edit **e, size_t x, size_t k)
+void deletion(struct edit **e, size_t x, size_t y, size_t k)
 {
 	(*e)++;
 	(*e)->edit = DELETION;
 	(*e)->x = x;
+	(*e)->y = y;
 	(*e)->k = k;
 	(*e)->next = *e - 1;
 }
@@ -280,7 +282,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		// Variable used to avoid undefined behavior with y--
 		// in following line
 		struct record *tmp = &rcrds2[y];
-		insertion(&curr_edt, tmp, y--, k++);
+		insertion(&curr_edt, tmp, x, y--, k++);
 
 		/*
 		k++;
@@ -296,7 +298,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		printf("\tAFTER DELETE: ");
 		p(&rcrds1[x-1], diffme1);
 
-		deletion(&curr_edt, x--, k--);
+		deletion(&curr_edt, x--, y, k--);
 
 		/*
 		k--;
@@ -348,7 +350,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 			// Variable used to avoid undefined behavior with y--
 			// in following line
 			struct record *tmp = &rcrds2[y];
-			insertion(&curr_edt, tmp, y--, k++);
+			insertion(&curr_edt, tmp, x, y--, k++);
 
 			/*
 			k++;
@@ -363,7 +365,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 			printf("\tAFTER DELETE: ");
 			p(x - 1 < 0 ? &rcrds1[0] : &rcrds1[x-1], diffme1);
 
-			deletion(&curr_edt, x--, k--);
+			deletion(&curr_edt, x--, y, k--);
 
 			/*
 			k--;
