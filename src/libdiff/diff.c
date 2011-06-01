@@ -228,7 +228,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	diffme1 = env->diffme1;
 	diffme2 = env->diffme2;
 
-	if(!(env->ses_mem = ld__malloc(sizeof(struct edit) * (max(m, n) + d + 1)))) {
+	if (!(env->ses_mem = ld__malloc(sizeof(struct edit) * (max(m, n) + d + 1)))) {
 
 		// TODO: WE SHOUDL RETURN AN ERROR CODE
 		return;
