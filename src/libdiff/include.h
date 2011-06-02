@@ -21,27 +21,6 @@
 #define max(a, b) ( ((a) > (b)) ? (a) : (b) )
 #endif
 
-#define END_OF_SCRIPT 0
-#define INSERTION 1
-#define DELETION 2
-
-
-
-struct edit {
-	struct record *rcrd;
-	struct edit *next;
-	unsigned char edit;
-	size_t x;
-	size_t y;
-	size_t k;
-};
-
-
-struct record {
-	unsigned long start;
-	unsigned long end;
-	unsigned long hash;
-};
 
 
 struct diff_env {
