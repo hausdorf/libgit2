@@ -55,7 +55,8 @@ unsigned long hash_rcrd(struct record *rcrd, const char *source)
 }
 
 
-int make_rcrds(struct record **rtrn_val, struct diff_mem *mem, size_t *num_rcrds_guess)
+int make_rcrds(struct record **rtrn_val, struct diff_mem *mem,
+		size_t *num_rcrds_guess)
 {
 	int i, tmp;
 	size_t num_rcrds = 0;
@@ -74,9 +75,10 @@ int make_rcrds(struct record **rtrn_val, struct diff_mem *mem, size_t *num_rcrds
 	struct record *curr_rcrd = rcrds;
 
 	// beginning to end of given data
-	// TODO: TEST BUG FIX: this used to be i <= data_size; making it i < data_size
-	// has eliminated a memory leak, but may or may not compromise code correctness.
-	// May also need to adjust the check on the inner for loop here also
+	// TODO: TEST BUG FIX: this used to be i <= data_size; making it i <
+	// data_size has eliminated a memory leak, but may or may not compromise
+	// code correctness. May also need to adjust the check on the inner for
+	// loop here also
 	for (i = 0; i < data_size;) {
 		tmp = i;
 		// find next newline
@@ -91,7 +93,8 @@ int make_rcrds(struct record **rtrn_val, struct diff_mem *mem, size_t *num_rcrds
 		// realloc if number of records is bigger than guess
 		if (++num_rcrds >= guess) {
 			guess = *num_rcrds_guess = guess * 2;
-			if (!(rcrds = ld__realloc(rcrds, sizeof(struct record) * guess))) {
+			if (!(rcrds = ld__realloc(rcrds, sizeof(struct record) *
+				guess))) {
 
 				// TODO: ADD FREE() HERE
 				return -1;
@@ -149,23 +152,27 @@ int prepare_data(struct diff_env *env)
 	env->rcrds_guess2 = guess_num_rcrds(env->diffme1);
 
 	// TODO: IMPLEMENT CHECKS FOR NULL POINTERS HERE
-	env->num_rcrds1 = make_rcrds(&env->rcrds1, env->diffme1, &env->rcrds_guess1);
+	env->num_rcrds1 = make_rcrds(&env->rcrds1, env->diffme1,
+			&env->rcrds_guess1);
 	// TODO TODO TODO: YOU ARE HERE, IMPLEMENTING CHECKS FOR THESE
 	// FUNCTION CALLS. YOU ALSO NEED TO MAKE PRINT LOOPS THAT VERIFY THAT WHAT
 	// WE'RE PUTTING IN IS WHAT WE'RE GETTING OUT.
-	env->num_rcrds2 = make_rcrds(&env->rcrds2, env->diffme2, &env->rcrds_guess2);
+	env->num_rcrds2 = make_rcrds(&env->rcrds2, env->diffme2,
+			&env->rcrds_guess2);
 
 	// TODO: REMOVE. For debugging, verifies that the recorsd are copied
 	/*
 	size_t i;
 	for (i = 0; i < env->rcrds_guess1; i++) {
-		printf("%lu\t%lu\t%lu\n", env->rcrds1[i].start, env->rcrds1[i].end, env->rcrds1[i].hash);
+		printf("%lu\t%lu\t%lu\n", env->rcrds1[i].start, env->rcrds1[i].end,
+				env->rcrds1[i].hash);
 	}
 
 	printf("\n");
 
 	for (i = 0; i < env->rcrds_guess2; i++) {
-		printf("%lu\t%lu\t%lu\n", env->rcrds2[i].start, env->rcrds2[i].end, env->rcrds2[i].hash);
+		printf("%lu\t%lu\t%lu\n", env->rcrds2[i].start, env->rcrds2[i].end,
+				env->rcrds2[i].hash);
 	}
 	*/
 
@@ -205,7 +212,8 @@ void edits(struct diff_env *e)
 }
 
 
-void insertion(struct edit **e, struct record *r, size_t x, size_t y, size_t k)
+void insertion(struct edit **e, struct record *r, size_t x, size_t y,
+		size_t k)
 {
 	(*e)++;
 	(*e)->edit = INSERTION;
@@ -228,7 +236,8 @@ void deletion(struct edit **e, size_t x, size_t y, size_t k)
 }
 
 
-void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n, int k)
+void build_script(int *v, int v_size, struct diff_env *env, int d, int m,
+		int n, int k)
 {
 	printf("\n\n");
 
@@ -242,7 +251,8 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	diffme1 = env->diffme1;
 	diffme2 = env->diffme2;
 
-	if (!(env->ses_mem = ld__malloc(sizeof(struct edit) * (max(m, n) + d + 1)))) {
+	if (!(env->ses_mem = ld__malloc(sizeof(struct edit) *
+			(max(m, n) + d + 1)))) {
 
 		// TODO: WE SHOUDL RETURN AN ERROR CODE
 		return;
@@ -254,18 +264,19 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	env->ses_tail = curr_edt;
 	env->ses_head = curr_edt;  // Updated again only just before return
 
-	// TODO TODO TODO: See if we can consolidate the normalization to be with the
-	// regular loop??
+	// TODO TODO TODO: See if we can consolidate the normalization to be with
+	// the regular loop??
 
 	// set x and y to be the last respective characters of s1 and s2
 	x = v[k];
 	y = x - k;
 	x -= 1; y -= 1;
 
-	// myers() terminates greedily when we find the first path from (0,0) to (N,M),
-	// so k, x, and y, may have been in the middle of myers() inner loop when this
-	// func was called. We need to normalize them:
-	for (; x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash; x--, y--) {
+	// myers() terminates greedily when we find the first path from (0,0) to
+	// (N,M), so k, x, and y, may have been in the middle of myers() inner
+	// loop when this func was called. We need to normalize them:
+	for (; x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash;
+			x--, y--) {
 
 		printf("DIAGONAL\n");
 	}
@@ -315,7 +326,8 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	// Do the above once for every version of V in v_hstry
 	for (; d >= 0; d--, v -= v_size) {
 
-		for (; x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash; x--, y--) {
+		for (; x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash;
+				x--, y--) {
 
 			printf("dIAGONAL\n");
 		}
@@ -429,8 +441,8 @@ int myers(struct diff_env *env)
 
 				edits(env);
 
-				// TODO: DECIDE WHETHER OR NOT WE WANT TO POSSIBLY SAVE THIS DATA
-				// FOR SEOMTHING ELSE???
+				// TODO: DECIDE WHETHER OR NOT WE WANT TO POSSIBLY SAVE THIS
+				// DATA FOR SEOMTHING ELSE???
 				ld__free(v_mem);
 				ld__free(v_hstry_mem);
 
