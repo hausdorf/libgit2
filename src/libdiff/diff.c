@@ -185,10 +185,20 @@ void p(struct record *r, struct diff_mem *d)
 
 
 // TODO DEBUGGING FUNCTION TAKE OUT
-void edits(struct edit *e)
+void edits(struct diff_env *e)
 {
-	for(; e->edit != END_OF_SCRIPT; e = e->next) {
-		printf("EDIT: %d\n", e->edit);
+	struct edit *ed = e->ses_head;
+	struct record *r1 = e->rcrds1, *r2 = e->rcrds2;
+
+	printf("\n\n");
+
+	for(; ed->edit != END_OF_SCRIPT; ed = ed->next) {
+		if (ed->edit == INSERTION) {
+			p(&r2[ed->y], e->diffme2);
+		}
+		else {
+			p(&r1[ed->x], e->diffme1);
+		}
 	}
 }
 
@@ -415,7 +425,7 @@ int myers(struct diff_env *env)
 				printf("RESULT: %d\n", d);
 				build_script(v_hstry - v_size + max, v_size, env, d, m, n, k);
 
-				//edits(env->ses_head);
+				edits(env);
 
 				// TODO: DECIDE WHETHER OR NOT WE WANT TO POSSIBLY SAVE THIS DATA
 				// FOR SEOMTHING ELSE???
