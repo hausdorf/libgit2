@@ -33,6 +33,7 @@
 
 
 
+// Computes a cheap hash of a record
 unsigned long hash_rcrd(struct record *rcrd, const char *source)
 {
 	unsigned long hash = 5381;
@@ -55,6 +56,7 @@ unsigned long hash_rcrd(struct record *rcrd, const char *source)
 }
 
 
+// Turns content in a diff_mem struct into an array of records
 int make_rcrds(struct record **rtrn_val, struct diff_mem *mem,
 		size_t *num_rcrds_guess)
 {
@@ -108,6 +110,7 @@ int make_rcrds(struct record **rtrn_val, struct diff_mem *mem,
 }
 
 
+// Cheaply guesses the number of records in a diff_mem's data
 long guess_num_rcrds(struct diff_mem *content)
 {
 	// TODO TODO TODO: This function is pretty much from libxdiff, and just
@@ -144,6 +147,9 @@ long guess_num_rcrds(struct diff_mem *content)
 }
 
 
+// Processes diff_mem data so that it is suitable for running diff algorithm;
+// primarily this includes creating records from the raw data, computing
+// a hash for each of those records, etc.
 int prepare_data(struct diff_env *env)
 {
 	// Guess # of records in data; we malloc the space needed to build list of
@@ -212,6 +218,7 @@ void edits(struct diff_env *e)
 }
 
 
+// Append an INSERTION to the end of the SES -- Shortest Edit Script
 void insertion(struct edit **e, struct record *r, size_t x, size_t y,
 		size_t k)
 {
@@ -225,6 +232,7 @@ void insertion(struct edit **e, struct record *r, size_t x, size_t y,
 }
 
 
+// Append a DELETION to the end of the SES -- Shortest Edit Script
 void deletion(struct edit **e, size_t x, size_t y, size_t k)
 {
 	(*e)++;
@@ -236,6 +244,7 @@ void deletion(struct edit **e, size_t x, size_t y, size_t k)
 }
 
 
+// Builds the Shortest Edit Script (SES) from the raw diff'd data
 void build_script(int *v, int v_size, struct diff_env *env, int d, int m,
 		int n, int k)
 {
@@ -361,6 +370,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m,
 }
 
 
+// Administrates the Myers O(ND) diffing algorithm
 int myers(struct diff_env *env)
 {
 	int m, n, max;
@@ -471,6 +481,7 @@ int prepare_and_myers(struct diff_env *env)
 }
 
 
+// Drives core diff logic
 int diff(struct diff_mem *diffme1, struct diff_mem *diffme2)
 {
 	struct diff_env env;
