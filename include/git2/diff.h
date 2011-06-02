@@ -78,7 +78,7 @@ GIT_EXTERN(int) git_diff_no_index(git_diff_conf **results_conf,
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff(git_diff_conf **results_conf,
+GIT_EXTERN(int) git_diff_std(git_diff_conf **results_conf,
 		git_commit *commit, git_repository *repo);
 
 /**

@@ -250,7 +250,7 @@ int diff_tree_to_filesystem(git_diff_conf **results_conf,
 	return GIT_SUCCESS;
 }
 
-int git_diff(git_diff_conf **results_conf, git_commit *commit,
+int git_diff_std(git_diff_conf **results_conf, git_commit *commit,
 		git_repository *repo)
 {
 	git_tree *tree;
