@@ -218,6 +218,8 @@ void deletion(struct edit **e, size_t x, size_t y, size_t k)
 
 void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n, int k)
 {
+	printf("\n\n");
+
 	struct record *rcrds1, *rcrds2;
 	struct diff_mem *diffme1, *diffme2;
 	int x, y;
@@ -254,10 +256,6 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	while (x >= 0 && y >= 0 && rcrds1[x].hash == rcrds2[y].hash) {
 
 		printf("DIAGONAL\n");
-		p(&rcrds1[x], diffme1);
-		p(&rcrds2[y], diffme2);
-		p(&rcrds1[x-1], diffme1);
-		p(&rcrds2[y-1], diffme2);
 		x--;
 		y--;
 	}
@@ -273,11 +271,8 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	// Continue "normalization"
 	if (k == -d || (k != d && v[k-1] < v[k+1])) {
 
-		printf("INSERTION at x %d\n", x);
-		p(&rcrds1[x], diffme1);
+		printf("INSERTION at x %d y %d\t", x, y);
 		p(&rcrds2[y], diffme2);
-		printf("\tAFTER INSERT: ");
-		p(&rcrds2[y-1], diffme2);
 
 		// Separate tmp declaration into two lines to avoid undefined
 		// behavior with y-- in following line
@@ -292,11 +287,8 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	}
 	else {
 
-		printf("DELETION at x %d\n", x);
+		printf("DELETION at x %d y %d\t", x, y);
 		p(&rcrds1[x], diffme1);
-		p(&rcrds2[y], diffme2);
-		printf("\tAFTER DELETE: ");
-		p(&rcrds1[x-1], diffme1);
 
 		deletion(&curr_edt, x--, y, k--);
 
@@ -324,10 +316,6 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		while (x >= 0 && y >= 0 && rcrds1[x].hash == rcrds2[y].hash ) {
 
 			printf("dIAGONAL\n");
-			p(x < 0 ? &rcrds1[0] : &rcrds1[x], diffme1);
-			p(y < 0 ? &rcrds2[0] : &rcrds2[y], diffme2);
-			p(x - 1 < 0 ? &rcrds1[0] : &rcrds1[x-1], diffme1);
-			p(y - 1 < 0 ? &rcrds2[0] : &rcrds2[y-1], diffme2);
 			x--;
 			y--;
 		}
@@ -341,11 +329,8 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 
 		if (k == -d || (k != d && v[k-1] < v[k+1])) {
 
-			printf("iNSERTION at x %d\n", x);
-			p(x < 0 ? &rcrds1[0] : &rcrds1[x], diffme1);
-			p(y < 0 ? &rcrds2[0] : &rcrds2[y], diffme2);
-			printf("\tAFTER INSERT: ");
-			p(y - 1 < 0 ? &rcrds2[0] : &rcrds2[y-1], diffme2);
+			printf("iNSERTION at x %d y %d\t", x, y);
+			p(&rcrds2[y], diffme2);
 
 			// Separate tmp declaration into two lines to avoid undefined
 			// behavior with y-- in following line
@@ -359,11 +344,8 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		}
 		else {
 
-			printf("dELETION at x %x\n", x);
-			p(x < 0 ? &rcrds1[0] : &rcrds1[x], diffme1);
-			p(y < 0 ? &rcrds2[0] : &rcrds2[y], diffme2);
-			printf("\tAFTER DELETE: ");
-			p(x - 1 < 0 ? &rcrds1[0] : &rcrds1[x-1], diffme1);
+			printf("dELETION at x %d y %d\t", x, y);
+			p(&rcrds1[x], diffme1);
 
 			deletion(&curr_edt, x--, y, k--);
 
@@ -455,7 +437,7 @@ int myers(struct diff_env *env)
 				printf("RESULT: %d\n", d);
 				build_script(v_hstry - v_size + max, v_size, env, d, m, n, k);
 
-				edits(env->ses_head);
+				//edits(env->ses_head);
 
 				// TODO: DECIDE WHETHER OR NOT WE WANT TO POSSIBLY SAVE THIS DATA
 				// FOR SEOMTHING ELSE???
