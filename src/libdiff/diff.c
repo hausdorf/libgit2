@@ -253,11 +253,9 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	// myers() terminates greedily when we find the first path from (0,0) to (N,M),
 	// so k, x, and y, may have been in the middle of myers() inner loop when this
 	// func was called. We need to normalize them:
-	while (x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash) {
+	for (; x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash; x--, y--) {
 
 		printf("DIAGONAL\n");
-		x--;
-		y--;
 	}
 
 	// Return if documents are the same
@@ -305,11 +303,9 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	// Do the above once for every version of V in v_hstry
 	for (; d >= 0; d--, v -= v_size) {
 
-		while (x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash ) {
+		for (; x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash; x--, y--) {
 
 			printf("dIAGONAL\n");
-			x--;
-			y--;
 		}
 
 		if (x + 1 < x && y + 1 < y) {
