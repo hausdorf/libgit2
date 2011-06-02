@@ -7,7 +7,7 @@
 
 struct git_diff_conf {
 	unsigned long flags;
-}
+};
 
 
 
