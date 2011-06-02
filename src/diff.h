@@ -30,13 +30,20 @@ enum diff_operation {
 	DIFF_CMT_TO_CMT
 };
 
+enum diff_handler {
 
+	// Cause diff to be printed to stdout
+	PRINT_DIFF,
 
+	// Cause diff result data to be emitted to a custom function
+	EMIT_DIFF
+};
 
 
 
 struct git_diff_conf {
 	enum diff_type type;
+	enum diff_handler hndlr;
 };
 
 
