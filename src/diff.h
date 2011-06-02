@@ -3,35 +3,40 @@
 
 #include "git2/diff.h"
 
-// "STANDARD" diff command
-// diffs working directory against index
-#define DIFF_IDX_WD 0
+enum diff_operation {
+	// "STANDARD" diff command
+	// diffs working directory against index
+	DIFF_IDX_WD,
 
-// git diff <commit>
-// diffs working directory against <commit>
-#define DIFF_WD_CMT 1
+	// git diff <commit>
+	// diffs working directory against <commit>
+	DIFF_WD_CMT,
 
-// git diff --cached
-// diffs index against the HEAD commit
-#define DIFF_IDX_HEAD 2
+	// git diff --cached
+	// diffs index against the HEAD commit
+	DIFF_IDX_HEAD,
 
-// git diff --cached <commit>
-// diffs index against <commit>
-#define DIFF_IDX_CMT 3
+	// git diff --cached <commit>
+	// diffs index against <commit>
+	DIFF_IDX_CMT,
 
-// git diff <commit> <commit>
-// diffs second commit against first commit
-#define DIFF_CMT_CMT 4
+	// git diff <commit> <commit>
+	// diffs second commit against first commit
+	DIFF_CMT_CMT,
 
-// git diff <commit>...<commit>
-// tricky: diffs between the commit that both commits share as
-// an ancestor to the second commit
-#define DIFF_CMT_TO_CMT 5
+	// git diff <commit>...<commit>
+	// tricky: diffs between the commit that both commits share as
+	// an ancestor to the second commit
+	DIFF_CMT_TO_CMT
+};
+
+
+
 
 
 
 struct git_diff_conf {
-	unsigned char diff_type;
+	enum diff_type type;
 };
 
 
