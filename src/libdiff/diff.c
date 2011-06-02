@@ -173,7 +173,7 @@ int prepare_data(struct diff_env *env)
 }
 
 
-// TODO DEBUGGING FUNCTION TAKE OUT
+// TODO THIS SHOULD GO IN A UTILS FILE -- PRINTS RECORDS, IS USEFUL
 void p(struct record *r, struct diff_mem *d)
 {
 	char *data = d->data;
