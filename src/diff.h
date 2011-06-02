@@ -3,6 +3,9 @@
 
 #include "git2/diff.h"
 
+// TODO: PATIENCE HASN'T BEEN IMPLEMENTED YET
+#define GIT_DIFF_PATIENCE	(1 << 0)
+
 enum diff_type {
 	// "STANDARD" diff command
 	// diffs working directory against index
@@ -44,6 +47,7 @@ enum diff_handle {
 struct git_diff_conf {
 	enum diff_type type;
 	enum diff_handle handle;
+	unsigned long flags;
 };
 
 
