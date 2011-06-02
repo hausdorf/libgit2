@@ -41,8 +41,11 @@ enum diff_handle {
 
 struct git_diff_conf {
 
+	// Defines the sort of diff -- e.g., diff --cached
 	enum diff_type type;
+	// What do do with diff results -- print, emit to function?
 	enum diff_handle handle;
+	// Do we look at whitespace? Are we using patience diff?
 	unsigned long flags;
 };
 
