@@ -271,7 +271,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	// Continue "normalization"
 	if (k == -d || (k != d && v[k-1] < v[k+1])) {
 
-		printf("INSERTION at x %d y %d\t", x, y);
+		printf("INSERTION at x %zu y %zu\t", x, y);
 		p(&rcrds2[y], diffme2);
 
 		// Separate tmp declaration into two lines to avoid undefined
@@ -283,7 +283,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	}
 	else {
 
-		printf("DELETION at x %d y %d\t", x, y);
+		printf("DELETION at x %zu y %zu\t", x, y);
 		p(&rcrds1[x], diffme1);
 
 		deletion(&curr_edt, x--, y, k--);
@@ -321,7 +321,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 
 		if (k == -d || (k != d && v[k-1] < v[k+1])) {
 
-			printf("iNSERTION at x %d y %d\t", x, y);
+			printf("iNSERTION at x %zu y %zu\t", x, y);
 			p(&rcrds2[y], diffme2);
 
 			// Separate tmp declaration into two lines to avoid undefined
@@ -331,7 +331,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		}
 		else {
 
-			printf("dELETION at x %d y %d\t", x, y);
+			printf("dELETION at x %zu y %zu\t", x, y);
 			p(&rcrds1[x], diffme1);
 
 			deletion(&curr_edt, x--, y, k--);
