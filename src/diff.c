@@ -11,6 +11,12 @@
 #include <assert.h>
 
 
+
+int git_diff(git_diff_conf *conf)
+{
+	return 0;
+}
+
 int git_diff_no_index(git_diff_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {

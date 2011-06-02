@@ -39,6 +39,27 @@
 GIT_BEGIN_DECL
 
 /**
+ * Core entry function for diff -- using the git_diff_conf struct, you can
+ * configure any sort of diff you want to occur, as well as what should be
+ * done with the results.
+ *
+ * The git_diff_conf struct can be configured either completely by hand,
+ * using functions like git_diff_setopt() or by using one of the
+ * predefined configuration functions like git_diff_conf_print_stdout().
+ *
+ * The sorts of output available will vary of course, but in general, the
+ * diff of two files is the smallest set of changes required to turn one
+ * set of content into another. Diff is guaranteed to produce the
+ * smallest possible changeset.
+ *
+ * @param conf Contains configuration for diff operation
+ * @param results Contains any data you have told diff to generate
+ *
+ * @return 0 on success; error code otherwise
+ */
+GIT_EXTERN(int) git_diff(git_diff_conf *conf);
+
+/**
  * Diffs two files
  *
  * Diff two files such that the diff output generates the changes
