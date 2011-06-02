@@ -222,7 +222,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 
 	struct record *rcrds1, *rcrds2;
 	struct diff_mem *diffme1, *diffme2;
-	int x, y;
+	size_t x, y;
 	struct edit *curr_edt;
 
 	rcrds1 = env->rcrds1;
@@ -253,7 +253,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	// myers() terminates greedily when we find the first path from (0,0) to (N,M),
 	// so k, x, and y, may have been in the middle of myers() inner loop when this
 	// func was called. We need to normalize them:
-	while (x >= 0 && y >= 0 && rcrds1[x].hash == rcrds2[y].hash) {
+	while (x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash) {
 
 		printf("DIAGONAL\n");
 		x--;
@@ -262,7 +262,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 
 	// Return if documents are the same
 	// TODO: we probably should not even call this function, in this case
-	if (x < 0 && y < 0) {
+	if (x + 1 < x && y + 1 < y) {
 
 		printf("RETURNING\n");
 		return;
@@ -292,7 +292,7 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	}
 
 	// Return if there is one difference
-	if (x < 0 && y < 0) {
+	if (x + 1 < x && y + 1 < y) {
 
 		printf("RETURNING FIRST\n");
 		env->ses_head = curr_edt;
@@ -305,14 +305,14 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 	// Do the above once for every version of V in v_hstry
 	for (; d >= 0; d--, v -= v_size) {
 
-		while (x >= 0 && y >= 0 && rcrds1[x].hash == rcrds2[y].hash ) {
+		while (x + 1 > x && y + 1 > y && rcrds1[x].hash == rcrds2[y].hash ) {
 
 			printf("dIAGONAL\n");
 			x--;
 			y--;
 		}
 
-		if (x < 0 && y < 0) {
+		if (x + 1 < x && y + 1 < y) {
 
 			printf("RETURNING\n");
 			env->ses_head = curr_edt;
