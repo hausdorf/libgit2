@@ -1,8 +1,7 @@
 /*
- * include.h - Collection of miscellaneous items (usually
- * definitions) that we use a lot here in libdiff:
- * #includes for common header files, declarations for
- * common structs, and so on.
+ * include.h - INTERNAL STUFF: structs, macros, functions, etc that
+ * libdiff depends on internally, but which are usually not meant
+ * for exportation.
  */
 #ifndef INCLUDE_include_h__
 #define INCLUDE_include_h__

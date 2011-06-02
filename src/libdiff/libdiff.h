@@ -1,8 +1,6 @@
 /*
- * libdif.h - Houses all functions that are intended to be directly
- * accessible by all of libgit2. Includes all data structures needed
- * to call and run diff. General rule: if it's not in here, it's not
- * supposed to be exported (probably).
+ * libdiff.h - STUFF FOR EXPORT: structs, macros, functions, etc
+ * that are useful or required for things that use libdiff.
  */
 #ifndef INCLUDE_libdiff_h__
 #define INCLUDE_libdiff_h__
