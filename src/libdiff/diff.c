@@ -279,10 +279,6 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 		struct record *tmp = &rcrds2[y];
 		insertion(&curr_edt, tmp, x, y--, k++);
 
-		/*
-		k++;
-		y--;
-		*/
 		d--;
 	}
 	else {
@@ -292,10 +288,6 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 
 		deletion(&curr_edt, x--, y, k--);
 
-		/*
-		k--;
-		x--;
-		*/
 		d--;
 	}
 
@@ -336,11 +328,6 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 			// behavior with y-- in following line
 			struct record *tmp = &rcrds2[y];
 			insertion(&curr_edt, tmp, x, y--, k++);
-
-			/*
-			k++;
-			y--;
-			*/
 		}
 		else {
 
@@ -348,11 +335,6 @@ void build_script(int *v, int v_size, struct diff_env *env, int d, int m, int n,
 			p(&rcrds1[x], diffme1);
 
 			deletion(&curr_edt, x--, y, k--);
-
-			/*
-			k--;
-			x--;
-			*/
 		}
 	}
 	printf("ERROR\n");
