@@ -60,6 +60,11 @@ GIT_BEGIN_DECL
 GIT_EXTERN(int) git_diff(git_diff_conf *conf);
 
 /**
+ */
+GIT_EXTERN(void) git_diff_setopt(git_diff_conf *conf, const int option,
+		const int param);
+
+/**
  * Diffs two files
  *
  * Diff two files such that the diff output generates the changes

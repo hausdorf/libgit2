@@ -18,6 +18,25 @@ int git_diff(git_diff_conf *conf)
 }
 
 
+void git_diff_setopt(git_diff_conf *conf, const int option,
+		const int param)
+{
+	switch (option) {
+		case DIFF_TYPE:
+			conf->type = param;
+			break;
+		case DIFF_HANDLE:
+			conf->handle = param;
+			break;
+		default:
+			printf("INVALID option PARAMETER TO git_diff_setopt()\n");
+			// TODO: THIS SHOULD BE MORE GRACEFUL
+			exit(1);
+			break;
+	}
+}
+
+
 int git_diff_no_index(git_diff_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {
