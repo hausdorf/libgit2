@@ -194,9 +194,11 @@ void edits(struct diff_env *e)
 
 	for(; ed->edit != END_OF_SCRIPT; ed = ed->next) {
 		if (ed->edit == INSERTION) {
+			printf("+");
 			p(&r2[ed->y], e->diffme2);
 		}
 		else {
+			printf("-");
 			p(&r1[ed->x], e->diffme1);
 		}
 	}
