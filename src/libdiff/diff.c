@@ -248,6 +248,11 @@ void deletion(struct edit **e, size_t x, size_t y, size_t k)
 void build_script(int *v, int v_size, struct diff_env *env, int d, int m,
 		int n, int k)
 {
+	// NOTE: ABOUT THE "UNDEFINED" BEHAVIOR HERE -- in several places you will
+	// notice that we see something like `if (x + 1 < x)`. This is a bounds
+	// on the records we're looking at (e.g., `if (x <= 0)`). This is NOT
+	// undefined according to the C spec.
+
 	printf("\n\n");
 
 	struct record *rcrds1, *rcrds2;
