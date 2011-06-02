@@ -27,13 +27,10 @@ struct edit {
 
 	// OPTIONAL: The record to insert is included if INSERTION
 	struct record *rcrd;
-
 	// OPTIONAL: The next edit in the script; NULL if last edit
 	struct edit *next;
-
 	// Type of edit -- INSERTION, DELETION, or END_OF_SCRIPT
 	unsigned char edit;
-
 	// Var names _directly_ from the Myers paper
 	size_t x;
 	size_t y;
@@ -50,7 +47,6 @@ struct record {
 	// e.g., from diff_mem->data[12] to diff_mem->data[27].
 	unsigned long start;
 	unsigned long end;
-
 	// The hash of the record; used for quick comparisons
 	unsigned long hash;
 };
