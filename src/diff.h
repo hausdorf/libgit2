@@ -6,6 +6,13 @@
 // TODO: PATIENCE HASN'T BEEN IMPLEMENTED YET
 #define GIT_DIFF_PATIENCE	(1 << 0)
 
+// Used in git_diff_setopt(), determines the option to set
+enum diff_opt_type {
+
+	DIFF_TYPE,
+	DIFF_HANDLE
+};
+
 // The type of diff command we're doing (e.g., git diff --cached)
 enum diff_type {
 
