@@ -3,7 +3,7 @@
 
 #include "git2/diff.h"
 
-enum diff_operation {
+enum diff_type {
 	// "STANDARD" diff command
 	// diffs working directory against index
 	DIFF_IDX_WD,
