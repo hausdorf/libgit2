@@ -11,10 +11,10 @@
 #include <assert.h>
 
 
-int git_diff_no_index(git_diffresults_conf **results_conf,
+int git_diff_no_index(git_diff_conf **results_conf,
 		const char *filepath1, const char *filepath2)
 {
-	//git_diffresults_conf conf;
+	//git_diff_conf conf;
 	struct diff_mem file1, file2;
 	gitfo_buf buffer1, buffer2;
 	int result;
@@ -36,8 +36,8 @@ int git_diff_no_index(git_diffresults_conf **results_conf,
 
 	// TODO TODO TODO: REMOVE THIS TEMPORARY TEST CODE, REPLACE
 	// WITH AWESOME GENERATOR FUNCTIONS
-	//git_diffresults_conf res;
-	//git_diffresults_conf *resu = &res;
+	//git_diff_conf res;
+	//git_diff_conf *resu = &res;
 
 	/* Preform the diff, curently not implemented */
 	file1.data = buffer1.data;
@@ -139,7 +139,7 @@ static int get_filepath(char** results, git_repository *repo, char *subdir,
 /* Gets the changes between the git_tree_entry and the local filesystem, and
  * saves them into **results_conf. Returns 0 on success, error otherwise */
 int diff_entry_to_filesystem(const git_tree_entry *entry, git_repository *repo,
-		char *subdir, git_diffresults_conf **results_conf)
+		char *subdir, git_diff_conf **results_conf)
 {
 	char *filepath;				/* Path to a file in the working directory*/
 	gitfo_buf buffer;			/* Buffer to hold the contects of a file */
@@ -213,7 +213,7 @@ static int get_subdir(char **new_subdir, char *subdir,
  * char array is so that we can figure out what sub directory (tree) we
  * are in as we recursivly go through the trees, and build the correct
  * filepatch to the local filesystem */
-int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
+int diff_tree_to_filesystem(git_diff_conf **results_conf,
 	 	git_repository *repo, git_tree *tree, char* subdir)
 {
 	const git_tree_entry *entry;
@@ -250,7 +250,7 @@ int diff_tree_to_filesystem(git_diffresults_conf **results_conf,
 	return GIT_SUCCESS;
 }
 
-int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
+int git_diff(git_diff_conf **results_conf, git_commit *commit,
 		git_repository *repo)
 {
 	git_tree *tree;
@@ -266,7 +266,7 @@ int git_diff(git_diffresults_conf **results_conf, git_commit *commit,
 	return result;
 }
 
-int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
+int git_diff_cached(git_diff_conf **results_conf, git_commit *commit,
 		git_index *index)
 {
 	/* TODO */
@@ -276,7 +276,7 @@ int git_diff_cached(git_diffresults_conf **results_conf, git_commit *commit,
 /* Assumes commit1 is newer then commit 2. If this is not the case then the
  * diff will be reversed, i.e. the added stuff will show up as deleted and
  * vice versa */
-int git_diff_commits(git_diffresults_conf **results_conf, git_commit *commit1,
+int git_diff_commits(git_diff_conf **results_conf, git_commit *commit1,
 		git_commit *commit2)
 {
 	git_tree *tree1, *tree2;

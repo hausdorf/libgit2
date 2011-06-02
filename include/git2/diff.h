@@ -55,7 +55,7 @@ GIT_BEGIN_DECL
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff_no_index(git_diffresults_conf **results_conf,
+GIT_EXTERN(int) git_diff_no_index(git_diff_conf **results_conf,
 		const char *file_path1, const char *file_path2);
 
 /**
@@ -78,7 +78,7 @@ GIT_EXTERN(int) git_diff_no_index(git_diffresults_conf **results_conf,
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff(git_diffresults_conf **results_conf,
+GIT_EXTERN(int) git_diff(git_diff_conf **results_conf,
 		git_commit *commit, git_repository *repo);
 
 /**
@@ -101,7 +101,7 @@ GIT_EXTERN(int) git_diff(git_diffresults_conf **results_conf,
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff_cached(git_diffresults_conf **results_conf,
+GIT_EXTERN(int) git_diff_cached(git_diff_conf **results_conf,
 		git_commit *commit, git_index *index);
 
 /**
@@ -116,7 +116,7 @@ GIT_EXTERN(int) git_diff_cached(git_diffresults_conf **results_conf,
  *
  * @return 0 on success; error code otherwise
  */
-GIT_EXTERN(int) git_diff_commits(git_diffresults_conf **results_conf,
+GIT_EXTERN(int) git_diff_commits(git_diff_conf **results_conf,
 		git_commit *commit1, git_commit *commit2);
 
 /** @} */
