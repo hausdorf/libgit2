@@ -6,6 +6,7 @@
 // TODO: PATIENCE HASN'T BEEN IMPLEMENTED YET
 #define GIT_DIFF_PATIENCE	(1 << 0)
 
+// The type of diff command we're doing (e.g., git diff --cached)
 enum diff_type {
 
 	// "STANDARD" diff command
@@ -29,6 +30,7 @@ enum diff_type {
 	DIFF_CMT_TO_CMT
 };
 
+// What we're doing with diff results (e.g., printing them)
 enum diff_handle {
 
 	// Cause diff to be printed to stdout
